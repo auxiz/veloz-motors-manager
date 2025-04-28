@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -27,8 +26,6 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
   const { sales } = useSales();
   
   const customer = customers.find(c => c.id === customerId);
-  
-  // Get sales for this customer
   const customerSales = sales.filter(sale => sale.customer_id === customerId);
   
   if (!customer) {

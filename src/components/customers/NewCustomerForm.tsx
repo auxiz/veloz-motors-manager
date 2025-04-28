@@ -14,7 +14,9 @@ const customerSchema = z.object({
   document: z.string().min(11, { message: 'CPF/CNPJ inválido' }),
   phone: z.string().optional(),
   email: z.string().email({ message: 'Email inválido' }).optional().or(z.literal('')),
-  address: z.string().optional(),
+  address: z.string().optional().or(z.literal('')),
+  birth_date: z.date().optional().nullable(),
+  internal_notes: z.string().optional().or(z.literal('')),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -35,18 +37,21 @@ export const NewCustomerForm: React.FC<NewCustomerFormProps> = ({ onCustomerCrea
       phone: '',
       email: '',
       address: '',
+      birth_date: null,
+      internal_notes: '',
     },
   });
 
   const onSubmit = async (data: CustomerFormValues) => {
     try {
       const result = await addCustomer.mutateAsync({
-        name: data.name,
-        document: data.document,
+        ...data,
+        status: 'active',
+        tags: [],
         phone: data.phone || null,
         email: data.email || null,
         address: data.address || null,
-        internal_notes: null,
+        internal_notes: data.internal_notes || null,
       });
 
       if (result && onCustomerCreated) {

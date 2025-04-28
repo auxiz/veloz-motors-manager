@@ -19,6 +19,8 @@ const customerSchema = z.object({
   address: z.string().optional().or(z.literal('')),
   birth_date: z.date().optional().nullable(),
   internal_notes: z.string().optional().or(z.literal('')),
+  status: z.string(),
+  tags: z.array(z.string()).nullable(),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -46,6 +48,8 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
       address: '',
       birth_date: null,
       internal_notes: '',
+      status: 'active',
+      tags: [],
     },
   });
 
@@ -61,6 +65,8 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
           address: customer.address || '',
           birth_date: customer.birth_date ? new Date(customer.birth_date) : null,
           internal_notes: customer.internal_notes || '',
+          status: customer.status,
+          tags: customer.tags,
         });
       }
     }
@@ -71,6 +77,10 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
       await updateCustomer.mutateAsync({
         id: customerId,
         ...data,
+        phone: data.phone || null,
+        email: data.email || null,
+        address: data.address || null,
+        internal_notes: data.internal_notes || null,
       });
       onClose();
     } catch (error) {

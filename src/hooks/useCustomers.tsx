@@ -2,19 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-
-type Customer = {
-  id: string;
-  name: string;
-  document: string;
-  phone: string | null;
-  email: string | null;
-  address: string | null;
-  internal_notes: string | null;
-  birth_date: string | null;
-  tags: string[] | null;
-  status: string | null;
-};
+import { Customer } from '@/types/customer';
 
 export const useCustomers = () => {
   const queryClient = useQueryClient();
@@ -37,7 +25,7 @@ export const useCustomers = () => {
   });
 
   const addCustomer = useMutation({
-    mutationFn: async (newCustomer: Omit<Customer, 'id'>) => {
+    mutationFn: async (newCustomer: Omit<Customer, 'id' | 'created_at' | 'updated_at'>) => {
       const { data, error } = await supabase
         .from('customers')
         .insert([newCustomer])
