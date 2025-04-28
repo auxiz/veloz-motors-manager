@@ -41,8 +41,8 @@ export function useUsers() {
 
   const fetchUserProfile = async (userId: string) => {
     try {
-      const { data, error } = await supabase
-        .rpc('get_profile', { user_id: userId });
+      // Use a type cast to handle the TypeScript issue with custom RPC functions
+      const { data, error } = await (supabase.rpc as any)('get_profile', { user_id: userId });
 
       if (error) {
         console.error('Error fetching user profile:', error);
@@ -127,7 +127,8 @@ export function useUsers() {
       setLoading(true);
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase.rpc('update_profile', { 
+      // Use a type cast to handle the TypeScript issue with custom RPC functions
+      const { error } = await (supabase.rpc as any)('update_profile', { 
         user_id: user.id,
         profile_updates: updates 
       });
