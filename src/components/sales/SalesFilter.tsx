@@ -22,7 +22,7 @@ export const SalesFilter: React.FC<SalesFilterProps> = ({ onFilterChange }) => {
   const [startDate, setStartDate] = useState<Date | null>(null);
   const [endDate, setEndDate] = useState<Date | null>(null);
   const [sellerName, setSellerName] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
+  const [status, setStatus] = useState<string>('all'); // Changed default to 'all' instead of empty string
   const [search, setSearch] = useState<string>('');
 
   const handleFilterApply = () => {
@@ -39,14 +39,14 @@ export const SalesFilter: React.FC<SalesFilterProps> = ({ onFilterChange }) => {
     setStartDate(null);
     setEndDate(null);
     setSellerName('');
-    setStatus('');
+    setStatus('all'); // Changed to 'all' instead of empty string
     setSearch('');
     
     onFilterChange({
       startDate: null,
       endDate: null,
       sellerName: '',
-      status: '',
+      status: 'all', // Changed to 'all' instead of empty string
       search: '',
     });
   };
@@ -86,7 +86,7 @@ export const SalesFilter: React.FC<SalesFilterProps> = ({ onFilterChange }) => {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem> {/* Changed value from empty string to "all" */}
               <SelectItem value="cash">À Vista</SelectItem>
               <SelectItem value="financing">Financiamento</SelectItem>
               <SelectItem value="consignment">Consignação</SelectItem>
