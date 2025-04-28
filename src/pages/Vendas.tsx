@@ -1,44 +1,86 @@
 
-import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { DollarSign } from 'lucide-react';
+import React, { useState } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DollarSign, Plus, FileText } from 'lucide-react';
+import { useSales } from '@/hooks/useSales';
+import { SalesList } from '@/components/sales/SalesList';
+import { SalesFilter } from '@/components/sales/SalesFilter';
+import { NewSaleDialog } from '@/components/sales/NewSaleDialog';
 
 const Vendas = () => {
+  const [newSaleDialogOpen, setNewSaleDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('all');
+  const [filters, setFilters] = useState({
+    startDate: null as Date | null,
+    endDate: null as Date | null,
+    sellerName: '',
+    status: '',
+    search: '',
+  });
+
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold mb-2">Controle de Vendas</h1>
-        <p className="text-muted-foreground">Gerencie as vendas de veículos</p>
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-3xl font-bold mb-2">Controle de Vendas</h1>
+          <p className="text-muted-foreground">Gerencie as vendas de veículos</p>
+        </div>
+        <Button
+          className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold"
+          onClick={() => setNewSaleDialogOpen(true)}
+        >
+          <Plus size={18} className="mr-2" />
+          Nova Venda
+        </Button>
       </div>
 
-      <Card className="bg-veloz-gray border-veloz-gray">
-        <CardContent className="p-12 flex flex-col items-center justify-center text-center">
-          <DollarSign className="h-16 w-16 text-veloz-yellow mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Módulo de Vendas</h2>
-          <p className="text-muted-foreground max-w-lg mb-6">
-            Este módulo será implementado na próxima fase do desenvolvimento.
-            Aqui você poderá registrar vendas, calcular comissões e gerar contratos.
-          </p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 w-full max-w-lg">
-            <div className="bg-veloz-black p-4 rounded-lg">
-              <p className="font-medium text-veloz-yellow mb-1">Registro de Vendas</p>
-              <p className="text-sm">Vinculação de veículos, clientes e condições de pagamento.</p>
+      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid grid-cols-4 max-w-md">
+          <TabsTrigger value="all">Todas</TabsTrigger>
+          <TabsTrigger value="cash">À Vista</TabsTrigger>
+          <TabsTrigger value="financing">Financiamento</TabsTrigger>
+          <TabsTrigger value="other">Outras</TabsTrigger>
+        </TabsList>
+        
+        <Card className="bg-veloz-gray border-veloz-gray mt-6">
+          <CardHeader>
+            <CardTitle className="text-xl">
+              {activeTab === 'all' && 'Todas as Vendas'}
+              {activeTab === 'cash' && 'Vendas à Vista'}
+              {activeTab === 'financing' && 'Vendas Financiadas'}
+              {activeTab === 'other' && 'Outras Modalidades'}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-6">
+              <SalesFilter onFilterChange={setFilters} />
+              
+              <TabsContent value="all" className="mt-0">
+                <SalesList />
+              </TabsContent>
+              
+              <TabsContent value="cash" className="mt-0">
+                {/* Will use the same component with filters */}
+                <SalesList />
+              </TabsContent>
+              
+              <TabsContent value="financing" className="mt-0">
+                {/* Will use the same component with filters */}
+                <SalesList />
+              </TabsContent>
+              
+              <TabsContent value="other" className="mt-0">
+                {/* Will use the same component with filters */}
+                <SalesList />
+              </TabsContent>
             </div>
-            <div className="bg-veloz-black p-4 rounded-lg">
-              <p className="font-medium text-veloz-yellow mb-1">Comissões</p>
-              <p className="text-sm">Cálculo automático de comissões para vendedores.</p>
-            </div>
-            <div className="bg-veloz-black p-4 rounded-lg">
-              <p className="font-medium text-veloz-yellow mb-1">Contratos</p>
-              <p className="text-sm">Geração de contratos de compra e venda.</p>
-            </div>
-            <div className="bg-veloz-black p-4 rounded-lg">
-              <p className="font-medium text-veloz-yellow mb-1">Acompanhamento</p>
-              <p className="text-sm">Monitoramento do status de cada venda.</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </Tabs>
+      
+      <NewSaleDialog open={newSaleDialogOpen} onOpenChange={setNewSaleDialogOpen} />
     </div>
   );
 };
