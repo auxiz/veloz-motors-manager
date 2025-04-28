@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { useCustomers } from '@/hooks/useCustomers';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
+import { Customer } from '@/types/customer';
 
 const customerSchema = z.object({
   name: z.string().min(3, { message: 'Nome deve ter no mínimo 3 caracteres' }),
@@ -66,7 +67,7 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
           birth_date: customer.birth_date ? new Date(customer.birth_date) : null,
           internal_notes: customer.internal_notes || '',
           status: customer.status,
-          tags: customer.tags,
+          tags: customer.tags || [],
         });
       }
     }
@@ -76,12 +77,15 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
     try {
       await updateCustomer.mutateAsync({
         id: customerId,
-        ...data,
+        name: data.name,
+        document: data.document,
         phone: data.phone || null,
         email: data.email || null,
         address: data.address || null,
         birth_date: data.birth_date ? data.birth_date.toISOString() : null,
         internal_notes: data.internal_notes || null,
+        status: data.status,
+        tags: data.tags,
         created_at: null,
         updated_at: null
       });

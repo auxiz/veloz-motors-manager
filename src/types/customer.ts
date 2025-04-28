@@ -7,7 +7,7 @@ export type Customer = {
   email: string | null;
   address: string | null;
   internal_notes: string | null;
-  birth_date: string | null;
+  birth_date: string | null;  // Using string for ISO date format from database
   tags: string[] | null;
   status: string;
   created_at: string | null;

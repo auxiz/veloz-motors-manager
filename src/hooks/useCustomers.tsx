@@ -26,9 +26,15 @@ export const useCustomers = () => {
 
   const addCustomer = useMutation({
     mutationFn: async (newCustomer: Omit<Customer, 'id' | 'created_at' | 'updated_at'>) => {
+      // Convert Date objects to ISO strings before sending to Supabase
+      const customerToAdd = {
+        ...newCustomer,
+        birth_date: newCustomer.birth_date || null,
+      };
+
       const { data, error } = await supabase
         .from('customers')
-        .insert([newCustomer])
+        .insert([customerToAdd])
         .select()
         .single();
 

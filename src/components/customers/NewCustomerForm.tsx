@@ -8,6 +8,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCustomers } from '@/hooks/useCustomers';
 import { toast } from 'sonner';
+import { Customer } from '@/types/customer';
 
 const customerSchema = z.object({
   name: z.string().min(3, { message: 'Nome deve ter no mínimo 3 caracteres' }),
@@ -44,16 +45,20 @@ export const NewCustomerForm: React.FC<NewCustomerFormProps> = ({ onCustomerCrea
 
   const onSubmit = async (data: CustomerFormValues) => {
     try {
-      const result = await addCustomer.mutateAsync({
-        ...data,
-        status: 'active',
-        tags: [],
+      // Create the customer object to match the required type
+      const newCustomer: Omit<Customer, 'id' | 'created_at' | 'updated_at'> = {
+        name: data.name,
+        document: data.document,
         phone: data.phone || null,
         email: data.email || null,
         address: data.address || null,
         birth_date: data.birth_date ? data.birth_date.toISOString() : null,
         internal_notes: data.internal_notes || null,
-      });
+        status: 'active',
+        tags: [],
+      };
+      
+      const result = await addCustomer.mutateAsync(newCustomer);
 
       if (result && onCustomerCreated) {
         onCustomerCreated(result.id);
