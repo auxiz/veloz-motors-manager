@@ -40,19 +40,26 @@ export function useUsers() {
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
-    const { data: profile, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', userId)
-      .single();
+    try {
+      const { data, error } = await supabase
+        .rpc('get_profile', { user_id: userId });
 
-    if (error) {
-      console.error('Error fetching user profile:', error);
-      return;
-    }
+      if (error) {
+        console.error('Error fetching user profile:', error);
+        return;
+      }
 
-    if (profile) {
-      setUser((prevUser) => prevUser ? { ...prevUser, profile } : null);
+      if (data) {
+        setUser((prevUser) => {
+          if (!prevUser) return null;
+          return {
+            ...prevUser,
+            profile: data as UserProfile
+          };
+        });
+      }
+    } catch (error) {
+      console.error('Error in fetchUserProfile:', error);
     }
   };
 
@@ -120,10 +127,10 @@ export function useUsers() {
       setLoading(true);
       if (!user) throw new Error('User not authenticated');
 
-      const { error } = await supabase
-        .from('profiles')
-        .update(updates)
-        .eq('id', user.id);
+      const { error } = await supabase.rpc('update_profile', { 
+        user_id: user.id,
+        profile_updates: updates 
+      });
 
       if (error) throw error;
 
