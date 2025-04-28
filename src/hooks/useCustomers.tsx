@@ -11,6 +11,9 @@ type Customer = {
   email: string | null;
   address: string | null;
   internal_notes: string | null;
+  birth_date: string | null;
+  tags: string[] | null;
+  status: string | null;
 };
 
 export const useCustomers = () => {
@@ -76,10 +79,31 @@ export const useCustomers = () => {
     },
   });
 
+  const deleteCustomer = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('customers')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error('Erro ao excluir cliente');
+        throw error;
+      }
+
+      toast.success('Cliente excluído com sucesso!');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['customers'] });
+    },
+  });
+
   return {
     customers,
     isLoading,
     addCustomer,
     updateCustomer,
+    deleteCustomer,
   };
 };
