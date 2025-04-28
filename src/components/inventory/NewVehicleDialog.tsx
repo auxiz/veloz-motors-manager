@@ -26,6 +26,7 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
         status: 'in_stock',
         entry_date: new Date().toISOString(),
         photos: null, // Adding the missing photos property with null as default
+        internal_notes: data.internal_notes || '', // Ensure internal_notes is always a string
       });
       onOpenChange(false);
     } catch (error) {
