@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -28,17 +27,20 @@ export const useVehicles = () => {
   const { data: vehicles = [], isLoading } = useQuery({
     queryKey: ['vehicles'],
     queryFn: async () => {
+      console.log('Fetching vehicles...');
       const { data, error } = await supabase
         .from('vehicles')
         .select('*')
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Error fetching vehicles:', error);
         toast.error('Erro ao carregar veículos');
         throw error;
       }
 
-      return data as Vehicle[];
+      console.log('Vehicles fetched:', data);
+      return data;
     },
   });
 

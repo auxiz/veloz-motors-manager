@@ -20,6 +20,7 @@ export const useSales = () => {
   const { data: sales = [], isLoading } = useQuery({
     queryKey: ['sales'],
     queryFn: async () => {
+      console.log('Fetching sales...');
       const { data, error } = await supabase
         .from('sales')
         .select(`
@@ -30,10 +31,12 @@ export const useSales = () => {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Error fetching sales:', error);
         toast.error('Erro ao carregar vendas');
         throw error;
       }
 
+      console.log('Sales fetched:', data);
       return data;
     },
   });
