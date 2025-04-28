@@ -1,10 +1,10 @@
 
 import * as React from "react"
-
 import { cn } from "@/lib/utils"
 
+// Omit the prefix from HTMLInputElement attributes to avoid conflict
 export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'prefix'> {
   prefix?: React.ReactNode;
 }
 
