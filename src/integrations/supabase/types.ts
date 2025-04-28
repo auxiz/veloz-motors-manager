@@ -9,7 +9,233 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      customers: {
+        Row: {
+          address: string | null
+          created_at: string | null
+          document: string
+          email: string | null
+          id: string
+          internal_notes: string | null
+          name: string
+          phone: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string | null
+          document: string
+          email?: string | null
+          id?: string
+          internal_notes?: string | null
+          name: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: string | null
+          created_at?: string | null
+          document?: string
+          email?: string | null
+          id?: string
+          internal_notes?: string | null
+          name?: string
+          phone?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      financial_transactions: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string | null
+          description: string
+          due_date: string
+          id: string
+          sale_id: string | null
+          status: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string | null
+          description: string
+          due_date: string
+          id?: string
+          sale_id?: string | null
+          status?: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string | null
+          description?: string
+          due_date?: string
+          id?: string
+          sale_id?: string | null
+          status?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "financial_transactions_sale_id_fkey"
+            columns: ["sale_id"]
+            isOneToOne: false
+            referencedRelation: "sales"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sales: {
+        Row: {
+          commission_amount: number
+          created_at: string | null
+          customer_id: string
+          final_price: number
+          id: string
+          payment_method: string
+          sale_date: string | null
+          seller_id: string
+          updated_at: string | null
+          vehicle_id: string
+        }
+        Insert: {
+          commission_amount: number
+          created_at?: string | null
+          customer_id: string
+          final_price: number
+          id?: string
+          payment_method: string
+          sale_date?: string | null
+          seller_id: string
+          updated_at?: string | null
+          vehicle_id: string
+        }
+        Update: {
+          commission_amount?: number
+          created_at?: string | null
+          customer_id?: string
+          final_price?: number
+          id?: string
+          payment_method?: string
+          sale_date?: string | null
+          seller_id?: string
+          updated_at?: string | null
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sales_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "customers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "sales_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string | null
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          role: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      vehicles: {
+        Row: {
+          brand: string
+          chassis: string | null
+          color: string
+          created_at: string | null
+          entry_date: string | null
+          fuel: string
+          id: string
+          internal_notes: string | null
+          mileage: number
+          model: string
+          photos: string[] | null
+          plate: string | null
+          purchase_price: number
+          renavam: string | null
+          sale_price: number
+          status: string
+          transmission: string
+          updated_at: string | null
+          version: string | null
+          year: number
+        }
+        Insert: {
+          brand: string
+          chassis?: string | null
+          color: string
+          created_at?: string | null
+          entry_date?: string | null
+          fuel: string
+          id?: string
+          internal_notes?: string | null
+          mileage: number
+          model: string
+          photos?: string[] | null
+          plate?: string | null
+          purchase_price: number
+          renavam?: string | null
+          sale_price: number
+          status?: string
+          transmission: string
+          updated_at?: string | null
+          version?: string | null
+          year: number
+        }
+        Update: {
+          brand?: string
+          chassis?: string | null
+          color?: string
+          created_at?: string | null
+          entry_date?: string | null
+          fuel?: string
+          id?: string
+          internal_notes?: string | null
+          mileage?: number
+          model?: string
+          photos?: string[] | null
+          plate?: string | null
+          purchase_price?: number
+          renavam?: string | null
+          sale_price?: number
+          status?: string
+          transmission?: string
+          updated_at?: string | null
+          version?: string | null
+          year?: number
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

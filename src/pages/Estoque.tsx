@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import { useVehicles } from '@/hooks/useVehicles';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -25,102 +25,14 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 
-// Dados fictícios para demonstração
-const veiculosMock = [
-  { 
-    id: 1, 
-    marca: 'Toyota', 
-    modelo: 'Corolla', 
-    versao: 'XEi', 
-    ano: '2022', 
-    placa: 'ABC-1234', 
-    cor: 'Preto', 
-    km: 45000, 
-    combustivel: 'Flex', 
-    cambio: 'Automático', 
-    valor_compra: 120000, 
-    valor_venda: 128900, 
-    status: 'Em estoque', 
-    data_entrada: '10/03/2025',
-    imagem: 'https://images.prd.kavak.io/eyJidWNrZXQiOiJrYXZhay1pbWFnZXMiLCJrZXkiOiJici9wcm9kdWN0LzI4Mzk4LW1haW4tNTM5NmExNzMwNGQyOGIwZWU1OTYuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjo2NDAsImhlaWdodCI6NDgwLCJmaXQiOiJjb250YWluIiwiYmFja2dyb3VuZCI6eyJyIjoyNTUsImciOjI1NSwiYiI6MjU1LCJhbHBoYSI6MX19fX0=' 
-  },
-  { 
-    id: 2, 
-    marca: 'Honda', 
-    modelo: 'Civic', 
-    versao: 'EXL', 
-    ano: '2021', 
-    placa: 'DEF-5678', 
-    cor: 'Branco', 
-    km: 32000, 
-    combustivel: 'Flex', 
-    cambio: 'Automático', 
-    valor_compra: 115000, 
-    valor_venda: 122500, 
-    status: 'Em estoque', 
-    data_entrada: '15/03/2025',
-    imagem: 'https://images.prd.kavak.io/eyJidWNrZXQiOiJrYXZhay1pbWFnZXMiLCJrZXkiOiJici9wcm9kdWN0LzM0NTItb3JpZy0wZDI3ZTc3OTliYTRlZGU2ZTBmOC5qcGciLCJlZGl0cyI6eyJyZXNpemUiOnsid2lkdGgiOjY0MCwiaGVpZ2h0Ijo0ODAsImZpdCI6ImNvbnRhaW4iLCJiYWNrZ3JvdW5kIjp7InIiOjI1NSwiZyI6MjU1LCJiIjoyNTUsImFscGhhIjoxfX19fQ==' 
-  },
-  { 
-    id: 3, 
-    marca: 'Volkswagen', 
-    modelo: 'Golf', 
-    versao: 'GTI', 
-    ano: '2023', 
-    placa: 'GHI-9012', 
-    cor: 'Azul', 
-    km: 15000, 
-    combustivel: 'Flex', 
-    cambio: 'Automático', 
-    valor_compra: 137000, 
-    valor_venda: 145900, 
-    status: 'Reservado', 
-    data_entrada: '20/02/2025',
-    imagem: 'https://images.prd.kavak.io/eyJidWNrZXQiOiJrYXZhay1pbWFnZXMiLCJrZXkiOiJici9wcm9kdWN0LzExMTY4LW9yaWctNGY3YTJiN2E2MWQ0Y2E4OTA0ZTkuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjo2NDAsImhlaWdodCI6NDgwLCJmaXQiOiJjb250YWluIiwiYmFja2dyb3VuZCI6eyJyIjoyNTUsImciOjI1NSwiYiI6MjU1LCJhbHBoYSI6MX19fX0=' 
-  },
-  { 
-    id: 4, 
-    marca: 'Hyundai', 
-    modelo: 'HB20', 
-    versao: 'Premium', 
-    ano: '2022', 
-    placa: 'JKL-3456', 
-    cor: 'Prata', 
-    km: 28000, 
-    combustivel: 'Flex', 
-    cambio: 'Manual', 
-    valor_compra: 72000, 
-    valor_venda: 78900, 
-    status: 'Em estoque', 
-    data_entrada: '05/04/2025',
-    imagem: 'https://images.prd.kavak.io/eyJidWNrZXQiOiJrYXZhay1pbWFnZXMiLCJrZXkiOiIyMDIzLzA5LzI3L2M4ZmY1NGEwNGE0MjRiMDFiM2RmZTU2NDk3MDJiNDI2NjgwZDFkN2QtMTIzNC1vcmlnLnBuZyIsImVkaXRzIjp7InJlc2l6ZSI6eyJ3aWR0aCI6NjQwLCJoZWlnaHQiOjQ4MCwiZml0IjoiY29udGFpbiIsImJhY2tncm91bmQiOnsiciI6MjU1LCJnIjoyNTUsImIiOjI1NSwiYWxwaGEiOjF9fX19' 
-  },
-  { 
-    id: 5, 
-    marca: 'Chevrolet', 
-    modelo: 'Onix', 
-    versao: 'LTZ', 
-    ano: '2021', 
-    placa: 'MNO-7890', 
-    cor: 'Vermelho', 
-    km: 39000, 
-    combustivel: 'Flex', 
-    cambio: 'Manual', 
-    valor_compra: 67000, 
-    valor_venda: 72900, 
-    status: 'Vendido', 
-    data_entrada: '15/01/2025',
-    imagem: 'https://images.prd.kavak.io/eyJidWNrZXQiOiJrYXZhay1pbWFnZXMiLCJrZXkiOiJici9wcm9kdWN0LzIyMjI1LW1haW4tZDRlOGNhOGQ5ZGY3ZDQ1MjU3MjEuanBnIiwiZWRpdHMiOnsicmVzaXplIjp7IndpZHRoIjo2NDAsImhlaWdodCI6NDgwLCJmaXQiOiJjb250YWluIiwiYmFja2dyb3VuZCI6eyJyIjoyNTUsImciOjI1NSwiYiI6MjU1LCJhbHBoYSI6MX19fX0=' 
-  },
-];
-
 const Estoque = () => {
-  const [veiculos, setVeiculos] = useState(veiculosMock);
-  const [visualizacao, setVisualizacao] = useState<'lista' | 'cards'>('lista');
   const [searchTerm, setSearchTerm] = useState('');
+  const [visualizacao, setVisualizacao] = useState<'lista' | 'cards'>('lista');
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [novoVeiculoDialogOpen, setNovoVeiculoDialogOpen] = useState(false);
+  
+  const { vehicles, isLoading } = useVehicles();
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -143,11 +55,22 @@ const Estoque = () => {
     });
   };
 
-  const filteredVeiculos = veiculos.filter(veiculo => 
-    veiculo.marca.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    veiculo.modelo.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    veiculo.placa.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredVeiculos = vehicles.filter(veiculo => 
+    veiculo.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    veiculo.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    veiculo.plate?.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-96">
+        <div className="flex flex-col items-center gap-4">
+          <Car className="h-12 w-12 text-veloz-yellow animate-pulse" />
+          <p className="text-veloz-white text-lg">Carregando veículos...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -220,10 +143,10 @@ const Estoque = () => {
                 <TableRow>
                   <TableHead 
                     className="cursor-pointer" 
-                    onClick={() => handleSort('marca')}
+                    onClick={() => handleSort('brand')}
                   >
                     <div className="flex items-center">
-                      Marca/Modelo {getSortIcon('marca')}
+                      Marca/Modelo {getSortIcon('brand')}
                     </div>
                   </TableHead>
                   <TableHead>Ano</TableHead>
@@ -231,10 +154,10 @@ const Estoque = () => {
                   <TableHead>Km</TableHead>
                   <TableHead 
                     className="cursor-pointer"
-                    onClick={() => handleSort('valor_venda')}
+                    onClick={() => handleSort('sale_price')}
                   >
                     <div className="flex items-center">
-                      Valor {getSortIcon('valor_venda')}
+                      Valor {getSortIcon('sale_price')}
                     </div>
                   </TableHead>
                   <TableHead 
@@ -252,12 +175,12 @@ const Estoque = () => {
                 {filteredVeiculos.map((veiculo) => (
                   <TableRow key={veiculo.id} className="hover:bg-veloz-black">
                     <TableCell className="font-medium">
-                      {veiculo.marca} {veiculo.modelo} {veiculo.versao}
+                      {veiculo.brand} {veiculo.model} {veiculo.version}
                     </TableCell>
-                    <TableCell>{veiculo.ano}</TableCell>
-                    <TableCell>{veiculo.placa}</TableCell>
-                    <TableCell>{veiculo.km.toLocaleString()}</TableCell>
-                    <TableCell>{formatCurrency(veiculo.valor_venda)}</TableCell>
+                    <TableCell>{veiculo.year}</TableCell>
+                    <TableCell>{veiculo.plate}</TableCell>
+                    <TableCell>{veiculo.mileage.toLocaleString()}</TableCell>
+                    <TableCell>{formatCurrency(veiculo.sale_price)}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded-full text-xs ${
                         veiculo.status === 'Em estoque' ? 'bg-blue-900 text-blue-200' :
@@ -289,11 +212,17 @@ const Estoque = () => {
           {filteredVeiculos.map((veiculo) => (
             <Card key={veiculo.id} className="overflow-hidden bg-veloz-gray border-veloz-gray card-hover">
               <div className="h-48 overflow-hidden relative">
-                <img 
-                  src={veiculo.imagem} 
-                  alt={`${veiculo.marca} ${veiculo.modelo}`}
-                  className="w-full h-full object-cover"
-                />
+                {veiculo.photos && veiculo.photos.length > 0 ? (
+                  <img 
+                    src={veiculo.photos[0]} 
+                    alt={`${veiculo.brand} ${veiculo.model}`}
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full flex items-center justify-center bg-gray-800 text-gray-400">
+                    Sem Imagem
+                  </div>
+                )}
                 <div className="absolute top-0 right-0 m-2">
                   <span className={`px-3 py-1 rounded-full text-xs font-medium ${
                     veiculo.status === 'Em estoque' ? 'bg-blue-900 text-blue-200' :
@@ -309,31 +238,31 @@ const Estoque = () => {
                 <div className="flex justify-between items-start mb-2">
                   <div>
                     <h3 className="font-bold text-lg">
-                      {veiculo.marca} {veiculo.modelo}
+                      {veiculo.brand} {veiculo.model}
                     </h3>
-                    <p className="text-sm text-muted-foreground">{veiculo.versao} • {veiculo.ano}</p>
+                    <p className="text-sm text-muted-foreground">{veiculo.version} • {veiculo.year}</p>
                   </div>
                   <p className="text-lg font-semibold text-veloz-yellow">
-                    {formatCurrency(veiculo.valor_venda)}
+                    {formatCurrency(veiculo.sale_price)}
                   </p>
                 </div>
                 
                 <div className="grid grid-cols-2 gap-2 text-sm mt-4">
                   <div className="flex items-center">
                     <span className="text-muted-foreground mr-1">Placa:</span>
-                    <span>{veiculo.placa}</span>
+                    <span>{veiculo.plate}</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-muted-foreground mr-1">Km:</span>
-                    <span>{veiculo.km.toLocaleString()}</span>
+                    <span>{veiculo.mileage.toLocaleString()}</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-muted-foreground mr-1">Câmbio:</span>
-                    <span>{veiculo.cambio}</span>
+                    <span>{veiculo.transmission}</span>
                   </div>
                   <div className="flex items-center">
                     <span className="text-muted-foreground mr-1">Combustível:</span>
-                    <span>{veiculo.combustivel}</span>
+                    <span>{veiculo.fuel}</span>
                   </div>
                 </div>
                 
