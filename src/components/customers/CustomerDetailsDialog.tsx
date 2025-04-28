@@ -85,7 +85,7 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
                             {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
                           </h5>
                           <p className="text-sm text-veloz-gray-lighter">
-                            {sale.vehicle?.year} • {sale.vehicle?.color}
+                            {sale.vehicle?.year} • {sale.vehicle?.color || "N/A"}
                           </p>
                         </div>
                         <div className="text-right">

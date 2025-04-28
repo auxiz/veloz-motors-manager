@@ -24,7 +24,7 @@ export const useSales = () => {
         .from('sales')
         .select(`
           *,
-          vehicle:vehicles(brand, model, version, year),
+          vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
           customer:customers(name, document)
         `)
         .order('created_at', { ascending: false });
