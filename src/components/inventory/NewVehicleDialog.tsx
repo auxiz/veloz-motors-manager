@@ -22,11 +22,21 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
   const handleSubmit = async (data: VehicleFormData) => {
     try {
       await addVehicle.mutateAsync({
-        ...data,
+        brand: data.brand,
+        model: data.model,
+        version: data.version || null,
+        year: data.year,
+        color: data.color,
+        plate: data.plate || null,
+        mileage: data.mileage,
+        fuel: data.fuel,
+        transmission: data.transmission,
+        purchase_price: data.purchase_price,
+        sale_price: data.sale_price,
         status: 'in_stock',
         entry_date: new Date().toISOString(),
-        photos: null, // Adding the missing photos property with null as default
-        internal_notes: data.internal_notes || '', // Ensure internal_notes is always a string
+        photos: null,
+        internal_notes: data.internal_notes || '',
       });
       onOpenChange(false);
     } catch (error) {
