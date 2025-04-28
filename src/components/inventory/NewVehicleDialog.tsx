@@ -1,14 +1,15 @@
 
 import React from 'react';
+import { useVehicles } from '@/hooks/useVehicles';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { VehicleForm, VehicleFormData } from './vehicle-form/VehicleForm';
 
 interface NewVehicleDialogProps {
   open: boolean;
@@ -16,6 +17,21 @@ interface NewVehicleDialogProps {
 }
 
 export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) => {
+  const { addVehicle } = useVehicles();
+
+  const handleSubmit = async (data: VehicleFormData) => {
+    try {
+      await addVehicle.mutateAsync({
+        ...data,
+        status: 'in_stock',
+        entry_date: new Date().toISOString(),
+      });
+      onOpenChange(false);
+    } catch (error) {
+      console.error('Error adding vehicle:', error);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-veloz-gray border-veloz-gray max-w-3xl">
@@ -26,20 +42,10 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
           </DialogDescription>
         </DialogHeader>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
-          <p className="col-span-1 md:col-span-2 text-center text-muted-foreground">
-            O formulário completo será implementado em uma próxima etapa com integração ao Supabase.
-          </p>
-        </div>
-        
-        <DialogFooter>
-          <Button variant="outline" className="border-veloz-gray text-veloz-white" onClick={() => onOpenChange(false)}>
-            Cancelar
-          </Button>
-          <Button className="bg-veloz-yellow text-veloz-black hover:bg-opacity-90">
-            Salvar Veículo
-          </Button>
-        </DialogFooter>
+        <VehicleForm 
+          onSubmit={handleSubmit} 
+          isLoading={addVehicle.isPending}
+        />
       </DialogContent>
     </Dialog>
   );
