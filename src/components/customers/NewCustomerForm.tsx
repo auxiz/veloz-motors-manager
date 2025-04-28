@@ -51,6 +51,7 @@ export const NewCustomerForm: React.FC<NewCustomerFormProps> = ({ onCustomerCrea
         phone: data.phone || null,
         email: data.email || null,
         address: data.address || null,
+        birth_date: data.birth_date ? data.birth_date.toISOString() : null,
         internal_notes: data.internal_notes || null,
       });
 

@@ -38,7 +38,7 @@ export const useCustomers = () => {
       }
 
       toast.success('Cliente adicionado com sucesso!');
-      return data;
+      return data as Customer;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });
@@ -60,7 +60,7 @@ export const useCustomers = () => {
       }
 
       toast.success('Cliente atualizado com sucesso!');
-      return data;
+      return data as Customer;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['customers'] });

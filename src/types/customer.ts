@@ -7,7 +7,7 @@ export type Customer = {
   email: string | null;
   address: string | null;
   internal_notes: string | null;
-  birth_date: Date | null;
+  birth_date: string | null;
   tags: string[] | null;
   status: string;
   created_at: string | null;

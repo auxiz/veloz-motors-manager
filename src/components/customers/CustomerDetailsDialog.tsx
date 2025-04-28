@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -17,6 +18,28 @@ interface CustomerDetailsDialogProps {
   onClose: () => void;
 }
 
+// Extend the vehicle type to include properties we're referencing
+interface VehicleDetails {
+  id: string;
+  brand: string;
+  model: string;
+  version: string | null;
+  year: number;
+  color: string;
+  fuel: string;
+  transmission: string;
+  plate?: string;
+}
+
+interface SaleWithVehicle {
+  id: string;
+  final_price: number;
+  sale_date: string | null;
+  vehicle: VehicleDetails | null;
+  customer_id: string;
+  [key: string]: any;
+}
+
 export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({ 
   customerId, 
   isOpen, 
@@ -26,7 +49,7 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
   const { sales } = useSales();
   
   const customer = customers.find(c => c.id === customerId);
-  const customerSales = sales.filter(sale => sale.customer_id === customerId);
+  const customerSales = sales.filter(sale => sale.customer_id === customerId) as SaleWithVehicle[];
   
   if (!customer) {
     return null;
@@ -93,7 +116,7 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
                           {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
                         </h4>
                         <p className="text-sm text-muted-foreground">
-                          Ano: {sale.vehicle?.year} • Cor: {sale.vehicle?.color}
+                          Ano: {sale.vehicle?.year} • Cor: {sale.vehicle?.color || 'N/A'}
                         </p>
                       </div>
                       <div className="text-right">
@@ -142,13 +165,13 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
               <div className="bg-veloz-gray p-4 rounded-lg">
                 <h3 className="font-medium mb-2">Preferências</h3>
                 <div className="flex flex-wrap gap-2 mt-4">
-                  {customerSales.length > 0 && (
+                  {customerSales.length > 0 && customerSales[0].vehicle && (
                     <>
                       <Badge variant="outline">
-                        {customerSales[0].vehicle?.transmission === 'automatic' ? 'Câmbio Automático' : 'Câmbio Manual'}
+                        {customerSales[0].vehicle.transmission === 'automatic' ? 'Câmbio Automático' : 'Câmbio Manual'}
                       </Badge>
                       <Badge variant="outline">
-                        Combustível: {customerSales[0].vehicle?.fuel}
+                        Combustível: {customerSales[0].vehicle.fuel || 'N/A'}
                       </Badge>
                     </>
                   )}
