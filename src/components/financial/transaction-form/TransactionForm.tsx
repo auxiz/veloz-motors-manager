@@ -22,9 +22,10 @@ import { transactionSchema, TransactionFormValues, CATEGORIES } from './transact
 interface TransactionFormProps {
   onSubmit: (data: TransactionFormValues) => void;
   onCancel: () => void;
+  defaultValues?: Partial<TransactionFormValues>;
 }
 
-export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
+export function TransactionForm({ onSubmit, onCancel, defaultValues }: TransactionFormProps) {
   const form = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionSchema),
     defaultValues: {
@@ -33,6 +34,7 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
       amount: 0,
       status: 'pending',
       category: '',
+      ...defaultValues,
     },
   });
 
@@ -190,7 +192,7 @@ export function TransactionForm({ onSubmit, onCancel }: TransactionFormProps) {
             type="submit"
             className="bg-veloz-yellow hover:bg-yellow-500 text-black"
           >
-            Adicionar Transação
+            {defaultValues ? 'Salvar Alterações' : 'Adicionar Transação'}
           </Button>
         </div>
       </form>
