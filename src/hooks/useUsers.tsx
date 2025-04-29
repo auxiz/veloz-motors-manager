@@ -5,10 +5,24 @@ import { supabase } from '@/integrations/supabase/client';
 import { AuthUser, AuthError, UserProfile } from '@/types/auth';
 import { toast } from 'sonner';
 
+export type User = {
+  id: string;
+  name: string;
+  email: string;
+  profile?: UserProfile;
+};
+
 export function useUsers() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [users, setUsers] = useState<User[]>([
+    { id: '1', name: 'João Silva', email: 'joao@exemplo.com' },
+    { id: '2', name: 'Maria Oliveira', email: 'maria@exemplo.com' },
+    { id: '3', name: 'Carlos Santos', email: 'carlos@exemplo.com' },
+    { id: '4', name: 'Ana Pereira', email: 'ana@exemplo.com' },
+    { id: '5', name: 'Luiz Costa', email: 'luiz@exemplo.com' }
+  ]);
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -35,6 +49,9 @@ export function useUsers() {
       }
       setLoading(false);
     });
+
+    // In a real application, we would fetch users from Supabase here
+    // For now, we're using mock data
 
     return () => subscription.unsubscribe();
   }, []);
@@ -155,5 +172,6 @@ export function useUsers() {
     signIn,
     signOut,
     updateUserProfile,
+    users, // Now exposing the users array
   };
 }

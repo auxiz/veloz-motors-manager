@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSales } from '@/hooks/useSales';
 import { useVehicles } from '@/hooks/useVehicles';

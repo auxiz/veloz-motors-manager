@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { useSales } from '@/hooks/useSales';
 import { useUsers } from '@/hooks/useUsers';
@@ -45,7 +44,7 @@ export function SalesPerformanceReports({ dateRange }: SalesPerformanceReportsPr
   
   filteredSales.forEach(sale => {
     const { seller_id, final_price, commission_amount } = sale;
-    const user = users.find(u => u.id === seller_id);
+    const user = users.users.find(u => u.id === seller_id);
     
     if (!user) return;
     
@@ -258,7 +257,7 @@ export function SalesPerformanceReports({ dateRange }: SalesPerformanceReportsPr
             <TableBody>
               {filteredSales.length > 0 ? (
                 filteredSales.map((sale) => {
-                  const seller = users.find(user => user.id === sale.seller_id);
+                  const seller = users.users.find(user => user.id === sale.seller_id);
                   const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
                   
                   return (
