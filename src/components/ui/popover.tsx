@@ -22,7 +22,8 @@ const PopoverContent = React.forwardRef<
         className
       )}
       style={{
-        backgroundColor: "var(--popover)"
+        backgroundColor: "var(--popover)",
+        zIndex: 9999
       }}
       {...props}
     />
