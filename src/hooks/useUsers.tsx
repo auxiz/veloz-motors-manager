@@ -17,11 +17,76 @@ export function useUsers() {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [users, setUsers] = useState<User[]>([
-    { id: '1', name: 'João Silva', email: 'joao@exemplo.com' },
-    { id: '2', name: 'Maria Oliveira', email: 'maria@exemplo.com' },
-    { id: '3', name: 'Carlos Santos', email: 'carlos@exemplo.com' },
-    { id: '4', name: 'Ana Pereira', email: 'ana@exemplo.com' },
-    { id: '5', name: 'Luiz Costa', email: 'luiz@exemplo.com' }
+    { 
+      id: '1', 
+      name: 'João Silva', 
+      email: 'joao@exemplo.com',
+      profile: {
+        id: '1',
+        first_name: 'João',
+        last_name: 'Silva',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'administrator'
+      }
+    },
+    { 
+      id: '2', 
+      name: 'Maria Oliveira', 
+      email: 'maria@exemplo.com',
+      profile: {
+        id: '2',
+        first_name: 'Maria',
+        last_name: 'Oliveira',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'seller'
+      }
+    },
+    { 
+      id: '3', 
+      name: 'Carlos Santos', 
+      email: 'carlos@exemplo.com',
+      profile: {
+        id: '3',
+        first_name: 'Carlos',
+        last_name: 'Santos',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'financial'
+      }
+    },
+    { 
+      id: '4', 
+      name: 'Ana Pereira', 
+      email: 'ana@exemplo.com',
+      profile: {
+        id: '4',
+        first_name: 'Ana',
+        last_name: 'Pereira',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'seller'
+      }
+    },
+    { 
+      id: '5', 
+      name: 'Luiz Costa', 
+      email: 'luiz@exemplo.com',
+      profile: {
+        id: '5',
+        first_name: 'Luiz',
+        last_name: 'Costa',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'seller'
+      }
+    }
   ]);
 
   useEffect(() => {
@@ -71,7 +136,11 @@ export function useUsers() {
           if (!prevUser) return null;
           return {
             ...prevUser,
-            profile: data as UserProfile
+            profile: {
+              ...data,
+              // Mock role for testing - this would come from the database in a real app
+              role: userId === '1' ? 'administrator' : 'seller'
+            } as UserProfile
           };
         });
       }
@@ -172,6 +241,6 @@ export function useUsers() {
     signIn,
     signOut,
     updateUserProfile,
-    users, // Now correctly exposing the users array
+    users,
   };
 }
