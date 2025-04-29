@@ -1,6 +1,5 @@
 
 import React from 'react';
-import { format } from 'date-fns';
 import {
   Dialog,
   DialogContent,
@@ -27,7 +26,7 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
       amount: data.amount, // This is already a number thanks to z.coerce.number()
       status: data.status,
       category: data.category,
-      due_date: format(data.due_date, 'yyyy-MM-dd'),
+      due_date: data.due_date, // This is already an ISO string from the schema transform
     };
     
     addTransaction.mutate(newTransaction);

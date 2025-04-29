@@ -22,7 +22,7 @@ export function useTransactionDetails({ transactionId, onOpenChange }: UseTransa
       category: data.category,
       description: data.description,
       amount: data.amount,
-      due_date: data.due_date.toISOString().split('T')[0],
+      due_date: data.due_date, // This is already an ISO string from the schema transform
       status: data.status,
       sale_id: transaction.sale_id,
     };
@@ -42,7 +42,7 @@ export function useTransactionDetails({ transactionId, onOpenChange }: UseTransa
     description: transaction.description,
     amount: transaction.amount,
     status: transaction.status,
-    due_date: transaction.due_date ? new Date(transaction.due_date) : new Date(),
+    due_date: new Date(transaction.due_date), // Convert string to Date for the DatePicker
   } : {};
 
   return {
