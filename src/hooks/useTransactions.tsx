@@ -22,7 +22,7 @@ export const useTransactions = () => {
     queryFn: async () => {
       const { data, error } = await supabase
         .from('financial_transactions')
-        .select('*')
+        .select('*, sale:sales(*)')
         .order('due_date', { ascending: true });
 
       if (error) {
@@ -77,10 +77,50 @@ export const useTransactions = () => {
     },
   });
 
+  const deleteTransaction = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('financial_transactions')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error('Erro ao excluir transação');
+        throw error;
+      }
+
+      toast.success('Transação excluída com sucesso!');
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+
+  // Function to automatically create a financial transaction linked to a sale
+  const createSaleTransaction = async (sale: any) => {
+    const vehicleDescription = sale.vehicle ? 
+      `${sale.vehicle.brand} ${sale.vehicle.model} (${sale.vehicle.year})` : 
+      'Veículo';
+    
+    const newTransaction = {
+      type: 'income',
+      category: 'venda',
+      description: `Venda de ${vehicleDescription}`,
+      amount: sale.final_price,
+      due_date: new Date().toISOString().split('T')[0],
+      status: 'pending',
+      sale_id: sale.id
+    };
+
+    return addTransaction.mutate(newTransaction);
+  };
+
   return {
     transactions,
     isLoading,
     addTransaction,
     updateTransaction,
+    deleteTransaction,
+    createSaleTransaction,
   };
 };

@@ -2,6 +2,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { useTransactions } from './useTransactions';
 
 type Sale = {
   id: string;
@@ -16,6 +17,7 @@ type Sale = {
 
 export const useSales = () => {
   const queryClient = useQueryClient();
+  const { createSaleTransaction } = useTransactions();
 
   const { data: sales = [], isLoading } = useQuery({
     queryKey: ['sales'],
@@ -46,7 +48,11 @@ export const useSales = () => {
       const { data, error } = await supabase
         .from('sales')
         .insert([newSale])
-        .select()
+        .select(`
+          *,
+          vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
+          customer:customers(name, document)
+        `)
         .single();
 
       if (error) {
@@ -68,9 +74,12 @@ export const useSales = () => {
       toast.success('Venda registrada com sucesso!');
       return data;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+      
+      // Automatically create financial transaction for this sale
+      createSaleTransaction(data);
     },
   });
 
