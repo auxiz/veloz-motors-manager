@@ -20,16 +20,16 @@ interface TransactionsFilterProps {
 export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) => {
   const [search, setSearch] = useState('');
   const [dateRange, setDateRange] = useState<{
-    from: Date | undefined;
-    to: Date | undefined;
+    from: Date;
+    to: Date;
   }>({
-    from: undefined,
-    to: undefined,
+    from: new Date(new Date().setDate(1)), // First day of current month
+    to: new Date(),
   });
   const [category, setCategory] = useState('all');
   const [status, setStatus] = useState('all');
   
-  const handleDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
+  const handleDateRangeChange = (range: { from: Date; to: Date }) => {
     setDateRange(range);
     onFilterChange({
       startDate: range.from || null,
@@ -90,8 +90,8 @@ export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) 
         
         <div className="w-full md:w-1/4">
           <DateRangePicker 
-            date={dateRange} 
-            onDateChange={handleDateRangeChange}
+            dateRange={dateRange}
+            onDateRangeChange={handleDateRangeChange}
           />
         </div>
         

@@ -380,7 +380,22 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      generate_dummy_customer: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_dummy_sale: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_dummy_transaction: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
+      generate_dummy_vehicle: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
