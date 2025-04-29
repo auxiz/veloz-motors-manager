@@ -20,7 +20,13 @@ export function DueDateField({ control }: DueDateFieldProps) {
           <FormControl>
             <DatePicker
               selected={field.value ? new Date(field.value) : new Date()}
-              onSelect={field.onChange}
+              onSelect={(date) => {
+                // If date is selected, it will be a Date object, which we need to convert to ISO string
+                // This matches the schema transformation
+                if (date) {
+                  field.onChange(date.toISOString());
+                }
+              }}
               placeholder="Selecione a data"
             />
           </FormControl>

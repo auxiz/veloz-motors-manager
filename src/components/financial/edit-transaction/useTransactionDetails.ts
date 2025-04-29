@@ -35,14 +35,14 @@ export function useTransactionDetails({ transactionId, onOpenChange }: UseTransa
     onOpenChange(false);
   };
   
-  // Default values for the form
-  const defaultValues = transaction ? {
+  // Default values for the form - ensure due_date is properly formatted
+  const defaultValues: Partial<TransactionFormValues> = transaction ? {
     type: transaction.type,
     category: transaction.category,
     description: transaction.description,
     amount: transaction.amount,
     status: transaction.status,
-    due_date: new Date(transaction.due_date), // Convert string to Date for the DatePicker
+    due_date: transaction.due_date, // Keep as string, the form component will handle conversion
   } : {};
 
   return {
