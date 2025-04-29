@@ -41,7 +41,10 @@ export function useUsers() {
           id: '00000000-0000-0000-0000-000000000001',
           first_name: 'Usuário',
           last_name: 'Demonstração',
-          role: 'administrator'
+          role: 'administrator',
+          avatar_url: null,
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString()
         }
       };
     }
