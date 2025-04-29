@@ -1,29 +1,13 @@
 
-import React, { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
 import { useTransactions, Transaction } from '@/hooks/useTransactions';
-import { TransactionForm } from './transaction-form/TransactionForm';
-import { transactionSchema, TransactionFormValues } from './transaction-form/transaction-schema';
+import { TransactionFormValues } from '../transaction-form/transaction-schema';
 
-interface EditTransactionDialogProps {
+interface UseTransactionDetailsProps {
   transactionId: string;
-  open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function EditTransactionDialog({ 
-  transactionId, 
-  open, 
-  onOpenChange 
-}: EditTransactionDialogProps) {
+export function useTransactionDetails({ transactionId, onOpenChange }: UseTransactionDetailsProps) {
   const { transactions, updateTransaction } = useTransactions();
   
   // Find the transaction to edit
@@ -61,24 +45,10 @@ export function EditTransactionDialog({
     due_date: transaction.due_date ? new Date(transaction.due_date) : new Date(),
   } : {};
 
-  return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[525px]">
-        <DialogHeader>
-          <DialogTitle>Editar Transação</DialogTitle>
-          <DialogDescription>
-            Atualize os detalhes da transação financeira.
-          </DialogDescription>
-        </DialogHeader>
-        
-        {transaction && (
-          <TransactionForm 
-            onSubmit={handleSubmit} 
-            onCancel={handleCancel} 
-            defaultValues={defaultValues}
-          />
-        )}
-      </DialogContent>
-    </Dialog>
-  );
+  return {
+    transaction,
+    defaultValues,
+    handleSubmit,
+    handleCancel
+  };
 }

@@ -1,4 +1,3 @@
-
 import React from 'react';
 import {
   Table,
@@ -12,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useTransactions, Transaction } from '@/hooks/useTransactions';
 import { formatCurrency, formatDate } from '@/lib/utils';
-import { EditTransactionDialog } from './EditTransactionDialog';
+import { EditTransactionDialog } from './edit-transaction/EditTransactionDialog';
 
 interface TransactionsListProps {
   transactionType?: 'income' | 'expense';
