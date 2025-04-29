@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useVehicles } from '@/hooks/useVehicles';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useSales } from '@/hooks/useSales';
@@ -17,8 +17,15 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
   const { vehicles } = useVehicles();
   const { customers } = useCustomers();
   const { addSale } = useSales();
-  const { user } = useUsers();
+  const { user, isAuthChecking } = useUsers();
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Log user state for debugging
+  useEffect(() => {
+    if (open) {
+      console.log('Current user state:', user);
+    }
+  }, [open, user]);
 
   const availableVehicles = vehicles.filter(vehicle => vehicle.status === 'in_stock');
 
@@ -30,13 +37,21 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
     commissionType: 'fixed' | 'percentage';
     commissionValue: number;
   }) => {
+    // Early validation and authentication check
     if (!user) {
       toast.error('Usuário não autenticado');
+      console.error('Tentativa de registro sem usuário autenticado');
       return;
     }
     
     if (!user.id) {
       toast.error('ID de usuário não disponível');
+      console.error('ID de usuário não disponível', user);
+      return;
+    }
+    
+    if (!data.vehicleId || !data.customerId) {
+      toast.error('Selecione um veículo e um cliente para continuar');
       return;
     }
     
@@ -78,12 +93,20 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
           <DialogTitle className="text-xl font-bold">Registrar Nova Venda</DialogTitle>
         </DialogHeader>
         
-        <SaleForm 
-          vehicles={availableVehicles}
-          customers={customers}
-          onSubmit={handleSubmit}
-          isSubmitting={isSubmitting}
-        />
+        {isAuthChecking ? (
+          <div className="p-4 text-center">Verificando autenticação...</div>
+        ) : !user ? (
+          <div className="p-4 text-center text-red-400">
+            Usuário não autenticado. Por favor, faça login para continuar.
+          </div>
+        ) : (
+          <SaleForm 
+            vehicles={availableVehicles}
+            customers={customers}
+            onSubmit={handleSubmit}
+            isSubmitting={isSubmitting}
+          />
+        )}
       </DialogContent>
     </Dialog>
   );
