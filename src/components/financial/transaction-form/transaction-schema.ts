@@ -7,7 +7,7 @@ export const transactionSchema = z.object({
   description: z.string().min(3, { message: 'Digite uma descrição válida' }),
   amount: z.coerce.number().min(0.01, { message: 'Digite um valor válido' }),
   status: z.enum(['pending', 'paid']),
-  due_date: z.date().transform(date => date.toISOString()), // Transform Date to ISO string
+  due_date: z.date().transform(date => date.toISOString()),
   sale_id: z.string().optional(),
 });
 

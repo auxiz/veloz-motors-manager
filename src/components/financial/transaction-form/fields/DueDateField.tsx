@@ -19,7 +19,7 @@ export function DueDateField({ control }: DueDateFieldProps) {
           <FormLabel>Data de Vencimento</FormLabel>
           <FormControl>
             <DatePicker
-              selected={field.value instanceof Date ? field.value : new Date(field.value)}
+              selected={field.value ? new Date(field.value) : new Date()}
               onSelect={field.onChange}
               placeholder="Selecione a data"
             />

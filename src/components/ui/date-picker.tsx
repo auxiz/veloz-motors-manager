@@ -18,6 +18,9 @@ interface DatePickerProps {
 }
 
 export function DatePicker({ selected, onSelect, placeholder = "Selecionar data" }: DatePickerProps) {
+  // Ensure we have a valid date object
+  const isValidDate = selected && !isNaN(selected.getTime());
+  
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -25,19 +28,20 @@ export function DatePicker({ selected, onSelect, placeholder = "Selecionar data"
           variant={"outline"}
           className={cn(
             "w-full justify-start text-left font-normal",
-            !selected && "text-muted-foreground"
+            !isValidDate && "text-muted-foreground"
           )}
         >
           <CalendarIcon className="mr-2 h-4 w-4" />
-          {selected ? format(selected, "dd/MM/yyyy") : <span>{placeholder}</span>}
+          {isValidDate ? format(selected, "dd/MM/yyyy") : <span>{placeholder}</span>}
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-auto p-0">
         <Calendar
           mode="single"
-          selected={selected || undefined}
+          selected={isValidDate ? selected : undefined}
           onSelect={onSelect}
           initialFocus
+          className="pointer-events-auto"
         />
       </PopoverContent>
     </Popover>

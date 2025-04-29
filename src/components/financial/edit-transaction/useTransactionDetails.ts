@@ -36,7 +36,7 @@ export function useTransactionDetails({ transactionId, onOpenChange }: UseTransa
   };
   
   // Default values for the form
-  const defaultValues: Partial<TransactionFormValues> = transaction ? {
+  const defaultValues = transaction ? {
     type: transaction.type,
     category: transaction.category,
     description: transaction.description,
