@@ -8,7 +8,7 @@ export type Transaction = {
   type: 'income' | 'expense';
   category: string;
   description: string;
-  amount: number;
+  amount: number; // Explicitly defined as number
   due_date: string;
   status: 'pending' | 'paid';
   sale_id?: string;
