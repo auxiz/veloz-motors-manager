@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Search, Filter } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
-import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface TransactionsFilterProps {
   onFilterChange: (filters: {
@@ -129,8 +128,6 @@ export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) 
           <Button variant="default" size="icon">
             <Filter size={16} />
           </Button>
-          
-          <DummyDataGenerator type="transaction" />
         </div>
       </div>
     </div>

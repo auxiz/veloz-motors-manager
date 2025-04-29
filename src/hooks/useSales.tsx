@@ -82,7 +82,7 @@ export const useSales = () => {
         category: 'venda',
         description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
         amount: data.final_price,
-        due_date: new Date(),
+        due_date: new Date().toISOString(), // Convert Date to string
         status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
         sale_id: data.id
       });

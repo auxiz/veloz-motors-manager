@@ -2,7 +2,6 @@
 import React from 'react';
 import { Button } from '@/components/ui/button';
 import { Car, GridIcon, LayoutList } from 'lucide-react';
-import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface InventoryHeaderProps {
   onViewChange: (view: 'lista' | 'cards') => void;
@@ -38,8 +37,6 @@ export function InventoryHeader({ onViewChange, currentView, onNewVehicle }: Inv
             Cards
           </Button>
         </div>
-        
-        <DummyDataGenerator type="vehicle" />
         
         <Button
           className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold"

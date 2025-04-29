@@ -5,7 +5,6 @@ import { Input } from '@/components/ui/input';
 import { Search, User, Filter } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { CUSTOMER_SEGMENTS } from '@/types/customer';
-import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface CustomersFilterProps {
   onFilterChange: (filters: {
@@ -92,8 +91,6 @@ export function CustomersFilter({ onFilterChange }: CustomersFilterProps) {
           <Button variant="default" size="icon">
             <Filter size={16} />
           </Button>
-          
-          <DummyDataGenerator type="customer" />
         </div>
       </div>
     </div>

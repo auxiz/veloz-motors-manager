@@ -6,7 +6,6 @@ import { Search, Filter } from 'lucide-react';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { DateRangePicker } from '@/components/reports/DateRangePicker';
 import { useUsers } from '@/hooks/useUsers';
-import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface SalesFilterProps {
   onFilterChange: (filters: {
@@ -131,8 +130,6 @@ export const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
           <Button variant="default" size="icon">
             <Filter size={16} />
           </Button>
-          
-          <DummyDataGenerator type="sale" />
         </div>
       </div>
     </div>
