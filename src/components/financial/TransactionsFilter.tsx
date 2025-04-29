@@ -1,14 +1,11 @@
 
 import React, { useState } from 'react';
-import { 
-  Card, 
-  CardContent 
-} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { DatePicker } from '@/components/ui/date-picker';
-import { Search, X } from 'lucide-react';
+import { Search, Filter } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { DateRangePicker } from '@/components/reports/DateRangePicker';
+import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface TransactionsFilterProps {
   onFilterChange: (filters: {
@@ -20,125 +17,122 @@ interface TransactionsFilterProps {
   }) => void;
 }
 
-const CATEGORIES = [
-  'venda',
-  'imposto',
-  'manutenção',
-  'salário',
-  'aluguel',
-  'marketing',
-  'outros'
-];
-
 export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [category, setCategory] = useState<string>('');
-  const [status, setStatus] = useState<string>('');
-  const [search, setSearch] = useState<string>('');
-
-  const applyFilters = () => {
+  const [search, setSearch] = useState('');
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [category, setCategory] = useState('all');
+  const [status, setStatus] = useState('all');
+  
+  const handleDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
+    setDateRange(range);
     onFilterChange({
-      startDate,
-      endDate,
+      startDate: range.from || null,
+      endDate: range.to || null,
       category,
       status,
-      search,
+      search
     });
   };
-
-  const resetFilters = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setCategory('');
-    setStatus('');
-    setSearch('');
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
     onFilterChange({
-      startDate: null,
-      endDate: null,
-      category: '',
-      status: '',
-      search: '',
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      category,
+      status,
+      search: e.target.value
     });
   };
-
+  
+  const handleCategoryChange = (value: string) => {
+    setCategory(value);
+    onFilterChange({
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      category: value,
+      status,
+      search
+    });
+  };
+  
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    onFilterChange({
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      category,
+      status: value,
+      search
+    });
+  };
+  
   return (
-    <Card className="bg-veloz-black border-veloz-gray">
-      <CardContent className="p-4">
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Data inicial</label>
-            <DatePicker 
-              selected={startDate} 
-              onSelect={setStartDate} 
-              placeholder="Data inicial"
+    <div className="space-y-4">
+      <div className="flex flex-col md:flex-row gap-4 items-end">
+        <div className="w-full md:w-1/4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar transações..."
+              value={search}
+              onChange={handleSearch}
+              className="pl-8"
             />
-          </div>
-          
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Data final</label>
-            <DatePicker 
-              selected={endDate} 
-              onSelect={setEndDate} 
-              placeholder="Data final"
-            />
-          </div>
-          
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Categoria</label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Todas" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas</SelectItem>
-                {CATEGORIES.map(cat => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Status</label>
-            <Select value={status} onValueChange={setStatus}>
-              <SelectTrigger>
-                <SelectValue placeholder="Todos" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todos</SelectItem>
-                <SelectItem value="paid">Pago</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-          
-          <div className="space-y-1">
-            <label className="text-xs text-muted-foreground">Busca</label>
-            <div className="flex">
-              <Input 
-                placeholder="Buscar transação..." 
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="rounded-r-none"
-              />
-              <Button 
-                onClick={applyFilters}
-                className="rounded-l-none bg-veloz-yellow hover:bg-yellow-500 text-black"
-              >
-                <Search size={16} />
-              </Button>
-            </div>
           </div>
         </div>
         
-        <div className="mt-3 flex justify-end">
-          <Button variant="outline" onClick={resetFilters} size="sm">
-            <X size={16} className="mr-2" />
-            Limpar Filtros
-          </Button>
+        <div className="w-full md:w-1/4">
+          <DateRangePicker 
+            date={dateRange} 
+            onDateChange={handleDateRangeChange}
+          />
         </div>
-      </CardContent>
-    </Card>
+        
+        <div className="w-full md:w-1/6">
+          <Select value={category} onValueChange={handleCategoryChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Categoria" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todas</SelectItem>
+              <SelectItem value="venda">Venda</SelectItem>
+              <SelectItem value="financiamento">Financiamento</SelectItem>
+              <SelectItem value="comissão">Comissão</SelectItem>
+              <SelectItem value="aluguel">Aluguel</SelectItem>
+              <SelectItem value="salários">Salários</SelectItem>
+              <SelectItem value="marketing">Marketing</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="w-full md:w-1/6">
+          <Select value={status} onValueChange={handleStatusChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos</SelectItem>
+              <SelectItem value="paid">Pago</SelectItem>
+              <SelectItem value="pending">Pendente</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Button variant="default" size="icon">
+            <Filter size={16} />
+          </Button>
+          
+          <DummyDataGenerator type="transaction" />
+        </div>
+      </div>
+    </div>
   );
-};
+}

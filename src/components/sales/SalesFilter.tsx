@@ -1,12 +1,12 @@
 
 import React, { useState } from 'react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
-import { CalendarIcon, Search, X } from 'lucide-react';
-import { DatePicker } from '@/components/ui/date-picker';
-import { format } from 'date-fns';
-import { ptBR } from 'date-fns/locale';
+import { Search, Filter } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { DateRangePicker } from '@/components/reports/DateRangePicker';
+import { useUsers } from '@/hooks/useUsers';
+import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface SalesFilterProps {
   onFilterChange: (filters: {
@@ -18,97 +18,123 @@ interface SalesFilterProps {
   }) => void;
 }
 
-export const SalesFilter: React.FC<SalesFilterProps> = ({ onFilterChange }) => {
-  const [startDate, setStartDate] = useState<Date | null>(null);
-  const [endDate, setEndDate] = useState<Date | null>(null);
-  const [sellerName, setSellerName] = useState<string>('');
-  const [status, setStatus] = useState<string>('all'); // Changed default to 'all' instead of empty string
-  const [search, setSearch] = useState<string>('');
-
-  const handleFilterApply = () => {
+export const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
+  const { users } = useUsers();
+  const [search, setSearch] = useState('');
+  const [dateRange, setDateRange] = useState<{
+    from: Date | undefined;
+    to: Date | undefined;
+  }>({
+    from: undefined,
+    to: undefined,
+  });
+  const [sellerName, setSellerName] = useState('');
+  const [status, setStatus] = useState('');
+  
+  const handleDateRangeChange = (range: { from: Date | undefined; to: Date | undefined }) => {
+    setDateRange(range);
     onFilterChange({
-      startDate,
-      endDate,
+      startDate: range.from || null,
+      endDate: range.to || null,
       sellerName,
       status,
-      search,
+      search
     });
   };
-
-  const handleReset = () => {
-    setStartDate(null);
-    setEndDate(null);
-    setSellerName('');
-    setStatus('all'); // Changed to 'all' instead of empty string
-    setSearch('');
-    
+  
+  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
     onFilterChange({
-      startDate: null,
-      endDate: null,
-      sellerName: '',
-      status: 'all', // Changed to 'all' instead of empty string
-      search: '',
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      sellerName,
+      status,
+      search: e.target.value
     });
   };
-
+  
+  const handleSellerChange = (value: string) => {
+    setSellerName(value);
+    onFilterChange({
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      sellerName: value,
+      status,
+      search
+    });
+  };
+  
+  const handleStatusChange = (value: string) => {
+    setStatus(value);
+    onFilterChange({
+      startDate: dateRange.from || null,
+      endDate: dateRange.to || null,
+      sellerName,
+      status: value,
+      search
+    });
+  };
+  
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-2/5">
-          <Input 
-            placeholder="Pesquisar por veículo, cliente ou vendedor..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full"
-            prefix={<Search size={16} />}
+      <div className="flex flex-col md:flex-row gap-4 items-end">
+        <div className="w-full md:w-1/4">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar vendas..."
+              value={search}
+              onChange={handleSearch}
+              className="pl-8"
+            />
+          </div>
+        </div>
+        
+        <div className="w-full md:w-1/4">
+          <DateRangePicker 
+            date={dateRange} 
+            onDateChange={handleDateRangeChange}
           />
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full md:w-3/5">
-          <div className="flex items-center gap-2">
-            <DatePicker 
-              selected={startDate} 
-              onSelect={setStartDate} 
-              placeholder="Data inicial" 
-            />
-          </div>
-          
-          <div className="flex items-center gap-2">
-            <DatePicker 
-              selected={endDate} 
-              onSelect={setEndDate} 
-              placeholder="Data final" 
-            />
-          </div>
-          
-          <Select value={status} onValueChange={setStatus}>
+        <div className="w-full md:w-1/6">
+          <Select value={sellerName} onValueChange={handleSellerChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Vendedor" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="">Todos</SelectItem>
+              {users.map((user) => (
+                <SelectItem key={user.id} value={user.name}>
+                  {user.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="w-full md:w-1/6">
+          <Select value={status} onValueChange={handleStatusChange}>
             <SelectTrigger>
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos</SelectItem> {/* Changed value from empty string to "all" */}
-              <SelectItem value="cash">À Vista</SelectItem>
-              <SelectItem value="financing">Financiamento</SelectItem>
-              <SelectItem value="consignment">Consignação</SelectItem>
+              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="completed">Concluída</SelectItem>
+              <SelectItem value="pending">Pendente</SelectItem>
+              <SelectItem value="canceled">Cancelada</SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </div>
-      
-      <div className="flex justify-end gap-2">
-        <Button 
-          variant="outline" 
-          onClick={handleReset}
-        >
-          <X size={16} className="mr-1" /> Limpar
-        </Button>
-        <Button 
-          onClick={handleFilterApply}
-          className="bg-veloz-yellow hover:bg-yellow-500 text-black"
-        >
-          <Search size={16} className="mr-1" /> Aplicar
-        </Button>
+        
+        <div className="flex items-center space-x-2">
+          <Button variant="default" size="icon">
+            <Filter size={16} />
+          </Button>
+          
+          <DummyDataGenerator type="sale" />
+        </div>
       </div>
     </div>
   );
-};
+}

@@ -1,54 +1,349 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { BarChart3, Car, DollarSign, TrendingUp, Calendar } from 'lucide-react';
+import { BarChart3, Car, DollarSign, TrendingUp, Calendar, ExternalLink } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { supabase } from '@/integrations/supabase/client';
+import { formatCurrency } from '@/lib/utils';
+import { Vehicle } from '@/hooks/useVehicles';
+import { Sale } from '@/hooks/useSales';
+import { Transaction } from '@/hooks/useTransactions';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
-  // Dados fictícios para demonstração
+  const navigate = useNavigate();
+  const [isLoading, setIsLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState({
+    vehiclesInStock: 0,
+    vehiclesInStockChange: 0,
+    monthSales: 0,
+    monthSalesChange: 0,
+    monthProfit: 0,
+    monthProfitChange: 0,
+    averageDaysInStock: 0,
+    averageDaysChange: 0,
+    latestVehicles: [] as Vehicle[],
+    latestSales: [] as Sale[],
+  });
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      
+      try {
+        // Fetch vehicles in stock
+        const { data: vehiclesData, error: vehiclesError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .eq('status', 'in_stock');
+          
+        if (vehiclesError) throw vehiclesError;
+        
+        // Fetch vehicles in stock from last week for comparison
+        const lastWeekDate = new Date();
+        lastWeekDate.setDate(lastWeekDate.getDate() - 7);
+        const { count: lastWeekCount, error: lastWeekError } = await supabase
+          .from('vehicles')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'in_stock')
+          .lt('created_at', lastWeekDate.toISOString());
+          
+        if (lastWeekError) throw lastWeekError;
+        
+        // Fetch sales from current month
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+        
+        const { data: salesData, error: salesError } = await supabase
+          .from('sales')
+          .select('*, vehicle:vehicles(*), customer:customers(*)')
+          .gte('created_at', startOfMonth.toISOString());
+          
+        if (salesError) throw salesError;
+        
+        // Fetch sales from previous month for comparison
+        const startOfLastMonth = new Date(startOfMonth);
+        startOfLastMonth.setMonth(startOfLastMonth.getMonth() - 1);
+        const endOfLastMonth = new Date(startOfMonth);
+        endOfLastMonth.setDate(0);
+        
+        const { data: lastMonthSales, error: lastMonthSalesError } = await supabase
+          .from('sales')
+          .select('*', { count: 'exact', head: true })
+          .gte('created_at', startOfLastMonth.toISOString())
+          .lte('created_at', endOfLastMonth.toISOString());
+          
+        if (lastMonthSalesError) throw lastMonthSalesError;
+        
+        // Fetch financial transactions for profit calculation
+        const { data: incomeData, error: incomeError } = await supabase
+          .from('financial_transactions')
+          .select('amount')
+          .eq('type', 'income')
+          .gte('created_at', startOfMonth.toISOString());
+          
+        if (incomeError) throw incomeError;
+        
+        const { data: expenseData, error: expenseError } = await supabase
+          .from('financial_transactions')
+          .select('amount')
+          .eq('type', 'expense')
+          .gte('created_at', startOfMonth.toISOString());
+          
+        if (expenseError) throw expenseError;
+        
+        // Calculate profit for this month
+        const totalIncome = incomeData.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+        const totalExpense = expenseData.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+        const profit = totalIncome - totalExpense;
+        
+        // Fetch profit from last month for comparison
+        const { data: lastMonthIncomeData, error: lastMonthIncomeError } = await supabase
+          .from('financial_transactions')
+          .select('amount')
+          .eq('type', 'income')
+          .gte('created_at', startOfLastMonth.toISOString())
+          .lte('created_at', endOfLastMonth.toISOString());
+          
+        if (lastMonthIncomeError) throw lastMonthIncomeError;
+        
+        const { data: lastMonthExpenseData, error: lastMonthExpenseError } = await supabase
+          .from('financial_transactions')
+          .select('amount')
+          .eq('type', 'expense')
+          .gte('created_at', startOfLastMonth.toISOString())
+          .lte('created_at', endOfLastMonth.toISOString());
+          
+        if (lastMonthExpenseError) throw lastMonthExpenseError;
+        
+        const lastMonthIncome = lastMonthIncomeData.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+        const lastMonthExpense = lastMonthExpenseData.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+        const lastMonthProfit = lastMonthIncome - lastMonthExpense;
+        
+        // Calculate average days in stock for sold vehicles
+        const { data: soldVehiclesData, error: soldVehiclesError } = await supabase
+          .from('vehicles')
+          .select('entry_date, updated_at')
+          .eq('status', 'sold');
+          
+        if (soldVehiclesError) throw soldVehiclesError;
+        
+        let totalDays = 0;
+        let vehicleCount = 0;
+        
+        soldVehiclesData.forEach(vehicle => {
+          if (vehicle.entry_date && vehicle.updated_at) {
+            const entryDate = new Date(vehicle.entry_date);
+            const soldDate = new Date(vehicle.updated_at);
+            const daysDiff = Math.floor((soldDate.getTime() - entryDate.getTime()) / (1000 * 3600 * 24));
+            if (daysDiff > 0) {
+              totalDays += daysDiff;
+              vehicleCount++;
+            }
+          }
+        });
+        
+        const avgDays = vehicleCount > 0 ? Math.floor(totalDays / vehicleCount) : 0;
+        
+        // Previous average days in stock (using vehicles sold more than a month ago)
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        
+        const { data: previousSoldVehicles, error: previousSoldError } = await supabase
+          .from('vehicles')
+          .select('entry_date, updated_at')
+          .eq('status', 'sold')
+          .lt('updated_at', monthAgo.toISOString());
+          
+        if (previousSoldError) throw previousSoldError;
+        
+        let previousTotalDays = 0;
+        let previousVehicleCount = 0;
+        
+        previousSoldVehicles.forEach(vehicle => {
+          if (vehicle.entry_date && vehicle.updated_at) {
+            const entryDate = new Date(vehicle.entry_date);
+            const soldDate = new Date(vehicle.updated_at);
+            const daysDiff = Math.floor((soldDate.getTime() - entryDate.getTime()) / (1000 * 3600 * 24));
+            if (daysDiff > 0) {
+              previousTotalDays += daysDiff;
+              previousVehicleCount++;
+            }
+          }
+        });
+        
+        const previousAvgDays = previousVehicleCount > 0 ? Math.floor(previousTotalDays / previousVehicleCount) : 0;
+        
+        // Fetch latest vehicles in stock
+        const { data: latestVehicles, error: latestVehiclesError } = await supabase
+          .from('vehicles')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(5);
+          
+        if (latestVehiclesError) throw latestVehiclesError;
+        
+        // Fetch latest sales
+        const { data: latestSales, error: latestSalesError } = await supabase
+          .from('sales')
+          .select(`
+            id,
+            final_price,
+            sale_date,
+            vehicle:vehicles(brand, model, year),
+            customer:customers(name)
+          `)
+          .order('created_at', { ascending: false })
+          .limit(3);
+          
+        if (latestSalesError) throw latestSalesError;
+        
+        setDashboardData({
+          vehiclesInStock: vehiclesData.length,
+          vehiclesInStockChange: vehiclesData.length - (lastWeekCount || 0),
+          monthSales: salesData.length,
+          monthSalesChange: salesData.length - (lastMonthSales?.length || 0),
+          monthProfit: profit,
+          monthProfitChange: ((profit - lastMonthProfit) / (lastMonthProfit || 1)) * 100,
+          averageDaysInStock: avgDays,
+          averageDaysChange: previousAvgDays > 0 ? avgDays - previousAvgDays : 0,
+          latestVehicles: latestVehicles,
+          latestSales: latestSales as Sale[],
+        });
+      } catch (error) {
+        console.error('Error fetching dashboard data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
+    fetchDashboardData();
+    
+    // Set up real-time subscription for changes
+    const vehiclesSubscription = supabase
+      .channel('public:vehicles')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'vehicles' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+      
+    const salesSubscription = supabase
+      .channel('public:sales')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'sales' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+      
+    const transactionsSubscription = supabase
+      .channel('public:financial_transactions')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'financial_transactions' }, () => {
+        fetchDashboardData();
+      })
+      .subscribe();
+    
+    return () => {
+      supabase.removeChannel(vehiclesSubscription);
+      supabase.removeChannel(salesSubscription);
+      supabase.removeChannel(transactionsSubscription);
+    };
+  }, []);
+
+  // Generate a random tip from the list of tips
+  const tips = [
+    "Veículos com mais de 60 dias em estoque têm 40% mais chances de sofrer desvalorização.",
+    "Carros das cores branco, prata e preto tendem a ser vendidos 25% mais rápido.",
+    "Agende inspeções regulares nos veículos em estoque para evitar problemas na hora da venda.",
+    "Atualizar fotos dos veículos periodicamente pode aumentar o interesse dos clientes.",
+    "Ofereça test drives para clientes potenciais para aumentar as chances de venda.",
+    "Mantenha os documentos dos veículos organizados e atualizados."
+  ];
+  
+  // Get a random tip
+  const randomTip = tips[Math.floor(Math.random() * tips.length)];
+  
+  // Generate random reminders
+  const reminders = [
+    "Três veículos precisam de documentação atualizada esta semana.",
+    "Fazer revisão de preços dos veículos com mais de 45 dias em estoque.",
+    "Reunião com fornecedores agendada para amanhã.",
+    "Atualizar cadastro de clientes antigos.",
+    "Renovar seguro da loja."
+  ];
+  
+  // Get a random reminder
+  const randomReminder = reminders[Math.floor(Math.random() * reminders.length)];
+
+  // Calculate due dates for transactions
+  const dueDate = async () => {
+    const today = new Date();
+    const nextWeek = new Date();
+    nextWeek.setDate(today.getDate() + 7);
+    
+    const { data, error } = await supabase
+      .from('financial_transactions')
+      .select('*')
+      .eq('status', 'pending')
+      .lte('due_date', nextWeek.toISOString())
+      .gte('due_date', today.toISOString())
+      .order('due_date', { ascending: true });
+      
+    if (error) {
+      console.error('Error fetching due dates:', error);
+      return "Nenhum vencimento próximo.";
+    }
+    
+    if (data && data.length > 0) {
+      const totalAmount = data.reduce((sum, transaction) => sum + Number(transaction.amount), 0);
+      return `${data.length} faturas vencem nos próximos 7 dias, totalizando ${formatCurrency(totalAmount)}.`;
+    }
+    
+    return "Nenhum vencimento próximo.";
+  };
+  
+  const [dueDateMessage, setDueDateMessage] = useState("Carregando vencimentos...");
+  
+  useEffect(() => {
+    dueDate().then(setDueDateMessage);
+  }, []);
+
   const estadisticas = [
     {
       title: "Veículos em estoque",
-      value: "18",
+      value: isLoading ? "..." : dashboardData.vehiclesInStock.toString(),
       icon: <Car className="h-8 w-8 text-veloz-yellow" />,
-      change: "+2 esta semana",
-      trend: "up",
+      change: isLoading ? "..." : `${dashboardData.vehiclesInStockChange >= 0 ? '+' : ''}${dashboardData.vehiclesInStockChange} esta semana`,
+      trend: dashboardData.vehiclesInStockChange >= 0 ? "up" : "down",
     },
     {
       title: "Vendas do Mês",
-      value: "8",
+      value: isLoading ? "..." : dashboardData.monthSales.toString(),
       icon: <TrendingUp className="h-8 w-8 text-veloz-yellow" />,
-      change: "+3 desde semana passada",
-      trend: "up",
+      change: isLoading ? "..." : `${dashboardData.monthSalesChange >= 0 ? '+' : ''}${dashboardData.monthSalesChange} vs. mês anterior`,
+      trend: dashboardData.monthSalesChange >= 0 ? "up" : "down",
     },
     {
       title: "Lucro Mensal",
-      value: "R$ 68.500",
+      value: isLoading ? "..." : formatCurrency(dashboardData.monthProfit),
       icon: <DollarSign className="h-8 w-8 text-veloz-yellow" />,
-      change: "+12% do que mês passado",
-      trend: "up",
+      change: isLoading ? "..." : `${dashboardData.monthProfitChange >= 0 ? '+' : ''}${Math.abs(Math.round(dashboardData.monthProfitChange))}% vs. mês anterior`,
+      trend: dashboardData.monthProfitChange >= 0 ? "up" : "down",
     },
     {
       title: "Média Dias Estoque",
-      value: "42",
+      value: isLoading ? "..." : dashboardData.averageDaysInStock.toString(),
       icon: <Calendar className="h-8 w-8 text-veloz-yellow" />,
-      change: "-5 dias vs. média anterior",
-      trend: "down",
+      change: isLoading ? "..." : `${dashboardData.averageDaysChange <= 0 ? '-' : '+'}${Math.abs(dashboardData.averageDaysChange)} dias vs. média anterior`,
+      trend: dashboardData.averageDaysChange <= 0 ? "up" : "down", // Lower is better for days in stock
     },
   ];
-
-  const estoqueVeiculos = [
-    { id: 1, marca: 'Toyota', modelo: 'Corolla', ano: '2022', valor: 'R$ 128.900', status: 'Em estoque', dias: 15 },
-    { id: 2, marca: 'Honda', modelo: 'Civic', ano: '2021', valor: 'R$ 122.500', status: 'Em estoque', dias: 22 },
-    { id: 3, marca: 'Volkswagen', modelo: 'Golf', ano: '2023', valor: 'R$ 145.900', status: 'Reservado', dias: 8 },
-    { id: 4, marca: 'Hyundai', modelo: 'HB20', ano: '2022', valor: 'R$ 78.900', status: 'Em estoque', dias: 45 },
-    { id: 5, marca: 'Chevrolet', modelo: 'Onix', ano: '2021', valor: 'R$ 72.900', status: 'Vendido', dias: 12 },
-  ];
-
-  const ultimasVendas = [
-    { id: 1, veiculo: 'Jeep Compass', cliente: 'João Silva', valor: 'R$ 148.500', data: '22/04/2025' },
-    { id: 2, veiculo: 'Ford Ranger', cliente: 'Maria Souza', valor: 'R$ 185.900', data: '18/04/2025' },
-    { id: 3, veiculo: 'Fiat Toro', cliente: 'Carlos Mendes', valor: 'R$ 132.500', data: '15/04/2025' },
-  ];
+  
+  const calculateDaysInStock = (vehicle: Vehicle) => {
+    if (!vehicle.entry_date) return 0;
+    const entryDate = new Date(vehicle.entry_date);
+    const today = new Date();
+    return Math.floor((today.getTime() - entryDate.getTime()) / (1000 * 3600 * 24));
+  };
 
   return (
     <div className="space-y-8">
@@ -89,39 +384,52 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-veloz-black">
-                    <th className="text-left py-3 font-medium">Marca/Modelo</th>
-                    <th className="text-left py-3 font-medium">Ano</th>
-                    <th className="text-left py-3 font-medium">Valor</th>
-                    <th className="text-left py-3 font-medium">Status</th>
-                    <th className="text-left py-3 font-medium">Dias</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {estoqueVeiculos.map((veiculo) => (
-                    <tr key={veiculo.id} className="border-b border-veloz-black hover:bg-veloz-black hover:bg-opacity-40 transition-colors">
-                      <td className="py-3">{veiculo.marca} {veiculo.modelo}</td>
-                      <td className="py-3">{veiculo.ano}</td>
-                      <td className="py-3">{veiculo.valor}</td>
-                      <td className="py-3">
-                        <span className={`px-2 py-1 rounded-full text-xs ${
-                          veiculo.status === 'Em estoque' ? 'bg-blue-900 text-blue-200' :
-                          veiculo.status === 'Reservado' ? 'bg-amber-900 text-amber-200' : 
-                          'bg-green-900 text-green-200'
-                        }`}>
-                          {veiculo.status}
-                        </span>
-                      </td>
-                      <td className="py-3">{veiculo.dias}</td>
+              {isLoading ? (
+                <div className="flex justify-center py-8">Carregando veículos...</div>
+              ) : dashboardData.latestVehicles.length === 0 ? (
+                <div className="text-center py-8">Nenhum veículo em estoque</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-veloz-black">
+                      <th className="text-left py-3 font-medium">Marca/Modelo</th>
+                      <th className="text-left py-3 font-medium">Ano</th>
+                      <th className="text-left py-3 font-medium">Valor</th>
+                      <th className="text-left py-3 font-medium">Status</th>
+                      <th className="text-left py-3 font-medium">Dias</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {dashboardData.latestVehicles.map((veiculo) => (
+                      <tr key={veiculo.id} className="border-b border-veloz-black hover:bg-veloz-black hover:bg-opacity-40 transition-colors">
+                        <td className="py-3">{veiculo.brand} {veiculo.model}</td>
+                        <td className="py-3">{veiculo.year}</td>
+                        <td className="py-3">{formatCurrency(veiculo.sale_price)}</td>
+                        <td className="py-3">
+                          <span className={`px-2 py-1 rounded-full text-xs ${
+                            veiculo.status === 'in_stock' ? 'bg-blue-900 text-blue-200' :
+                            veiculo.status === 'reserved' ? 'bg-amber-900 text-amber-200' : 
+                            'bg-green-900 text-green-200'
+                          }`}>
+                            {veiculo.status === 'in_stock' ? 'Em estoque' :
+                             veiculo.status === 'reserved' ? 'Reservado' : 'Vendido'}
+                          </span>
+                        </td>
+                        <td className="py-3">{calculateDaysInStock(veiculo)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
             <div className="mt-4 text-center">
-              <button className="btn-outline text-sm">Ver todos os veículos</button>
+              <Button 
+                variant="outline" 
+                className="text-sm"
+                onClick={() => navigate('/estoque')}
+              >
+                Ver todos os veículos
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -136,29 +444,41 @@ const Dashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-veloz-black">
-                    <th className="text-left py-3 font-medium">Veículo</th>
-                    <th className="text-left py-3 font-medium">Cliente</th>
-                    <th className="text-left py-3 font-medium">Valor</th>
-                    <th className="text-left py-3 font-medium">Data</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {ultimasVendas.map((venda) => (
-                    <tr key={venda.id} className="border-b border-veloz-black hover:bg-veloz-black hover:bg-opacity-40 transition-colors">
-                      <td className="py-3">{venda.veiculo}</td>
-                      <td className="py-3">{venda.cliente}</td>
-                      <td className="py-3">{venda.valor}</td>
-                      <td className="py-3">{venda.data}</td>
+              {isLoading ? (
+                <div className="flex justify-center py-8">Carregando vendas...</div>
+              ) : dashboardData.latestSales.length === 0 ? (
+                <div className="text-center py-8">Nenhuma venda registrada</div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-veloz-black">
+                      <th className="text-left py-3 font-medium">Veículo</th>
+                      <th className="text-left py-3 font-medium">Cliente</th>
+                      <th className="text-left py-3 font-medium">Valor</th>
+                      <th className="text-left py-3 font-medium">Data</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {dashboardData.latestSales.map((venda) => (
+                      <tr key={venda.id} className="border-b border-veloz-black hover:bg-veloz-black hover:bg-opacity-40 transition-colors">
+                        <td className="py-3">{venda.vehicle?.brand} {venda.vehicle?.model}</td>
+                        <td className="py-3">{venda.customer?.name}</td>
+                        <td className="py-3">{formatCurrency(venda.final_price)}</td>
+                        <td className="py-3">{new Date(venda.sale_date!).toLocaleDateString('pt-BR')}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
             <div className="mt-4 text-center">
-              <button className="btn-outline text-sm">Ver todas as vendas</button>
+              <Button 
+                variant="outline" 
+                className="text-sm"
+                onClick={() => navigate('/vendas')}
+              >
+                Ver todas as vendas
+              </Button>
             </div>
           </CardContent>
         </Card>
@@ -179,15 +499,15 @@ const Dashboard = () => {
           <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-veloz-black rounded-lg p-4">
               <p className="font-medium mb-2 text-veloz-yellow">Dica do dia</p>
-              <p className="text-sm">Veículos com mais de 60 dias em estoque têm 40% mais chances de sofrer desvalorização.</p>
+              <p className="text-sm">{randomTip}</p>
             </div>
             <div className="bg-veloz-black rounded-lg p-4">
               <p className="font-medium mb-2 text-veloz-yellow">Lembrete</p>
-              <p className="text-sm">Três veículos precisam de documentação atualizada esta semana.</p>
+              <p className="text-sm">{randomReminder}</p>
             </div>
             <div className="bg-veloz-black rounded-lg p-4">
               <p className="font-medium mb-2 text-veloz-yellow">Próximos vencimentos</p>
-              <p className="text-sm">2 faturas vencem nos próximos 3 dias, totalizando R$ 15.450,00.</p>
+              <p className="text-sm">{dueDateMessage}</p>
             </div>
           </div>
         </CardContent>

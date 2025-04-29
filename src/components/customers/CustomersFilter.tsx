@@ -1,10 +1,11 @@
 
-import React, { useState } from 'react';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React, { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
-import { Search, X } from 'lucide-react';
+import { Input } from '@/components/ui/input';
+import { Search, User, Filter } from 'lucide-react';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
 import { CUSTOMER_SEGMENTS } from '@/types/customer';
+import { DummyDataGenerator } from '@/components/shared/DummyDataGenerator';
 
 interface CustomersFilterProps {
   onFilterChange: (filters: {
@@ -14,105 +15,87 @@ interface CustomersFilterProps {
   }) => void;
 }
 
-export const CustomersFilter: React.FC<CustomersFilterProps> = ({ onFilterChange }) => {
-  const [search, setSearch] = useState<string>('');
-  const [segment, setSegment] = useState<string>('all');
-  const [status, setStatus] = useState<string>('all');
-
-  const handleFilterApply = () => {
+export function CustomersFilter({ onFilterChange }: CustomersFilterProps) {
+  const [search, setSearch] = useState('');
+  const [segment, setSegment] = useState('all');
+  const [status, setStatus] = useState('all');
+  
+  useEffect(() => {
     onFilterChange({
       search,
       segment,
-      status
+      status,
     });
-  };
-
-  const handleReset = () => {
-    setSearch('');
-    setSegment('all');
-    setStatus('all');
-    
-    onFilterChange({
-      search: '',
-      segment: 'all',
-      status: 'all'
-    });
-  };
-
-  // Group segments by type for better organization
-  const behaviorSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'behavior');
-  const preferenceSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'preference');
-  const statusSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'status');
-
+  }, [search, segment, status, onFilterChange]);
+  
+  // Group segments by type
+  const groupedSegments = CUSTOMER_SEGMENTS.reduce((groups, item) => {
+    groups[item.type] = [...(groups[item.type] || []), item];
+    return groups;
+  }, {} as Record<string, typeof CUSTOMER_SEGMENTS>);
+  
   return (
     <div className="space-y-4">
-      <div className="flex flex-col md:flex-row gap-4">
-        <div className="w-full md:w-2/4">
-          <Input 
-            placeholder="Pesquisar por nome, CPF/CNPJ, email..." 
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full"
-            prefix={<Search size={16} />}
-          />
+      <div className="flex flex-col md:flex-row gap-4 items-end">
+        <div className="w-full md:w-1/3">
+          <div className="relative">
+            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Buscar por nome, documento ou e-mail..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="pl-8"
+            />
+          </div>
         </div>
         
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full md:w-2/4">
+        <div className="w-full md:w-1/4">
           <Select value={segment} onValueChange={setSegment}>
             <SelectTrigger>
-              <SelectValue placeholder="Segmento" />
+              <SelectValue placeholder="Filtrar por segmento" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">Todos Segmentos</SelectItem>
+              <SelectItem value="all">Todos os segmentos</SelectItem>
               
-              <SelectItem value="behavior" disabled className="font-semibold text-veloz-yellow">
-                Comportamento
-              </SelectItem>
-              {behaviorSegments.map((segment) => (
-                <SelectItem key={segment.id} value={segment.id}>
-                  {segment.label}
-                </SelectItem>
+              {Object.entries(groupedSegments).map(([type, segments]) => (
+                <React.Fragment key={type}>
+                  <SelectItem value={`header-${type}`} disabled className="text-xs uppercase font-bold py-1">
+                    {type === 'behavior' ? 'Comportamento' : 
+                     type === 'preference' ? 'Preferências' : 'Status'}
+                  </SelectItem>
+                  {segments.map(segment => (
+                    <SelectItem key={segment.id} value={segment.id}>
+                      {segment.label}
+                    </SelectItem>
+                  ))}
+                </React.Fragment>
               ))}
-              
-              <SelectItem value="preference" disabled className="font-semibold text-veloz-yellow">
-                Preferências
-              </SelectItem>
-              {preferenceSegments.map((segment) => (
-                <SelectItem key={segment.id} value={segment.id}>
-                  {segment.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          
-          <Select value={status} onValueChange={setStatus}>
-            <SelectTrigger>
-              <SelectValue placeholder="Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">Todos Status</SelectItem>
-              <SelectItem value="lead">Lead</SelectItem>
-              <SelectItem value="active">Cliente Ativo</SelectItem>
-              <SelectItem value="inactive">Cliente Inativo</SelectItem>
             </SelectContent>
           </Select>
         </div>
-      </div>
-      
-      <div className="flex justify-end gap-2">
-        <Button 
-          variant="outline" 
-          onClick={handleReset}
-        >
-          <X size={16} className="mr-1" /> Limpar
-        </Button>
-        <Button 
-          onClick={handleFilterApply}
-          className="bg-veloz-yellow hover:bg-yellow-500 text-black"
-        >
-          <Search size={16} className="mr-1" /> Aplicar
-        </Button>
+        
+        <div className="w-full md:w-1/4">
+          <Select value={status} onValueChange={setStatus}>
+            <SelectTrigger>
+              <SelectValue placeholder="Filtrar por status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os status</SelectItem>
+              <SelectItem value="active">Ativos</SelectItem>
+              <SelectItem value="inactive">Inativos</SelectItem>
+              <SelectItem value="lead">Leads</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        
+        <div className="flex items-center space-x-2">
+          <Button variant="default" size="icon">
+            <Filter size={16} />
+          </Button>
+          
+          <DummyDataGenerator type="customer" />
+        </div>
       </div>
     </div>
   );
-};
+}
