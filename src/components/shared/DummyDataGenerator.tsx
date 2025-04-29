@@ -18,23 +18,23 @@ export function DummyDataGenerator({ type, buttonClassName }: DummyDataGenerator
     setIsLoading(true);
     try {
       let message = '';
-      let functionName = '';
+      let functionName: "generate_dummy_vehicle" | "generate_dummy_customer" | "generate_dummy_transaction" | "generate_dummy_sale";
       
       switch (type) {
         case 'vehicle':
-          functionName = 'generate_dummy_vehicle';
+          functionName = "generate_dummy_vehicle";
           message = 'Veículo gerado com sucesso!';
           break;
         case 'customer':
-          functionName = 'generate_dummy_customer';
+          functionName = "generate_dummy_customer";
           message = 'Cliente gerado com sucesso!';
           break;
         case 'transaction':
-          functionName = 'generate_dummy_transaction';
+          functionName = "generate_dummy_transaction";
           message = 'Transação gerada com sucesso!';
           break;
         case 'sale':
-          functionName = 'generate_dummy_sale';
+          functionName = "generate_dummy_sale";
           message = 'Venda gerada com sucesso!';
           break;
       }

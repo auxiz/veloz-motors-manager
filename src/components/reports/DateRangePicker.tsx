@@ -8,7 +8,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { cn } from '@/lib/utils';
 
-interface DateRangePickerProps {
+export interface DateRangePickerProps {
   dateRange: {
     from: Date;
     to: Date;
@@ -74,6 +74,7 @@ export function DateRangePicker({ dateRange, onDateRangeChange }: DateRangePicke
           }}
           numberOfMonths={2}
           initialFocus
+          className="pointer-events-auto"
         />
       </PopoverContent>
     </Popover>
