@@ -103,7 +103,7 @@ export const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
               <SelectValue placeholder="Vendedor" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.name}>
                   {user.name}
@@ -119,7 +119,7 @@ export const SalesFilter = ({ onFilterChange }: SalesFilterProps) => {
               <SelectValue placeholder="Status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="">Todos</SelectItem>
+              <SelectItem value="all">Todos</SelectItem>
               <SelectItem value="completed">Concluída</SelectItem>
               <SelectItem value="pending">Pendente</SelectItem>
               <SelectItem value="canceled">Cancelada</SelectItem>
