@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -42,7 +43,9 @@ const transactionSchema = z.object({
   description: z.string().min(3, { 
     message: 'Descrição deve ter pelo menos 3 caracteres'
   }),
-  amount: z.string().transform(val => Number(val.replace(',', '.'))),
+  amount: z.coerce.number().min(0, {
+    message: 'Valor deve ser maior que zero'
+  }),
   status: z.enum(['paid', 'pending'], {
     required_error: 'Selecione o status da transação'
   }),
@@ -76,11 +79,10 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
   });
 
   const onSubmit = (data: TransactionFormValues) => {
-    // The key fix: ensure amount is a number when creating the transaction
     const newTransaction: Omit<Transaction, 'id'> = {
       type: data.type,
       description: data.description,
-      amount: Number(data.amount), // Explicitly ensure it's a number
+      amount: data.amount, // amount is already a number thanks to z.coerce.number()
       status: data.status,
       category: data.category,
       due_date: format(data.due_date, 'yyyy-MM-dd'),
