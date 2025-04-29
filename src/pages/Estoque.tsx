@@ -8,6 +8,7 @@ import { InventorySearch } from '@/components/inventory/InventorySearch';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { VehicleTable } from '@/components/inventory/VehicleTable';
 import { NewVehicleDialog } from '@/components/inventory/NewVehicleDialog';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 
 const Estoque = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -50,41 +51,43 @@ const Estoque = () => {
   }
 
   return (
-    <div className="space-y-8">
-      <InventoryHeader 
-        onViewChange={setVisualizacao}
-        currentView={visualizacao}
-        onNewVehicle={() => setNovoVeiculoDialogOpen(true)}
-      />
-      
-      <InventorySearch 
-        searchTerm={searchTerm}
-        onSearchChange={setSearchTerm}
-      />
-      
-      {visualizacao === 'lista' ? (
-        <Card className="bg-veloz-gray border-veloz-gray">
-          <VehicleTable 
-            vehicles={filteredVeiculos}
-            sortField={sortField}
-            sortDirection={sortDirection}
-            onSort={handleSort}
-            getSortIcon={getSortIcon}
-          />
-        </Card>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredVeiculos.map((vehicle) => (
-            <VehicleCard key={vehicle.id} vehicle={vehicle} />
-          ))}
-        </div>
-      )}
-      
-      <NewVehicleDialog 
-        open={novoVeiculoDialogOpen}
-        onOpenChange={setNovoVeiculoDialogOpen}
-      />
-    </div>
+    <AuthGuard allowedRoles={['administrator', 'seller', 'dispatcher']}>
+      <div className="space-y-8">
+        <InventoryHeader 
+          onViewChange={setVisualizacao}
+          currentView={visualizacao}
+          onNewVehicle={() => setNovoVeiculoDialogOpen(true)}
+        />
+        
+        <InventorySearch 
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+        />
+        
+        {visualizacao === 'lista' ? (
+          <Card className="bg-veloz-gray border-veloz-gray">
+            <VehicleTable 
+              vehicles={filteredVeiculos}
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onSort={handleSort}
+              getSortIcon={getSortIcon}
+            />
+          </Card>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredVeiculos.map((vehicle) => (
+              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+            ))}
+          </div>
+        )}
+        
+        <NewVehicleDialog 
+          open={novoVeiculoDialogOpen}
+          onOpenChange={setNovoVeiculoDialogOpen}
+        />
+      </div>
+    </AuthGuard>
   );
 };
 

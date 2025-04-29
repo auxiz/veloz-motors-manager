@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +9,7 @@ import { SalesFilter } from '@/components/sales/SalesFilter';
 import { NewSaleDialog } from '@/components/sales/NewSaleDialog';
 import { useUsers } from '@/hooks/useUsers';
 import { toast } from 'sonner';
+import { AuthGuard } from '@/components/auth/AuthGuard';
 
 const Vendas = () => {
   const [newSaleDialogOpen, setNewSaleDialogOpen] = useState(false);
@@ -38,20 +38,21 @@ const Vendas = () => {
   };
 
   return (
-    <div className="space-y-8">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold mb-2">Controle de Vendas</h1>
-          <p className="text-muted-foreground">Gerencie as vendas de veículos</p>
+    <AuthGuard allowedRoles={['administrator', 'seller']}>
+      <div className="space-y-8">
+        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+          <div>
+            <h1 className="text-3xl font-bold mb-2">Controle de Vendas</h1>
+            <p className="text-muted-foreground">Gerencie as vendas de veículos</p>
+          </div>
+          <Button
+            className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold"
+            onClick={handleNewSaleClick}
+          >
+            <Plus size={18} className="mr-2" />
+            Nova Venda
+          </Button>
         </div>
-        <Button
-          className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold"
-          onClick={handleNewSaleClick}
-        >
-          <Plus size={18} className="mr-2" />
-          Nova Venda
-        </Button>
-      </div>
 
       {user ? (
         <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
@@ -116,6 +117,7 @@ const Vendas = () => {
       
       <NewSaleDialog open={newSaleDialogOpen} onOpenChange={setNewSaleDialogOpen} />
     </div>
+    </AuthGuard>
   );
 };
 
