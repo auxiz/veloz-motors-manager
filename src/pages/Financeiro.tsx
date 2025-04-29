@@ -127,7 +127,7 @@ const Financeiro = () => {
         <CardHeader>
           <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
         </CardHeader>
-        <CardContent>
+        <CardContent className="relative z-10">
           <div className="flex items-center justify-center mb-4">
             <span className={`text-3xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
               {formatCurrency(netBalance)}
@@ -154,7 +154,7 @@ const Financeiro = () => {
               {activeTab === 'pending' && 'Transações Pendentes'}
             </CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="relative z-20">
             <div className="space-y-6">
               <TransactionsFilter onFilterChange={setFilters} />
               <TransactionsList 
