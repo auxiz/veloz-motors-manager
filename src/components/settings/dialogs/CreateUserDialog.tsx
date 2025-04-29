@@ -3,14 +3,13 @@ import React from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
+import { useProfiles } from '@/hooks/useProfiles';
+import { toast } from 'sonner';
 
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
@@ -23,10 +22,11 @@ type FormValues = z.infer<typeof formSchema>;
 interface CreateUserDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  onUserCreated?: () => void;
 }
 
-export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) {
-  const { toast } = useToast();
+export function CreateUserDialog({ open, onOpenChange, onUserCreated }: CreateUserDialogProps) {
+  const { inviteUser } = useProfiles();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -38,20 +38,18 @@ export function CreateUserDialog({ open, onOpenChange }: CreateUserDialogProps) 
 
   const onSubmit = async (data: FormValues) => {
     try {
-      // This would actually send an invite via Supabase Auth in a real implementation
-      // For now, we'll just show a toast message
-      toast({
-        title: "Convite enviado",
-        description: `Um convite foi enviado para ${data.email}`,
-      });
+      const result = await inviteUser(data.email, data.name, data.role);
       
-      form.reset();
-      onOpenChange(false);
+      if (result.success) {
+        form.reset();
+        onOpenChange(false);
+        if (onUserCreated) {
+          onUserCreated();
+        }
+      }
     } catch (error: any) {
-      toast({
-        title: "Erro ao enviar convite",
+      toast.error("Erro ao enviar convite", {
         description: error.message,
-        variant: "destructive",
       });
     }
   };

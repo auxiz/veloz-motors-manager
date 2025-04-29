@@ -1,19 +1,23 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Edit, Save, User, Image } from 'lucide-react';
+import { Edit, Save, User, Image, Loader2 } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
-import { useToast } from '@/hooks/use-toast';
+import { useProfiles } from '@/hooks/useProfiles';
+import { toast } from 'sonner';
 
 const ProfileSettings = () => {
-  const { user, updateUserProfile } = useUsers();
-  const { toast } = useToast();
+  const { user } = useUsers();
+  const { updateProfile, uploadAvatar } = useProfiles();
+  
   const [isEditing, setIsEditing] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
   
   const [formData, setFormData] = useState({
     firstName: user?.profile?.first_name || '',
@@ -24,6 +28,17 @@ const ProfileSettings = () => {
     confirmPassword: '',
   });
 
+  useEffect(() => {
+    if (user?.profile) {
+      setFormData(prev => ({
+        ...prev,
+        firstName: user.profile?.first_name || '',
+        lastName: user.profile?.last_name || '',
+        email: user.email || '',
+      }));
+    }
+  }, [user]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -32,24 +47,21 @@ const ProfileSettings = () => {
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (!user?.id) return;
+    
     try {
-      await updateUserProfile({
+      setIsUpdating(true);
+      
+      await updateProfile(user.id, {
         first_name: formData.firstName,
         last_name: formData.lastName,
       });
       
-      toast({
-        title: "Perfil atualizado",
-        description: "Suas informações foram atualizadas com sucesso.",
-      });
-      
       setIsEditing(false);
-    } catch (error: any) {
-      toast({
-        title: "Erro ao atualizar perfil",
-        description: error.message,
-        variant: "destructive",
-      });
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setIsUpdating(false);
     }
   };
 
@@ -57,18 +69,47 @@ const ProfileSettings = () => {
     e.preventDefault();
     
     if (formData.newPassword !== formData.confirmPassword) {
-      toast({
-        title: "Erro ao atualizar senha",
-        description: "As senhas não coincidem.",
-        variant: "destructive",
-      });
+      toast.error('As senhas não coincidem');
       return;
     }
     
-    toast({
-      title: "Senha atualizada",
-      description: "Sua senha foi atualizada com sucesso.",
-    });
+    // This would use Supabase Auth to update the password in a real app
+    toast.success('Senha atualizada com sucesso');
+    
+    // Reset password fields
+    setFormData(prev => ({
+      ...prev,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    }));
+  };
+
+  const handleAvatarChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    try {
+      setIsUploading(true);
+      
+      // Check file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('O arquivo é muito grande. Tamanho máximo: 5MB');
+        return;
+      }
+      
+      // Check file type
+      if (!file.type.startsWith('image/')) {
+        toast.error('Apenas arquivos de imagem são permitidos');
+        return;
+      }
+      
+      await uploadAvatar(file);
+    } catch (error) {
+      console.error('Error uploading avatar:', error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const getInitials = () => {
@@ -100,9 +141,22 @@ const ProfileSettings = () => {
                 </AvatarFallback>
               )}
             </Avatar>
-            <Button variant="outline">
-              <Image className="h-4 w-4 mr-2" />
-              Alterar Foto
+            <Button variant="outline" disabled={isUploading} asChild>
+              <label className="flex items-center cursor-pointer">
+                {isUploading ? (
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                ) : (
+                  <Image className="h-4 w-4 mr-2" />
+                )}
+                Alterar Foto
+                <input 
+                  type="file" 
+                  className="hidden" 
+                  accept="image/*"
+                  onChange={handleAvatarChange}
+                  disabled={isUploading}
+                />
+              </label>
             </Button>
           </div>
 
@@ -121,7 +175,7 @@ const ProfileSettings = () => {
                       <Input
                         id="firstName"
                         name="firstName"
-                        disabled={!isEditing}
+                        disabled={!isEditing || isUpdating}
                         value={formData.firstName}
                         onChange={handleInputChange}
                       />
@@ -131,7 +185,7 @@ const ProfileSettings = () => {
                       <Input
                         id="lastName"
                         name="lastName"
-                        disabled={!isEditing}
+                        disabled={!isEditing || isUpdating}
                         value={formData.lastName}
                         onChange={handleInputChange}
                       />
@@ -151,8 +205,12 @@ const ProfileSettings = () => {
                   
                   <div className="pt-2 flex justify-end">
                     {isEditing ? (
-                      <Button type="submit">
-                        <Save className="h-4 w-4 mr-2" />
+                      <Button type="submit" disabled={isUpdating}>
+                        {isUpdating ? (
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        ) : (
+                          <Save className="h-4 w-4 mr-2" />
+                        )}
                         Salvar
                       </Button>
                     ) : (
