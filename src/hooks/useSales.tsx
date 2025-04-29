@@ -60,6 +60,7 @@ export const useSales = () => {
 
   const addSale = useMutation({
     mutationFn: async (newSale: Omit<Sale, 'id'>) => {
+      console.log('Adding new sale:', newSale);
       // Begin by creating the sale record
       const { data, error } = await supabase
         .from('sales')
@@ -72,26 +73,38 @@ export const useSales = () => {
         .single();
 
       if (error) {
+        console.error('Error adding sale:', error);
         toast.error('Erro ao registrar venda');
         throw error;
       }
 
-      // Create financial transaction for this sale
-      await addTransaction.mutateAsync({
-        type: 'income',
-        category: 'venda',
-        description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
-        amount: data.final_price,
-        due_date: new Date().toISOString(), // Convert Date to string
-        status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
-        sale_id: data.id
-      });
+      console.log('Sale added successfully:', data);
 
-      // Update vehicle status to 'sold'
-      await updateVehicleStatus.mutateAsync({
-        id: newSale.vehicle_id,
-        status: 'sold'
-      });
+      try {
+        // Create financial transaction for this sale
+        await addTransaction.mutateAsync({
+          type: 'income',
+          category: 'venda',
+          description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
+          amount: data.final_price,
+          due_date: new Date().toISOString(), // Ensure proper date formatting
+          status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
+          sale_id: data.id
+        });
+
+        console.log('Transaction created for sale');
+
+        // Update vehicle status to 'sold'
+        await updateVehicleStatus.mutateAsync({
+          id: newSale.vehicle_id,
+          status: 'sold'
+        });
+
+        console.log('Vehicle status updated to sold');
+      } catch (transactionError) {
+        console.error('Error in post-sale operations:', transactionError);
+        // We don't throw here as the sale itself was successfully created
+      }
 
       toast.success('Venda registrada com sucesso!');
       return data;

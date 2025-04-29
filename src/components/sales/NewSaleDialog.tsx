@@ -46,7 +46,7 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
         payment_method: data.paymentMethod,
         seller_id: user.id,
         commission_amount: commissionAmount,
-        sale_date: new Date().toISOString(),
+        sale_date: new Date().toISOString(), // Make sure to convert Date to ISO string
       });
 
       onOpenChange(false);
