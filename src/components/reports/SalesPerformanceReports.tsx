@@ -10,7 +10,7 @@ import { SummaryCards } from './performance/SummaryCards';
 import { PerformanceChart } from './performance/PerformanceChart';
 import { SellersRankingTable } from './performance/SellersRankingTable';
 import { SalesDetailsTable } from './performance/SalesDetailsTable';
-import { calculatePerformanceData, prepareChartData, createDownloadCSV } from './performance/utils';
+import { calculatePerformanceData, prepareChartData, createDownloadCSV, createDownloadPDF } from './performance/utils';
 
 interface SalesPerformanceReportsProps {
   dateRange: {
@@ -37,6 +37,7 @@ export function SalesPerformanceReports({ dateRange }: SalesPerformanceReportsPr
   const performanceData = calculatePerformanceData(filteredSales, users);
   const chartData = prepareChartData(performanceData);
   const downloadCSV = createDownloadCSV(performanceData);
+  const downloadPDF = createDownloadPDF(performanceData, filteredSales, vehicles, users);
 
   // Calculate totals
   const totalSalesAmount = performanceData.reduce((total, user) => total + user.totalSales, 0);
@@ -55,6 +56,7 @@ export function SalesPerformanceReports({ dateRange }: SalesPerformanceReportsPr
       <PerformanceChart 
         chartData={chartData} 
         downloadCSV={downloadCSV} 
+        downloadPDF={downloadPDF}
       />
 
       {/* Sellers Ranking Table Component */}
@@ -65,6 +67,7 @@ export function SalesPerformanceReports({ dateRange }: SalesPerformanceReportsPr
         filteredSales={filteredSales}
         users={users}
         vehicles={vehicles}
+        downloadPDF={downloadPDF}
       />
     </div>
   );

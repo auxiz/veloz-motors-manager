@@ -9,7 +9,7 @@ import { SalesSummaryCards } from './sales/SalesSummaryCards';
 import { SalesFilterBar } from './sales/SalesFilterBar';
 import { SalesChart } from './sales/SalesChart';
 import { SalesDetailsTable } from './sales/SalesDetailsTable';
-import { filterSales, generateChartData, createDownloadCSV } from './sales/utils';
+import { filterSales, generateChartData, createDownloadCSV, createDownloadPDF } from './sales/utils';
 
 interface SalesReportsProps {
   dateRange: {
@@ -40,8 +40,9 @@ export function SalesReports({ dateRange }: SalesReportsProps) {
   const totalSales = filteredSales.length;
   const totalAmount = filteredSales.reduce((sum, sale) => sum + Number(sale.final_price), 0);
 
-  // Download as CSV function
+  // Download functions
   const downloadCSV = createDownloadCSV(filteredSales, vehicles, users);
+  const downloadPDF = createDownloadPDF(filteredSales, vehicles, users);
 
   // Loading state
   if (isLoadingSales) {
@@ -80,6 +81,7 @@ export function SalesReports({ dateRange }: SalesReportsProps) {
         vehicles={vehicles}
         users={users}
         downloadCSV={downloadCSV}
+        downloadPDF={downloadPDF}
       />
     </div>
   );

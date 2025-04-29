@@ -15,6 +15,7 @@ interface SalesDetailsTableProps {
   vehicles: Vehicle[];
   users: User[];
   downloadCSV: () => void;
+  downloadPDF: () => void;
 }
 
 export function SalesDetailsTable({
@@ -22,7 +23,8 @@ export function SalesDetailsTable({
   allSalesCount,
   vehicles,
   users,
-  downloadCSV
+  downloadCSV,
+  downloadPDF
 }: SalesDetailsTableProps) {
   return (
     <Card>
@@ -34,7 +36,7 @@ export function SalesDetailsTable({
               <Download className="h-4 w-4 mr-2" />
               CSV
             </Button>
-            <Button size="sm" variant="outline">
+            <Button size="sm" variant="outline" onClick={downloadPDF}>
               <FileText className="h-4 w-4 mr-2" />
               PDF
             </Button>
