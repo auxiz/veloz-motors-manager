@@ -75,53 +75,90 @@ export const useSales = () => {
         throw new Error(errorMsg);
       }
       
-      // Begin by creating the sale record
-      const { data, error } = await supabase
-        .from('sales')
-        .insert([newSale])
-        .select(`
-          *,
-          vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
-          customer:customers(name, document)
-        `)
-        .single();
-
-      if (error) {
-        console.error('Error adding sale:', error);
-        toast.error('Erro ao registrar venda');
-        throw error;
-      }
-
-      console.log('Sale added successfully:', data);
-
-      try {
-        // Create financial transaction for this sale
-        await addTransaction.mutateAsync({
-          type: 'income',
-          category: 'venda',
-          description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
-          amount: data.final_price,
-          due_date: new Date().toISOString(), // Ensure proper date formatting
-          status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
-          sale_id: data.id
-        });
-
-        console.log('Transaction created for sale');
-
-        // Update vehicle status to 'sold'
+      // Se estamos usando o usuário de demonstração (ID iniciando com zeros),
+      // usamos um fluxo alternativo para ambiente de desenvolvimento
+      const isDemoUser = newSale.seller_id.startsWith('00000000-0000-0000-0000');
+      
+      if (isDemoUser) {
+        console.log('Usando fluxo de desenvolvimento para usuário de demonstração');
+        
+        // Simular o registro da venda
+        const mockSale = {
+          id: `mock-${Date.now()}`,
+          ...newSale,
+          created_at: new Date().toISOString(),
+          vehicle: null,
+          customer: null,
+        };
+        
+        // Atualizar status do veículo
         await updateVehicleStatus.mutateAsync({
           id: newSale.vehicle_id,
           status: 'sold'
         });
+        
+        // Criar transação financeira para esta venda
+        await addTransaction.mutateAsync({
+          type: 'income',
+          category: 'venda',
+          description: `Venda de veículo (Demo)`,
+          amount: newSale.final_price,
+          due_date: new Date().toISOString(),
+          status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
+          sale_id: mockSale.id
+        });
+        
+        toast.success('Venda registrada com sucesso! (Modo demonstração)');
+        return mockSale;
+      } else {
+        // Fluxo normal para usuários reais
+        const { data, error } = await supabase
+          .from('sales')
+          .insert([newSale])
+          .select(`
+            *,
+            vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
+            customer:customers(name, document)
+          `)
+          .single();
 
-        console.log('Vehicle status updated to sold');
-      } catch (transactionError) {
-        console.error('Error in post-sale operations:', transactionError);
-        // We don't throw here as the sale itself was successfully created
+        if (error) {
+          console.error('Error adding sale:', error);
+          toast.error('Erro ao registrar venda');
+          throw error;
+        }
+
+        console.log('Sale added successfully:', data);
+
+        try {
+          // Create financial transaction for this sale
+          await addTransaction.mutateAsync({
+            type: 'income',
+            category: 'venda',
+            description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
+            amount: data.final_price,
+            due_date: new Date().toISOString(), // Ensure proper date formatting
+            status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
+            sale_id: data.id
+          });
+
+          console.log('Transaction created for sale');
+
+          // Update vehicle status to 'sold'
+          await updateVehicleStatus.mutateAsync({
+            id: newSale.vehicle_id,
+            status: 'sold'
+          });
+
+          console.log('Vehicle status updated to sold');
+        } catch (transactionError) {
+          console.error('Error in post-sale operations:', transactionError);
+          // We don't throw here as the sale itself was successfully created
+        }
+
+        toast.success('Venda registrada com sucesso!');
+        return data;
       }
-
-      toast.success('Venda registrada com sucesso!');
-      return data;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
