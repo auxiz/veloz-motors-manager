@@ -72,7 +72,7 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
     defaultValues: {
       type: 'income',
       description: '',
-      amount: '',
+      amount: 0, // Initialize as number, not string
       status: 'pending',
       category: '',
     },
@@ -82,7 +82,7 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
     const newTransaction: Omit<Transaction, 'id'> = {
       type: data.type,
       description: data.description,
-      amount: data.amount, // amount is already a number thanks to z.coerce.number()
+      amount: data.amount, // This is already a number thanks to z.coerce.number()
       status: data.status,
       category: data.category,
       due_date: format(data.due_date, 'yyyy-MM-dd'),
@@ -181,14 +181,18 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
               <FormField
                 control={form.control}
                 name="amount"
-                render={({ field }) => (
+                render={({ field: { onChange, ...rest } }) => (
                   <FormItem>
                     <FormLabel>Valor (R$)</FormLabel>
                     <FormControl>
                       <Input 
                         placeholder="0,00" 
-                        {...field} 
-                        type="text"
+                        onChange={(e) => {
+                          // Allow input in the Brazilian currency format (comma as decimal separator)
+                          const value = e.target.value.replace(',', '.');
+                          onChange(value);
+                        }}
+                        {...rest}
                       />
                     </FormControl>
                     <FormMessage />
