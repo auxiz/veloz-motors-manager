@@ -10,13 +10,13 @@ import {
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { useTransactions } from '@/hooks/useTransactions';
+import { useTransactions, Transaction } from '@/hooks/useTransactions';
 import { formatCurrency, formatDate } from '@/lib/utils';
 import { EditTransactionDialog } from './EditTransactionDialog';
 
 interface TransactionsListProps {
   transactionType?: 'income' | 'expense';
-  status?: string;
+  status?: 'pending' | 'paid';
   filters?: {
     startDate: Date | null;
     endDate: Date | null;
@@ -60,7 +60,7 @@ export const TransactionsList = ({
       );
     }
     
-    if (filters.category) {
+    if (filters.category && filters.category !== 'all') {
       filteredTransactions = filteredTransactions.filter(t => 
         t.category === filters.category
       );
@@ -89,7 +89,7 @@ export const TransactionsList = ({
     return <div className="text-center py-8">Nenhuma transação encontrada.</div>;
   }
 
-  const handleStatusChange = (transaction: any) => {
+  const handleStatusChange = (transaction: Transaction) => {
     const newStatus = transaction.status === 'paid' ? 'pending' : 'paid';
     updateTransaction.mutate({
       ...transaction, 

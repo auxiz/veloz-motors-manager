@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
-import { useTransactions } from '@/hooks/useTransactions';
+import { useTransactions, Transaction } from '@/hooks/useTransactions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const CATEGORIES = [
@@ -77,10 +77,16 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
   });
 
   const onSubmit = (data: TransactionFormValues) => {
-    addTransaction.mutate({
-      ...data,
+    const newTransaction: Omit<Transaction, 'id'> = {
+      type: data.type,
+      description: data.description,
+      amount: Number(data.amount),
+      status: data.status,
+      category: data.category,
       due_date: format(data.due_date, 'yyyy-MM-dd'),
-    });
+    };
+    
+    addTransaction.mutate(newTransaction);
     form.reset();
     onOpenChange(false);
   };

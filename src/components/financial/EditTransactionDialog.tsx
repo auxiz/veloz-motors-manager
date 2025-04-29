@@ -1,3 +1,4 @@
+
 import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -21,7 +22,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
-import { useTransactions } from '@/hooks/useTransactions';
+import { useTransactions, Transaction } from '@/hooks/useTransactions';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const CATEGORIES = [
@@ -52,7 +53,7 @@ const transactionSchema = z.object({
   category: z.string().min(1, {
     message: 'Selecione uma categoria'
   }),
-  sale_id: z.string().nullable(),
+  sale_id: z.string().nullable().optional(),
 });
 
 type TransactionFormValues = z.infer<typeof transactionSchema>;
@@ -96,11 +97,15 @@ export function EditTransactionDialog({
   }, [transactionId, transactions, form]);
 
   const onSubmit = (data: TransactionFormValues) => {
-    const formattedData = {
-      ...data,
+    const formattedData: Transaction = {
+      id: data.id,
+      type: data.type,
+      category: data.category,
+      description: data.description,
+      amount: Number(data.amount),
       due_date: data.due_date.toISOString().split('T')[0],
-      // Keep the sale_id relationship intact
-      sale_id: form.getValues('sale_id'),
+      status: data.status,
+      sale_id: data.sale_id || undefined,
     };
     
     updateTransaction.mutate(formattedData);

@@ -91,7 +91,7 @@ export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) 
                 <SelectValue placeholder="Todas" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todas</SelectItem>
+                <SelectItem value="all">Todas</SelectItem>
                 {CATEGORIES.map(cat => (
                   <SelectItem key={cat} value={cat}>{cat}</SelectItem>
                 ))}
@@ -106,7 +106,7 @@ export const TransactionsFilter = ({ onFilterChange }: TransactionsFilterProps) 
                 <SelectValue placeholder="Todos" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Todos</SelectItem>
+                <SelectItem value="all">Todos</SelectItem>
                 <SelectItem value="paid">Pago</SelectItem>
                 <SelectItem value="pending">Pendente</SelectItem>
               </SelectContent>

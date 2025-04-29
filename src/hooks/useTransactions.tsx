@@ -3,14 +3,14 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
-type Transaction = {
+export type Transaction = {
   id: string;
-  type: string;
+  type: 'income' | 'expense';
   category: string;
   description: string;
   amount: number;
   due_date: string;
-  status: string;
+  status: 'pending' | 'paid';
   sale_id?: string;
 };
 
@@ -102,7 +102,7 @@ export const useTransactions = () => {
       `${sale.vehicle.brand} ${sale.vehicle.model} (${sale.vehicle.year})` : 
       'Veículo';
     
-    const newTransaction = {
+    const newTransaction: Omit<Transaction, 'id'> = {
       type: 'income',
       category: 'venda',
       description: `Venda de ${vehicleDescription}`,

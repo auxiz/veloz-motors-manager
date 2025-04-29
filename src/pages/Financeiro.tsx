@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, Plus, FileText, ArrowDown, ArrowUp } from 'lucide-react';
+import { DollarSign, Plus, ArrowDown, ArrowUp } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { useTransactions } from '@/hooks/useTransactions';
 import { TransactionsList } from '@/components/financial/TransactionsList';
@@ -49,6 +49,13 @@ const Financeiro = () => {
   );
 
   const netBalance = (summary.totalReceived - summary.totalPaid);
+
+  // Function to determine which transactions to display based on the active tab
+  const getTransactionType = (): 'income' | 'expense' | undefined => {
+    if (activeTab === 'income') return 'income';
+    if (activeTab === 'expense') return 'expense';
+    return undefined;
+  };
 
   return (
     <div className="space-y-8">
@@ -151,7 +158,7 @@ const Financeiro = () => {
             <div className="space-y-6">
               <TransactionsFilter onFilterChange={setFilters} />
               <TransactionsList 
-                transactionType={activeTab === 'all' ? undefined : (activeTab === 'pending' ? undefined : activeTab)}
+                transactionType={getTransactionType()}
                 status={activeTab === 'pending' ? 'pending' : undefined}
                 filters={filters}
               />
