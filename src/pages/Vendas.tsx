@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { DollarSign, Plus, FileText } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { useSales } from '@/hooks/useSales';
 import { SalesList } from '@/components/sales/SalesList';
 import { SalesFilter } from '@/components/sales/SalesFilter';
@@ -62,18 +62,15 @@ const Vendas = () => {
               </TabsContent>
               
               <TabsContent value="cash" className="mt-0">
-                {/* Will use the same component with filters */}
-                <SalesList />
+                <SalesList filter="cash" />
               </TabsContent>
               
               <TabsContent value="financing" className="mt-0">
-                {/* Will use the same component with filters */}
-                <SalesList />
+                <SalesList filter="financing" />
               </TabsContent>
               
               <TabsContent value="other" className="mt-0">
-                {/* Will use the same component with filters */}
-                <SalesList />
+                <SalesList filter="other" />
               </TabsContent>
             </div>
           </CardContent>

@@ -10,8 +10,22 @@ import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateSaleContract } from '@/lib/contractGenerator';
 
-export const SalesList = () => {
+interface SalesListProps {
+  filter?: 'cash' | 'financing' | 'other';
+}
+
+export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
   const { sales, isLoading } = useSales();
+
+  // Apply filter if provided
+  const filteredSales = filter 
+    ? sales.filter(sale => {
+        if (filter === 'cash') return sale.payment_method === 'cash';
+        if (filter === 'financing') return sale.payment_method === 'financing';
+        if (filter === 'other') return sale.payment_method !== 'cash' && sale.payment_method !== 'financing';
+        return true;
+      })
+    : sales;
 
   const handleGenerateContract = (sale: any) => {
     generateSaleContract(sale);
@@ -25,7 +39,7 @@ export const SalesList = () => {
     );
   }
 
-  if (!sales.length) {
+  if (!filteredSales.length) {
     return (
       <div className="flex flex-col items-center justify-center h-40 text-center">
         <p className="text-muted-foreground">Nenhuma venda registrada</p>
@@ -49,7 +63,7 @@ export const SalesList = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {sales.map((sale) => (
+          {filteredSales.map((sale) => (
             <TableRow key={sale.id}>
               <TableCell>
                 {sale.sale_date 

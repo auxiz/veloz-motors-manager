@@ -88,10 +88,32 @@ export const useVehicles = () => {
     },
   });
 
+  const updateVehicleStatus = useMutation({
+    mutationFn: async ({ id, status }: { id: string, status: string }) => {
+      const { data, error } = await supabase
+        .from('vehicles')
+        .update({ status })
+        .eq('id', id)
+        .select()
+        .single();
+
+      if (error) {
+        toast.error('Erro ao atualizar status do veículo');
+        throw error;
+      }
+
+      return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+    },
+  });
+
   return {
     vehicles,
     isLoading,
     addVehicle,
     updateVehicle,
+    updateVehicleStatus,
   };
 };

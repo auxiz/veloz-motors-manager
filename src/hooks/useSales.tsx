@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useTransactions } from './useTransactions';
+import { useVehicles } from './useVehicles';
 
 export type Sale = {
   id: string;
@@ -30,7 +31,8 @@ export type Sale = {
 
 export const useSales = () => {
   const queryClient = useQueryClient();
-  const { createSaleTransaction } = useTransactions();
+  const { addTransaction } = useTransactions();
+  const { updateVehicleStatus } = useVehicles();
 
   const { data: sales = [], isLoading } = useQuery({
     queryKey: ['sales'],
@@ -58,6 +60,7 @@ export const useSales = () => {
 
   const addSale = useMutation({
     mutationFn: async (newSale: Omit<Sale, 'id'>) => {
+      // Begin by creating the sale record
       const { data, error } = await supabase
         .from('sales')
         .insert([newSale])
@@ -69,30 +72,34 @@ export const useSales = () => {
         .single();
 
       if (error) {
-        toast.error('Erro ao adicionar venda');
+        toast.error('Erro ao registrar venda');
         throw error;
       }
 
-      // Update vehicle status
-      const { error: vehicleError } = await supabase
-        .from('vehicles')
-        .update({ status: 'sold' })
-        .eq('id', newSale.vehicle_id);
+      // Create financial transaction for this sale
+      await addTransaction.mutateAsync({
+        type: 'income',
+        category: 'venda',
+        description: `Venda de veículo - ${data.vehicle?.brand} ${data.vehicle?.model} (${data.vehicle?.year})`,
+        amount: data.final_price,
+        due_date: new Date(),
+        status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
+        sale_id: data.id
+      });
 
-      if (vehicleError) {
-        toast.error('Erro ao atualizar status do veículo');
-        throw vehicleError;
-      }
+      // Update vehicle status to 'sold'
+      await updateVehicleStatus.mutateAsync({
+        id: newSale.vehicle_id,
+        status: 'sold'
+      });
 
       toast.success('Venda registrada com sucesso!');
       return data;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['sales'] });
       queryClient.invalidateQueries({ queryKey: ['vehicles'] });
-      
-      // Automatically create financial transaction for this sale
-      createSaleTransaction(data);
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
     },
   });
 

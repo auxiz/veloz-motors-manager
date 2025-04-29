@@ -8,7 +8,7 @@ export type Transaction = {
   type: 'income' | 'expense';
   category: string;
   description: string;
-  amount: number; // Explicitly defined as number
+  amount: number;
   due_date: string;
   status: 'pending' | 'paid';
   sale_id?: string;
@@ -102,31 +102,11 @@ export const useTransactions = () => {
     },
   });
 
-  // Function to automatically create a financial transaction linked to a sale
-  const createSaleTransaction = async (sale: any) => {
-    const vehicleDescription = sale.vehicle ? 
-      `${sale.vehicle.brand} ${sale.vehicle.model} (${sale.vehicle.year})` : 
-      'Veículo';
-    
-    const newTransaction: Omit<Transaction, 'id'> = {
-      type: 'income',
-      category: 'venda',
-      description: `Venda de ${vehicleDescription}`,
-      amount: Number(sale.final_price),  // Ensure this is a number
-      due_date: new Date().toISOString().split('T')[0],
-      status: 'pending',
-      sale_id: sale.id
-    };
-
-    return addTransaction.mutate(newTransaction);
-  };
-
   return {
     transactions,
     isLoading,
     addTransaction,
     updateTransaction,
     deleteTransaction,
-    createSaleTransaction,
   };
 };

@@ -8,6 +8,7 @@ export const transactionSchema = z.object({
   amount: z.coerce.number().min(0.01, { message: 'Digite um valor válido' }),
   status: z.enum(['pending', 'paid']),
   due_date: z.date(),
+  sale_id: z.string().optional(),
 });
 
 export type TransactionFormValues = z.infer<typeof transactionSchema>;
