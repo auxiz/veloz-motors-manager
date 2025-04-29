@@ -6,6 +6,7 @@ import { useSales } from '@/hooks/useSales';
 import { useUsers } from '@/hooks/useUsers';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { SaleForm } from './SaleForm';
+import { toast } from 'sonner';
 
 interface NewSaleDialogProps {
   open: boolean;
@@ -29,10 +30,21 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
     commissionType: 'fixed' | 'percentage';
     commissionValue: number;
   }) => {
-    if (!user?.id) return;
+    if (!user) {
+      toast.error('Usuário não autenticado');
+      return;
+    }
+    
+    if (!user.id) {
+      toast.error('ID de usuário não disponível');
+      return;
+    }
     
     setIsSubmitting(true);
     try {
+      console.log('Registrando venda com dados:', data);
+      console.log('Usuário atual:', user);
+      
       // Calculate commission amount
       const commissionAmount = data.commissionType === 'fixed'
         ? data.commissionValue
@@ -46,12 +58,14 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
         payment_method: data.paymentMethod,
         seller_id: user.id,
         commission_amount: commissionAmount,
-        sale_date: new Date().toISOString(), // Make sure to convert Date to ISO string
+        sale_date: new Date().toISOString(), // Garantir que a data está no formato correto
       });
 
+      toast.success('Venda registrada com sucesso!');
       onOpenChange(false);
     } catch (error) {
-      console.error('Error registering sale:', error);
+      console.error('Erro ao registrar venda:', error);
+      toast.error('Erro ao registrar venda. Verifique o console para mais detalhes.');
     } finally {
       setIsSubmitting(false);
     }

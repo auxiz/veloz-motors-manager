@@ -61,6 +61,20 @@ export const useSales = () => {
   const addSale = useMutation({
     mutationFn: async (newSale: Omit<Sale, 'id'>) => {
       console.log('Adding new sale:', newSale);
+      
+      // Validar campos obrigatórios
+      if (!newSale.vehicle_id || !newSale.customer_id || !newSale.seller_id) {
+        const missingFields = [];
+        if (!newSale.vehicle_id) missingFields.push('vehicle_id');
+        if (!newSale.customer_id) missingFields.push('customer_id');
+        if (!newSale.seller_id) missingFields.push('seller_id');
+        
+        const errorMsg = `Campos obrigatórios faltando: ${missingFields.join(', ')}`;
+        console.error(errorMsg);
+        toast.error(errorMsg);
+        throw new Error(errorMsg);
+      }
+      
       // Begin by creating the sale record
       const { data, error } = await supabase
         .from('sales')
