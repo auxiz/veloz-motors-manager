@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useTransactions } from './useTransactions';
 
-type Sale = {
+export type Sale = {
   id: string;
   vehicle_id: string;
   customer_id: string;
@@ -13,6 +13,19 @@ type Sale = {
   seller_id: string;
   commission_amount: number;
   sale_date: string;
+  vehicle?: {
+    brand: string;
+    model: string;
+    version?: string;
+    year: number;
+    color: string;
+    transmission: string;
+    fuel: string;
+  };
+  customer?: {
+    name: string;
+    document: string;
+  };
 };
 
 export const useSales = () => {
