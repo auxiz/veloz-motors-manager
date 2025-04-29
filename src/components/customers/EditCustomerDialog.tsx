@@ -10,18 +10,20 @@ import { Button } from '@/components/ui/button';
 import { useCustomers } from '@/hooks/useCustomers';
 import { Textarea } from '@/components/ui/textarea';
 import { DatePicker } from '@/components/ui/date-picker';
-import { Customer } from '@/types/customer';
+import { Customer, CUSTOMER_SEGMENTS } from '@/types/customer';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { CheckboxReactHookFormMultiple } from '@/components/ui/checkbox-multiple';
 
 const customerSchema = z.object({
   name: z.string().min(3, { message: 'Nome deve ter no mínimo 3 caracteres' }),
   document: z.string().min(11, { message: 'CPF/CNPJ inválido' }),
-  phone: z.string().optional(),
+  phone: z.string().optional().or(z.literal('')),
   email: z.string().email({ message: 'Email inválido' }).optional().or(z.literal('')),
   address: z.string().optional().or(z.literal('')),
   birth_date: z.date().optional().nullable(),
   internal_notes: z.string().optional().or(z.literal('')),
   status: z.string(),
-  tags: z.array(z.string()).nullable(),
+  tags: z.array(z.string()).default([]),
 });
 
 type CustomerFormValues = z.infer<typeof customerSchema>;
@@ -94,6 +96,10 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
       console.error('Error updating customer:', error);
     }
   };
+
+  // Group segments by type for the UI
+  const behaviorSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'behavior');
+  const preferenceSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'preference');
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -188,6 +194,57 @@ export const EditCustomerDialog: React.FC<EditCustomerDialogProps> = ({
                     placeholder="Selecione a data" 
                   />
                   <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="status"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Status do Cliente</FormLabel>
+                  <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Selecione o status" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="bg-veloz-black border-veloz-gray">
+                      <SelectItem value="active">Cliente Ativo</SelectItem>
+                      <SelectItem value="inactive">Cliente Inativo</SelectItem>
+                      <SelectItem value="lead">Lead</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="tags"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Segmentação do Cliente</FormLabel>
+                  <div className="space-y-4">
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Comportamento do Cliente</h4>
+                      <CheckboxReactHookFormMultiple
+                        items={behaviorSegments.map(s => ({ id: s.id, label: s.label }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-medium mb-2">Preferências do Cliente</h4>
+                      <CheckboxReactHookFormMultiple
+                        items={preferenceSegments.map(s => ({ id: s.id, label: s.label }))}
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    </div>
+                  </div>
                 </FormItem>
               )}
             />

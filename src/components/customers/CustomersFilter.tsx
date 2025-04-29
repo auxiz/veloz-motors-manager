@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { Search, X } from 'lucide-react';
+import { CUSTOMER_SEGMENTS } from '@/types/customer';
 
 interface CustomersFilterProps {
   onFilterChange: (filters: {
@@ -38,6 +39,11 @@ export const CustomersFilter: React.FC<CustomersFilterProps> = ({ onFilterChange
     });
   };
 
+  // Group segments by type for better organization
+  const behaviorSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'behavior');
+  const preferenceSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'preference');
+  const statusSegments = CUSTOMER_SEGMENTS.filter(s => s.type === 'status');
+
   return (
     <div className="space-y-4">
       <div className="flex flex-col md:flex-row gap-4">
@@ -58,11 +64,24 @@ export const CustomersFilter: React.FC<CustomersFilterProps> = ({ onFilterChange
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos Segmentos</SelectItem>
-              <SelectItem value="frequent">Comprador Frequente</SelectItem>
-              <SelectItem value="first-time">Primeira Compra</SelectItem>
-              <SelectItem value="suv">Preferência: SUV</SelectItem>
-              <SelectItem value="sedan">Preferência: Sedan</SelectItem>
-              <SelectItem value="pickup">Preferência: Pickup</SelectItem>
+              
+              <SelectItem value="behavior" disabled className="font-semibold text-veloz-yellow">
+                Comportamento
+              </SelectItem>
+              {behaviorSegments.map((segment) => (
+                <SelectItem key={segment.id} value={segment.id}>
+                  {segment.label}
+                </SelectItem>
+              ))}
+              
+              <SelectItem value="preference" disabled className="font-semibold text-veloz-yellow">
+                Preferências
+              </SelectItem>
+              {preferenceSegments.map((segment) => (
+                <SelectItem key={segment.id} value={segment.id}>
+                  {segment.label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
           

@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { Badge } from '@/components/ui/badge';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useSales } from '@/hooks/useSales';
+import { CUSTOMER_SEGMENTS } from '@/types/customer';
 
 interface CustomerDetailsDialogProps {
   customerId: string;
@@ -26,6 +27,44 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
     return null;
   }
 
+  // Get customer segments
+  const getCustomerSegmentBadges = () => {
+    if (!customer.tags || customer.tags.length === 0) {
+      return <Badge className="bg-blue-600">Novo Cliente</Badge>;
+    }
+    
+    return customer.tags.map(tag => {
+      const segment = CUSTOMER_SEGMENTS.find(s => s.id === tag);
+      if (!segment) return null;
+      
+      // Use different colors for different segment types
+      let badgeClass = "";
+      if (segment.type === 'behavior') badgeClass = "bg-blue-600";
+      if (segment.type === 'preference') badgeClass = "bg-purple-600";
+      if (segment.type === 'status') badgeClass = "bg-green-600";
+      
+      return (
+        <Badge key={tag} className={badgeClass}>
+          {segment.label}
+        </Badge>
+      );
+    });
+  };
+
+  // Get status badge
+  const getStatusBadge = () => {
+    switch (customer.status) {
+      case 'active':
+        return <Badge className="bg-green-600">Cliente Ativo</Badge>;
+      case 'inactive':
+        return <Badge className="bg-gray-600">Cliente Inativo</Badge>;
+      case 'lead':
+        return <Badge className="bg-blue-600">Lead</Badge>;
+      default:
+        return null;
+    }
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="bg-veloz-black text-veloz-white border-veloz-gray max-w-3xl">
@@ -38,8 +77,8 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
           <p className="text-veloz-gray-lighter">{customer.document}</p>
           
           <div className="flex flex-wrap gap-2 mt-4">
-            <Badge className="bg-blue-600">Novo Cliente</Badge>
-            <Badge className="bg-green-600">Cliente Ativo</Badge>
+            {getStatusBadge()}
+            {getCustomerSegmentBadges()}
             {customerSales.length > 0 && customerSales[0].vehicle?.brand && (
               <Badge className="bg-purple-600">Comprador de {customerSales[0].vehicle.brand}</Badge>
             )}
@@ -76,7 +115,7 @@ export const CustomerDetailsDialog: React.FC<CustomerDetailsDialogProps> = ({
               {customerSales.length === 0 ? (
                 <p>Este cliente ainda não realizou nenhuma compra.</p>
               ) : (
-                <div className="space-y-4">
+                <div className="space-y-4 max-h-80 overflow-y-auto pr-2">
                   {customerSales.map((sale) => (
                     <div key={sale.id} className="bg-veloz-black border border-veloz-gray rounded-md p-4">
                       <div className="flex justify-between items-start">

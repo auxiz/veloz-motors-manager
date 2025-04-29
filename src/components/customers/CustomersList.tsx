@@ -2,11 +2,13 @@
 import React, { useState } from 'react';
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
-import { Edit, FileText, Eye } from 'lucide-react';
+import { Edit, FileText, Trash2, Eye } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { useCustomers } from '@/hooks/useCustomers';
 import { CustomerDetailsDialog } from './CustomerDetailsDialog';
 import { EditCustomerDialog } from './EditCustomerDialog';
+import { DeleteCustomerDialog } from './DeleteCustomerDialog';
+import { CUSTOMER_SEGMENTS } from '@/types/customer';
 
 interface CustomersListProps {
   filters: {
@@ -21,6 +23,7 @@ export const CustomersList: React.FC<CustomersListProps> = ({ filters }) => {
   const [selectedCustomer, setSelectedCustomer] = useState<string | null>(null);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
 
   // Filter customers based on filters
   const filteredCustomers = customers.filter(customer => {
@@ -31,16 +34,15 @@ export const CustomersList: React.FC<CustomersListProps> = ({ filters }) => {
       return false;
     }
     
-    // Segment filter - in a real app, this would filter based on tags stored in DB
+    // Segment filter
     if (filters.segment !== 'all') {
-      // This is placeholder logic - in real implementation, we'd check tags from the database
-      return false; // Currently no segment data available
+      // Check if customer has the selected segment in tags
+      return customer.tags?.includes(filters.segment) ?? false;
     }
     
-    // Status filter - in a real app, this would filter based on status stored in DB
-    if (filters.status !== 'all') {
-      // This is placeholder logic - in real implementation, we'd check status from the database
-      return false; // Currently no status data available
+    // Status filter
+    if (filters.status !== 'all' && customer.status !== filters.status) {
+      return false;
     }
     
     return true;
@@ -54,6 +56,34 @@ export const CustomersList: React.FC<CustomersListProps> = ({ filters }) => {
   const handleEdit = (customerId: string) => {
     setSelectedCustomer(customerId);
     setIsEditOpen(true);
+  };
+
+  const handleDelete = (customerId: string) => {
+    setSelectedCustomer(customerId);
+    setIsDeleteOpen(true);
+  };
+
+  const getCustomerSegmentBadges = (customer: any) => {
+    if (!customer.tags || customer.tags.length === 0) {
+      return <Badge variant="outline" className="bg-veloz-black">Novo Cliente</Badge>;
+    }
+    
+    return customer.tags.map((tag: string) => {
+      const segment = CUSTOMER_SEGMENTS.find(s => s.id === tag);
+      if (!segment) return null;
+      
+      // Use different colors for different segment types
+      let badgeClass = "bg-veloz-black";
+      if (segment.type === 'behavior') badgeClass = "bg-blue-700";
+      if (segment.type === 'preference') badgeClass = "bg-purple-700";
+      if (segment.type === 'status') badgeClass = "bg-green-700";
+      
+      return (
+        <Badge key={tag} variant="outline" className={badgeClass}>
+          {segment.label}
+        </Badge>
+      );
+    });
   };
 
   if (isLoading) {
@@ -90,29 +120,48 @@ export const CustomersList: React.FC<CustomersListProps> = ({ filters }) => {
                   {customer.phone ? customer.phone : '-'}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  <Badge variant="outline" className="bg-veloz-black">Novo Cliente</Badge>
+                  <div className="flex flex-wrap gap-1">
+                    {getCustomerSegmentBadges(customer)}
+                  </div>
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  <Badge className="bg-green-700 text-white">Ativo</Badge>
+                  <Badge className={
+                    customer.status === 'active' ? 'bg-green-700 text-white' : 
+                    customer.status === 'lead' ? 'bg-blue-700 text-white' : 
+                    'bg-gray-700 text-white'
+                  }>
+                    {customer.status === 'active' ? 'Ativo' : 
+                     customer.status === 'lead' ? 'Lead' : 
+                     customer.status === 'inactive' ? 'Inativo' : 'Desconhecido'}
+                  </Badge>
                 </TableCell>
-                <TableCell className="text-right space-x-2">
+                <TableCell className="text-right space-x-1">
                   <Button
                     onClick={() => handleViewDetails(customer.id)}
                     variant="outline"
                     size="sm"
-                    className="h-8 w-8 p-0 sm:w-auto sm:px-3"
+                    className="h-8 w-8 p-0 sm:w-auto sm:px-2"
                   >
-                    <Eye size={16} className="sm:mr-2" />
+                    <Eye size={16} className="sm:mr-1" />
                     <span className="hidden sm:inline">Detalhes</span>
                   </Button>
                   <Button
                     onClick={() => handleEdit(customer.id)}
                     variant="outline"
                     size="sm"
-                    className="h-8 w-8 p-0 sm:w-auto sm:px-3"
+                    className="h-8 w-8 p-0 sm:w-auto sm:px-2"
                   >
-                    <Edit size={16} className="sm:mr-2" />
+                    <Edit size={16} className="sm:mr-1" />
                     <span className="hidden sm:inline">Editar</span>
+                  </Button>
+                  <Button
+                    onClick={() => handleDelete(customer.id)}
+                    variant="outline"
+                    size="sm"
+                    className="h-8 w-8 p-0 sm:w-auto sm:px-2 border-red-800 hover:bg-red-900"
+                  >
+                    <Trash2 size={16} className="sm:mr-1 text-red-500" />
+                    <span className="hidden sm:inline text-red-500">Excluir</span>
                   </Button>
                 </TableCell>
               </TableRow>
@@ -132,6 +181,11 @@ export const CustomersList: React.FC<CustomersListProps> = ({ filters }) => {
             customerId={selectedCustomer}
             isOpen={isEditOpen}
             onClose={() => setIsEditOpen(false)}
+          />
+          <DeleteCustomerDialog
+            customerId={selectedCustomer}
+            isOpen={isDeleteOpen}
+            onClose={() => setIsDeleteOpen(false)}
           />
         </>
       )}
