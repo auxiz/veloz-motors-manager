@@ -172,6 +172,6 @@ export function useUsers() {
     signIn,
     signOut,
     updateUserProfile,
-    users, // Now exposing the users array
+    users, // Now correctly exposing the users array
   };
 }
