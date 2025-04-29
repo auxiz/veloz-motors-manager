@@ -80,6 +80,34 @@ export function useUserData() {
         created_at: new Date().toISOString(),
         role: 'seller'
       }
+    },
+    { 
+      id: '6', 
+      name: 'Roberto Almeida', 
+      email: 'roberto@exemplo.com',
+      profile: {
+        id: '6',
+        first_name: 'Roberto',
+        last_name: 'Almeida',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'dispatcher'
+      }
+    },
+    { 
+      id: '7', 
+      name: 'Carla Lima', 
+      email: 'carla@exemplo.com',
+      profile: {
+        id: '7',
+        first_name: 'Carla',
+        last_name: 'Lima',
+        avatar_url: null,
+        updated_at: new Date().toISOString(),
+        created_at: new Date().toISOString(),
+        role: 'dispatcher'
+      }
     }
   ]);
 

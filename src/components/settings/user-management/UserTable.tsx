@@ -23,6 +23,7 @@ import { type UserData } from '@/hooks/useUsers';
 interface UserTableProps {
   users: UserData[];
   onDeactivateUser: (userId: string) => void;
+  onEditUser?: (user: UserData) => void;
 }
 
 export const getRoleBadgeColor = (role?: string) => {
@@ -33,12 +34,29 @@ export const getRoleBadgeColor = (role?: string) => {
       return 'bg-green-500 hover:bg-green-600';
     case 'financial':
       return 'bg-blue-500 hover:bg-blue-600';
+    case 'dispatcher':
+      return 'bg-purple-500 hover:bg-purple-600';
     default:
       return 'bg-gray-500 hover:bg-gray-600';
   }
 };
 
-const UserTable: React.FC<UserTableProps> = ({ users, onDeactivateUser }) => {
+export const getRoleDisplayName = (role?: string) => {
+  switch (role) {
+    case 'administrator':
+      return 'Administrador';
+    case 'seller':
+      return 'Vendedor';
+    case 'financial':
+      return 'Financeiro';
+    case 'dispatcher':
+      return 'Despachante';
+    default:
+      return role || 'Desconhecido';
+  }
+};
+
+const UserTable: React.FC<UserTableProps> = ({ users, onDeactivateUser, onEditUser }) => {
   return (
     <Table>
       <TableHeader>
@@ -58,10 +76,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onDeactivateUser }) => {
             <TableCell>
               {user.profile?.role && (
                 <Badge className={getRoleBadgeColor(user.profile?.role)}>
-                  {user.profile?.role === 'administrator' && 'Administrador'}
-                  {user.profile?.role === 'seller' && 'Vendedor'}
-                  {user.profile?.role === 'financial' && 'Financeiro'}
-                  {!['administrator', 'seller', 'financial'].includes(user.profile?.role) && user.profile?.role}
+                  {getRoleDisplayName(user.profile?.role)}
                 </Badge>
               )}
             </TableCell>
@@ -79,7 +94,11 @@ const UserTable: React.FC<UserTableProps> = ({ users, onDeactivateUser }) => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Editar usuário</DropdownMenuItem>
+                  {onEditUser && (
+                    <DropdownMenuItem onClick={() => onEditUser(user)}>
+                      Editar usuário
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem>Alterar função</DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 

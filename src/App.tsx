@@ -19,6 +19,7 @@ import Financeiro from "./pages/Financeiro"
 import Relatorios from "./pages/Relatorios"
 import Configuracoes from "./pages/Configuracoes"
 import NotFound from "./pages/NotFound"
+import { AuthGuard } from "./components/auth/AuthGuard"
 
 const queryClient = new QueryClient();
 
@@ -32,13 +33,41 @@ const App = () => (
             <Route path="/auth" element={<Auth />} />
             
             <Route element={<MainLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/estoque" element={<Estoque />} />
-              <Route path="/vendas" element={<Vendas />} />
-              <Route path="/clientes" element={<Clientes />} />
-              <Route path="/financeiro" element={<Financeiro />} />
-              <Route path="/relatorios" element={<Relatorios />} />
-              <Route path="/configuracoes" element={<Configuracoes />} />
+              <Route path="/dashboard" element={
+                <AuthGuard>
+                  <Dashboard />
+                </AuthGuard>
+              } />
+              <Route path="/estoque" element={
+                <AuthGuard>
+                  <Estoque />
+                </AuthGuard>
+              } />
+              <Route path="/vendas" element={
+                <AuthGuard allowedRoles={['administrator', 'seller']}>
+                  <Vendas />
+                </AuthGuard>
+              } />
+              <Route path="/clientes" element={
+                <AuthGuard>
+                  <Clientes />
+                </AuthGuard>
+              } />
+              <Route path="/financeiro" element={
+                <AuthGuard allowedRoles={['administrator', 'financial']}>
+                  <Financeiro />
+                </AuthGuard>
+              } />
+              <Route path="/relatorios" element={
+                <AuthGuard allowedRoles={['administrator', 'seller', 'financial']}>
+                  <Relatorios />
+                </AuthGuard>
+              } />
+              <Route path="/configuracoes" element={
+                <AuthGuard>
+                  <Configuracoes />
+                </AuthGuard>
+              } />
             </Route>
             
             <Route path="*" element={<NotFound />} />

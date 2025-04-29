@@ -9,7 +9,7 @@ export interface ProfileData {
   first_name: string | null;
   last_name: string | null;
   avatar_url: string | null;
-  role?: 'administrator' | 'seller' | 'financial';
+  role?: 'administrator' | 'seller' | 'financial' | 'dispatcher';
 }
 
 export function useProfiles() {
@@ -75,7 +75,7 @@ export function useProfiles() {
 
   // Invite new user - in a real app, this would use Supabase's invite functionality
   // For now, we'll simulate the invite process
-  const inviteUser = async (email: string, name: string, role: 'administrator' | 'seller' | 'financial') => {
+  const inviteUser = async (email: string, name: string, role: 'administrator' | 'seller' | 'financial' | 'dispatcher') => {
     try {
       setLoading(true);
       

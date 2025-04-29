@@ -2,21 +2,32 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { Car, User, DollarSign, File, Package, BarChart, Settings } from 'lucide-react';
+import { useUsers } from '@/hooks/useUsers';
 
 type SidebarProps = {
   open: boolean;
 };
 
 export const Sidebar = ({ open }: SidebarProps) => {
+  const { user } = useUsers();
+  const userRole = user?.profile?.role || '';
+  
+  // Define page access by role
+  const canAccessVendas = ['administrator', 'seller'].includes(userRole);
+  const canAccessFinanceiro = ['administrator', 'financial'].includes(userRole);
+  const canAccessRelatorios = ['administrator', 'seller', 'financial'].includes(userRole);
+  
   const navItems = [
-    { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} /> },
-    { name: 'Estoque', path: '/estoque', icon: <Car size={20} /> },
-    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} /> },
-    { name: 'Clientes', path: '/clientes', icon: <User size={20} /> },
-    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} /> },
-    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} /> },
-    { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} /> },
+    { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },
+    { name: 'Estoque', path: '/estoque', icon: <Car size={20} />, visible: true },
+    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: canAccessVendas },
+    { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: true },
+    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: canAccessFinanceiro },
+    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: canAccessRelatorios },
+    { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} />, visible: true },
   ];
+
+  const visibleNavItems = navItems.filter(item => item.visible);
 
   return (
     <aside 
@@ -32,7 +43,7 @@ export const Sidebar = ({ open }: SidebarProps) => {
         </div>
         
         <nav className="space-y-1">
-          {navItems.map((item) => (
+          {visibleNavItems.map((item) => (
             <NavLink
               key={item.path}
               to={item.path}

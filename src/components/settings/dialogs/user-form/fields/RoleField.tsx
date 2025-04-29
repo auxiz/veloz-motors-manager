@@ -1,7 +1,20 @@
 
-import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import React from 'react';
 import { Control } from 'react-hook-form';
+import { 
+  FormField, 
+  FormItem, 
+  FormLabel, 
+  FormControl, 
+  FormMessage 
+} from '@/components/ui/form';
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from '@/components/ui/select';
 import { UserFormValues } from '../CreateUserForm';
 
 interface RoleFieldProps {
@@ -17,8 +30,8 @@ export function RoleField({ control }: RoleFieldProps) {
         <FormItem>
           <FormLabel>Função</FormLabel>
           <FormControl>
-            <Select 
-              onValueChange={field.onChange} 
+            <Select
+              onValueChange={field.onChange}
               defaultValue={field.value}
             >
               <SelectTrigger>
@@ -28,6 +41,7 @@ export function RoleField({ control }: RoleFieldProps) {
                 <SelectItem value="administrator">Administrador</SelectItem>
                 <SelectItem value="seller">Vendedor</SelectItem>
                 <SelectItem value="financial">Financeiro</SelectItem>
+                <SelectItem value="dispatcher">Despachante</SelectItem>
               </SelectContent>
             </Select>
           </FormControl>
