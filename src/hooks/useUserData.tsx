@@ -1,20 +1,12 @@
 
 import { useState } from 'react';
-import { User } from '@/types/auth';
+import { UserProfile } from '@/types/auth';
 
 export type UserData = {
   id: string;
   name: string;
   email: string;
-  profile?: {
-    id: string;
-    first_name: string;
-    last_name: string;
-    avatar_url: string | null;
-    updated_at: string;
-    created_at: string;
-    role: 'administrator' | 'seller' | 'financial';
-  };
+  profile?: UserProfile;
 };
 
 export function useUserData() {
