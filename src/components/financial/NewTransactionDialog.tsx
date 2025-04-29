@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -79,7 +80,7 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
     const newTransaction: Omit<Transaction, 'id'> = {
       type: data.type,
       description: data.description,
-      amount: Number(data.amount), // Explicitly convert to number
+      amount: Number(data.amount), // Ensure amount is converted to number
       status: data.status,
       category: data.category,
       due_date: format(data.due_date, 'yyyy-MM-dd'),
