@@ -4,6 +4,7 @@ import { useUserData } from './useUserData';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { UserProfile } from '@/types/auth';
 
 export type { UserData } from './useUserData';
 // Re-export UserData as User for backward compatibility
@@ -41,11 +42,11 @@ export function useUsers() {
           id: '00000000-0000-0000-0000-000000000001',
           first_name: 'Usuário',
           last_name: 'Demonstração',
-          role: 'administrator',
+          role: 'administrator' as const,
           avatar_url: null,
           updated_at: new Date().toISOString(),
           created_at: new Date().toISOString()
-        }
+        } as UserProfile
       };
     }
     return auth.user;

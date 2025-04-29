@@ -1,11 +1,13 @@
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useUsers } from '@/hooks/useUsers';
 import { toast } from 'sonner';
+import { UserProfile } from '@/types/auth';
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  allowedRoles?: Array<'administrator' | 'seller' | 'dispatcher' | 'financial'>;
+  allowedRoles?: UserProfile['role'][];
 }
 
 export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) => {
