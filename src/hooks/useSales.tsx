@@ -82,34 +82,38 @@ export const useSales = () => {
       if (isDemoUser) {
         console.log('Usando fluxo de desenvolvimento para usuário de demonstração');
         
-        // Simular o registro da venda
-        const mockSale = {
-          id: `mock-${Date.now()}`,
-          ...newSale,
-          created_at: new Date().toISOString(),
-          vehicle: null,
-          customer: null,
-        };
-        
-        // Atualizar status do veículo
-        await updateVehicleStatus.mutateAsync({
-          id: newSale.vehicle_id,
-          status: 'sold'
-        });
-        
-        // Criar transação financeira para esta venda
-        await addTransaction.mutateAsync({
-          type: 'income',
-          category: 'venda',
-          description: `Venda de veículo (Demo)`,
-          amount: newSale.final_price,
-          due_date: new Date().toISOString(),
-          status: newSale.payment_method === 'cash' ? 'paid' : 'pending',
-          sale_id: mockSale.id
-        });
-        
-        toast.success('Venda registrada com sucesso! (Modo demonstração)');
-        return mockSale;
+        try {
+          // Atualizar status do veículo para vendido
+          await updateVehicleStatus.mutateAsync({
+            id: newSale.vehicle_id,
+            status: 'sold'
+          });
+          
+          // Criar transação financeira sem vincular a uma venda específica
+          // Note que omitimos o sale_id para evitar o erro de formato de UUID
+          await addTransaction.mutateAsync({
+            type: 'income',
+            category: 'venda',
+            description: `Venda de veículo (Demo) - ID: ${newSale.vehicle_id.slice(0, 8)}`,
+            amount: newSale.final_price,
+            due_date: new Date().toISOString(),
+            status: newSale.payment_method === 'cash' ? 'paid' : 'pending'
+            // Não incluímos o sale_id aqui para evitar o erro
+          });
+          
+          toast.success('Venda registrada com sucesso! (Modo demonstração)');
+          
+          // Retornar um objeto simulando uma venda
+          return {
+            id: crypto.randomUUID(), // Gerar um UUID válido
+            ...newSale,
+            created_at: new Date().toISOString()
+          };
+        } catch (error) {
+          console.error('Erro no fluxo de demonstração:', error);
+          toast.error('Erro ao registrar venda em modo de demonstração');
+          throw error;
+        }
       } else {
         // Fluxo normal para usuários reais
         const { data, error } = await supabase
