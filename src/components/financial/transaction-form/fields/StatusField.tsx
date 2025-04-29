@@ -1,8 +1,8 @@
 
 import React from 'react';
+import { Control } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Control } from 'react-hook-form';
 import { TransactionFormValues } from '../transaction-schema';
 
 interface StatusFieldProps {
@@ -17,20 +17,17 @@ export function StatusField({ control }: StatusFieldProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Status</FormLabel>
-          <FormControl>
-            <Select
-              value={field.value}
-              onValueChange={field.onChange}
-            >
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o status" />
+                <SelectValue placeholder="Status da transação" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="paid">Pago</SelectItem>
-                <SelectItem value="pending">Pendente</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="pending">Pendente</SelectItem>
+              <SelectItem value="paid">Paga</SelectItem>
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}

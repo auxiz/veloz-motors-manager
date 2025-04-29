@@ -1,9 +1,8 @@
 
 import React from 'react';
+import { Control } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { CATEGORIES } from '../transaction-schema';
-import { Control } from 'react-hook-form';
 import { TransactionFormValues } from '../transaction-schema';
 
 interface CategoryFieldProps {
@@ -18,23 +17,27 @@ export function CategoryField({ control }: CategoryFieldProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Categoria</FormLabel>
-          <FormControl>
-            <Select
-              value={field.value}
-              onValueChange={field.onChange}
-            >
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione a categoria" />
+                <SelectValue placeholder="Selecione uma categoria" />
               </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map(category => (
-                  <SelectItem key={category} value={category}>
-                    {category.charAt(0).toUpperCase() + category.slice(1)}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="venda">Venda</SelectItem>
+              <SelectItem value="financiamento">Financiamento</SelectItem>
+              <SelectItem value="seguro">Seguro</SelectItem>
+              <SelectItem value="comissão">Comissão</SelectItem>
+              <SelectItem value="aluguel">Aluguel</SelectItem>
+              <SelectItem value="salários">Salários</SelectItem>
+              <SelectItem value="marketing">Marketing</SelectItem>
+              <SelectItem value="impostos">Impostos</SelectItem>
+              <SelectItem value="documentação">Documentação</SelectItem>
+              <SelectItem value="combustível">Combustível</SelectItem>
+              <SelectItem value="manutenção">Manutenção</SelectItem>
+              <SelectItem value="outros">Outros</SelectItem>
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}

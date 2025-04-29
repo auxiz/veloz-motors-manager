@@ -1,8 +1,8 @@
 
 import React from 'react';
+import { Control } from 'react-hook-form';
 import { FormField, FormItem, FormLabel, FormControl, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Control } from 'react-hook-form';
 import { TransactionFormValues } from '../transaction-schema';
 
 interface TypeFieldProps {
@@ -17,20 +17,17 @@ export function TypeField({ control }: TypeFieldProps) {
       render={({ field }) => (
         <FormItem>
           <FormLabel>Tipo</FormLabel>
-          <FormControl>
-            <Select
-              value={field.value}
-              onValueChange={field.onChange}
-            >
+          <Select onValueChange={field.onChange} defaultValue={field.value}>
+            <FormControl>
               <SelectTrigger>
-                <SelectValue placeholder="Selecione o tipo" />
+                <SelectValue placeholder="Tipo de transação" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="income">Receita</SelectItem>
-                <SelectItem value="expense">Despesa</SelectItem>
-              </SelectContent>
-            </Select>
-          </FormControl>
+            </FormControl>
+            <SelectContent>
+              <SelectItem value="income">Receita</SelectItem>
+              <SelectItem value="expense">Despesa</SelectItem>
+            </SelectContent>
+          </Select>
           <FormMessage />
         </FormItem>
       )}
