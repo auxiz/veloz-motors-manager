@@ -36,9 +36,15 @@ export const useTransactions = () => {
 
   const addTransaction = useMutation({
     mutationFn: async (newTransaction: Omit<Transaction, 'id'>) => {
+      // Make sure the amount is a number before sending to the database
+      const transactionToAdd = {
+        ...newTransaction,
+        amount: Number(newTransaction.amount)
+      };
+
       const { data, error } = await supabase
         .from('financial_transactions')
-        .insert([newTransaction])
+        .insert([transactionToAdd])
         .select()
         .single();
 
@@ -106,7 +112,7 @@ export const useTransactions = () => {
       type: 'income',
       category: 'venda',
       description: `Venda de ${vehicleDescription}`,
-      amount: sale.final_price,
+      amount: Number(sale.final_price),  // Ensure this is a number
       due_date: new Date().toISOString().split('T')[0],
       status: 'pending',
       sale_id: sale.id

@@ -80,7 +80,7 @@ export function NewTransactionDialog({ open, onOpenChange }: NewTransactionDialo
     const newTransaction: Omit<Transaction, 'id'> = {
       type: data.type,
       description: data.description,
-      amount: Number(data.amount),
+      amount: Number(data.amount), // Ensure amount is converted to number
       status: data.status,
       category: data.category,
       due_date: format(data.due_date, 'yyyy-MM-dd'),
