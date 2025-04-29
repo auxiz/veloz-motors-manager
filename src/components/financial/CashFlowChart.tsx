@@ -82,16 +82,18 @@ export const CashFlowChart = ({ transactions }: CashFlowChartProps) => {
   return (
     <div className="space-y-4">
       <div className="flex justify-end">
-        <Select value={period} onValueChange={(value) => setPeriod(value as '3' | '6' | '12')}>
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Período" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="3">Últimos 3 meses</SelectItem>
-            <SelectItem value="6">Últimos 6 meses</SelectItem>
-            <SelectItem value="12">Últimos 12 meses</SelectItem>
-          </SelectContent>
-        </Select>
+        <div className="relative z-30"> {/* Added a wrapper with its own z-index */}
+          <Select value={period} onValueChange={(value) => setPeriod(value as '3' | '6' | '12')}>
+            <SelectTrigger className="w-[180px] bg-background">
+              <SelectValue placeholder="Período" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="3">Últimos 3 meses</SelectItem>
+              <SelectItem value="6">Últimos 6 meses</SelectItem>
+              <SelectItem value="12">Últimos 12 meses</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
       
       <div className="h-[300px]">

@@ -123,49 +123,57 @@ const Financeiro = () => {
         </Card>
       </div>
       
-      <Card className="bg-veloz-gray border-veloz-gray">
-        <CardHeader>
-          <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
-        </CardHeader>
-        <CardContent className="relative z-10">
-          <div className="flex items-center justify-center mb-4">
-            <span className={`text-3xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-              {formatCurrency(netBalance)}
-            </span>
-          </div>
-          <CashFlowChart transactions={transactions} />
-        </CardContent>
-      </Card>
-
-      <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid grid-cols-4 max-w-md">
-          <TabsTrigger value="all">Todas</TabsTrigger>
-          <TabsTrigger value="income">Receitas</TabsTrigger>
-          <TabsTrigger value="expense">Despesas</TabsTrigger>
-          <TabsTrigger value="pending">Pendentes</TabsTrigger>
-        </TabsList>
-        
-        <Card className="bg-veloz-gray border-veloz-gray mt-6">
+      <div className="flex flex-col gap-8">
+        <Card className="bg-veloz-gray border-veloz-gray">
           <CardHeader>
-            <CardTitle className="text-xl">
-              {activeTab === 'all' && 'Todas as Transações'}
-              {activeTab === 'income' && 'Receitas'}
-              {activeTab === 'expense' && 'Despesas'}
-              {activeTab === 'pending' && 'Transações Pendentes'}
-            </CardTitle>
+            <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
           </CardHeader>
-          <CardContent className="relative z-20">
-            <div className="space-y-6">
-              <TransactionsFilter onFilterChange={setFilters} />
-              <TransactionsList 
-                transactionType={getTransactionType()}
-                status={activeTab === 'pending' ? 'pending' : undefined}
-                filters={filters}
-              />
+          <CardContent className="relative">
+            <div className="flex items-center justify-center mb-4">
+              <span className={`text-3xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {formatCurrency(netBalance)}
+              </span>
+            </div>
+            <div className="relative z-10">
+              <CashFlowChart transactions={transactions} />
             </div>
           </CardContent>
         </Card>
-      </Tabs>
+
+        <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid grid-cols-4 max-w-md">
+            <TabsTrigger value="all">Todas</TabsTrigger>
+            <TabsTrigger value="income">Receitas</TabsTrigger>
+            <TabsTrigger value="expense">Despesas</TabsTrigger>
+            <TabsTrigger value="pending">Pendentes</TabsTrigger>
+          </TabsList>
+          
+          <Card className="bg-veloz-gray border-veloz-gray mt-6">
+            <CardHeader>
+              <CardTitle className="text-xl">
+                {activeTab === 'all' && 'Todas as Transações'}
+                {activeTab === 'income' && 'Receitas'}
+                {activeTab === 'expense' && 'Despesas'}
+                {activeTab === 'pending' && 'Transações Pendentes'}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="relative">
+              <div className="space-y-6">
+                <div className="relative z-30">
+                  <TransactionsFilter onFilterChange={setFilters} />
+                </div>
+                <div className="relative z-20">
+                  <TransactionsList 
+                    transactionType={getTransactionType()}
+                    status={activeTab === 'pending' ? 'pending' : undefined}
+                    filters={filters}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </Tabs>
+      </div>
       
       <NewTransactionDialog open={newTransactionDialogOpen} onOpenChange={setNewTransactionDialogOpen} />
     </div>
