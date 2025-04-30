@@ -4,7 +4,7 @@ import { useVehicles } from '@/hooks/useVehicles';
 import { useCustomers } from '@/hooks/useCustomers';
 import { useSales } from '@/hooks/useSales';
 import { useUsers } from '@/hooks/useUsers';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { SaleForm } from './SaleForm';
 import { toast } from 'sonner';
 
@@ -27,7 +27,8 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
     }
   }, [open, user]);
 
-  const availableVehicles = vehicles.filter(vehicle => vehicle.status === 'in_stock');
+  // Mostrar todos os veículos que não estão vendidos (in_stock ou reserved)
+  const availableVehicles = vehicles.filter(vehicle => vehicle.status !== 'sold');
 
   const handleSubmit = async (data: {
     vehicleId: string;
@@ -91,6 +92,9 @@ export const NewSaleDialog: React.FC<NewSaleDialogProps> = ({ open, onOpenChange
       <DialogContent className="bg-veloz-gray border-veloz-gray max-w-3xl">
         <DialogHeader>
           <DialogTitle className="text-xl font-bold">Registrar Nova Venda</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
+            Preencha os dados abaixo para registrar uma nova venda.
+          </DialogDescription>
         </DialogHeader>
         
         {isAuthChecking ? (

@@ -41,8 +41,8 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
       customerId: '',
       finalPrice: 0,
       paymentMethod: 'cash',
-      commissionType: 'percentage',
-      commissionValue: 5, // Default 5%
+      commissionType: 'fixed',
+      commissionValue: 300, // Valor padrão de R$300
     },
   });
 
@@ -88,12 +88,18 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
                     <SelectValue placeholder="Selecione um veículo" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
-                  {vehicles.map((vehicle) => (
-                    <SelectItem key={vehicle.id} value={vehicle.id}>
-                      {vehicle.brand} {vehicle.model} {vehicle.version} ({vehicle.year}) - {formatCurrency(vehicle.sale_price)}
-                    </SelectItem>
-                  ))}
+                <SelectContent className="bg-veloz-black border-veloz-gray max-h-[300px]">
+                  {vehicles.length > 0 ? (
+                    vehicles.map((vehicle) => (
+                      <SelectItem key={vehicle.id} value={vehicle.id}>
+                        {vehicle.brand} {vehicle.model} {vehicle.version} ({vehicle.year}) - {formatCurrency(vehicle.sale_price)}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="p-2 text-center text-muted-foreground">
+                      Nenhum veículo disponível
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -125,7 +131,7 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
                           <SelectValue placeholder="Selecione um cliente" />
                         </SelectTrigger>
                       </FormControl>
-                      <SelectContent>
+                      <SelectContent className="bg-veloz-black border-veloz-gray max-h-[300px]">
                         {customers.map((customer) => (
                           <SelectItem key={customer.id} value={customer.id}>
                             {customer.name} ({customer.document})
@@ -160,7 +166,7 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
                     <SelectValue placeholder="Selecione a forma de pagamento" />
                   </SelectTrigger>
                 </FormControl>
-                <SelectContent>
+                <SelectContent className="bg-veloz-black border-veloz-gray">
                   <SelectItem value="cash">À Vista</SelectItem>
                   <SelectItem value="financing">Financiamento</SelectItem>
                   <SelectItem value="consignment">Consignação</SelectItem>
@@ -206,9 +212,9 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
                       <SelectValue placeholder="Tipo de comissão" />
                     </SelectTrigger>
                   </FormControl>
-                  <SelectContent>
-                    <SelectItem value="percentage">Percentual (%)</SelectItem>
+                  <SelectContent className="bg-veloz-black border-veloz-gray">
                     <SelectItem value="fixed">Valor Fixo (R$)</SelectItem>
+                    <SelectItem value="percentage">Percentual (%)</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
