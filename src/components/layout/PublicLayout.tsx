@@ -14,7 +14,7 @@ export const PublicLayout = ({
           <div className="flex justify-between items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-30 md:h-30\\\\n" />
+              <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-12 md:h-16" />
             </Link>
 
             {/* Desktop Navigation */}
@@ -78,7 +78,7 @@ export const PublicLayout = ({
           <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
             <div>
               <div className="mb-6">
-                <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-16" />
+                <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-12" />
               </div>
               <p className="text-white text-lg">Seu parceiro de confiança na busca pelo veículo ideal.</p>
               <div className="mt-4 flex space-x-4">
