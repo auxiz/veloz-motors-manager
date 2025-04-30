@@ -1,21 +1,4 @@
 
-import { User as SupabaseUser } from '@supabase/supabase-js';
+import { AuthUser, UserProfile, AuthError } from '@/hooks/auth/types';
 
-export interface UserProfile {
-  id: string;
-  first_name: string | null;
-  last_name: string | null;
-  avatar_url: string | null;
-  updated_at: string;
-  created_at: string;
-  role: 'administrator' | 'seller' | 'dispatcher' | 'financial';
-}
-
-export interface AuthError {
-  message: string;
-  status?: number;
-}
-
-export type AuthUser = SupabaseUser & {
-  profile?: UserProfile;
-};
+export type { AuthUser, UserProfile, AuthError };

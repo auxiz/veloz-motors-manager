@@ -2,13 +2,17 @@
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthUser, AuthError, UserProfile } from '@/types/auth';
-import { toast } from 'sonner';
+import { AuthUser } from './auth/types';
+import { useProfileFetcher } from './auth/useProfileFetcher';
+import { useAuthActions } from './auth/useAuthActions';
 
 export function useAuth() {
   const [user, setUser] = useState<AuthUser | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  
+  const { fetchUserProfile } = useProfileFetcher();
+  const authActions = useAuthActions();
 
   useEffect(() => {
     // Set up auth state listener FIRST
@@ -21,7 +25,7 @@ export function useAuth() {
         // Fetch user profile using setTimeout to prevent Supabase deadlocks
         if (currentSession?.user) {
           setTimeout(() => {
-            fetchUserProfile(currentSession.user.id);
+            updateUserWithProfile(currentSession.user.id);
           }, 0);
         }
       }
@@ -33,7 +37,7 @@ export function useAuth() {
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       if (currentSession?.user) {
-        fetchUserProfile(currentSession.user.id);
+        updateUserWithProfile(currentSession.user.id);
       }
       setLoading(false);
     });
@@ -41,177 +45,40 @@ export function useAuth() {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchUserProfile = async (userId: string) => {
-    try {
-      // Use a type cast to handle the TypeScript issue with custom RPC functions
-      const { data, error } = await (supabase.rpc as any)('get_profile', { user_id: userId });
-
-      if (error) {
-        console.error('Error fetching user profile:', error);
-        return;
-      }
-
-      if (data) {
-        setUser((prevUser) => {
-          if (!prevUser) return null;
-          return {
-            ...prevUser,
-            profile: {
-              ...data,
-              // Mock role for testing - this would come from the database in a real app
-              role: userId === '1' ? 'administrator' : 'seller'
-            } as UserProfile
-          };
-        });
-      }
-    } catch (error) {
-      console.error('Error in fetchUserProfile:', error);
-    }
-  };
-
-  const signIn = async (
-    email: string, 
-    password: string
-  ): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      console.log('Attempting login with:', email);
-      
-      // Remove any potential extra spaces from email and password
-      const trimmedEmail = email.trim();
-      const trimmedPassword = password;
-      
-      // Always provide detailed console logs for debugging
-      console.log('Login credentials:', { email: trimmedEmail, passwordLength: trimmedPassword.length });
-
-      // Basic Supabase login without extra options
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: trimmedEmail,
-        password: trimmedPassword,
+  const updateUserWithProfile = async (userId: string) => {
+    const profile = await fetchUserProfile(userId);
+    
+    if (profile) {
+      setUser((prevUser) => {
+        if (!prevUser) return null;
+        return {
+          ...prevUser,
+          profile
+        };
       });
-
-      if (error) {
-        console.error('Login error:', error);
-        return { error };
-      }
-
-      console.log('Login successful:', data);
-      toast.success('Login realizado com sucesso!');
-      return { error: null };
-    } catch (error: any) {
-      console.error('Login catch error:', error);
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
     }
   };
 
-  const signUp = async (
-    email: string, 
-    password: string,
-    captchaToken?: string
-  ): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      // Removendo o captchaToken da solicitação para teste
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          captchaToken
-        }
-      });
-
-      if (error) {
-        console.error('Signup error:', error);
-        throw error;
-      }
-
-      toast.success('Conta criada com sucesso! Verifique seu email.');
-      return { error: null };
-    } catch (error: any) {
-      console.error('Signup catch error:', error);
-      toast.error(error.message || 'Erro ao criar conta');
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
+  const updateUserProfile = async (updates: any) => {
+    if (!user) return { error: { message: 'User not authenticated' } };
+    
+    const result = await authActions.updateUserProfile(user.id, updates);
+    
+    if (!result.error) {
+      // Refresh user profile after update
+      await updateUserWithProfile(user.id);
     }
-  };
-
-  const signOut = async (): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      
-      if (error) throw error;
-      
-      setUser(null);
-      setSession(null);
-      toast.success('Logout realizado com sucesso!');
-      return { error: null };
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao fazer logout');
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const resetPassword = async (
-    email: string,
-    captchaToken?: string
-  ): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      
-      // Removendo o captchaToken da solicitação para teste
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        captchaToken,
-        redirectTo: `${window.location.origin}/configuracoes`,
-      });
-      
-      if (error) throw error;
-      
-      return { error: null };
-    } catch (error: any) {
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const updateUserProfile = async (updates: Partial<UserProfile>): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      if (!user) throw new Error('User not authenticated');
-
-      // Use a type cast to handle the TypeScript issue with custom RPC functions
-      const { error } = await (supabase.rpc as any)('update_profile', { 
-        user_id: user.id,
-        profile_updates: updates 
-      });
-
-      if (error) throw error;
-
-      // Refresh user profile
-      await fetchUserProfile(user.id);
-      toast.success('Perfil atualizado com sucesso!');
-      return { error: null };
-    } catch (error: any) {
-      toast.error(error.message || 'Erro ao atualizar perfil');
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
-    }
+    
+    return result;
   };
 
   return {
     user,
     session,
-    loading,
-    signIn,
-    signOut: signOut || (async () => ({ error: null })),
-    resetPassword,
-    updateUserProfile: updateUserProfile || (async () => ({ error: null }))
+    loading: loading || authActions.loading,
+    signIn: authActions.signIn,
+    signOut: authActions.signOut,
+    resetPassword: authActions.resetPassword,
+    updateUserProfile
   };
 }
