@@ -22,9 +22,13 @@ export const MainLayout = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const closeSidebar = () => {
+    setSidebarOpen(false);
+  };
+
   return (
     <div className="flex h-screen bg-veloz-black text-veloz-white">
-      <Sidebar open={sidebarOpen} />
+      <Sidebar open={sidebarOpen} onClose={closeSidebar} />
       
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen && !isMobile ? 'ml-64' : 'ml-0'}`}>
         <Header toggleSidebar={toggleSidebar} sidebarOpen={sidebarOpen} />

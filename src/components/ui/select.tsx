@@ -82,7 +82,8 @@ const SelectContent = React.forwardRef<
       position={position}
       style={{
         backgroundColor: "var(--popover)", 
-        zIndex: 9999  // Using a much higher z-index to ensure dropdowns appear above all elements
+        color: "var(--popover-foreground)",
+        zIndex: 9999
       }}
       {...props}
     >

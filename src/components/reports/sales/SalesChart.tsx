@@ -50,7 +50,7 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={chartData}
-                  margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+                  margin={{ top: 10, right: 30, left: 20, bottom: 40 }}
                   barGap={12}
                   barSize={24}
                 >
@@ -61,6 +61,9 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
                     padding={{ left: 10, right: 10 }}
                     tick={{ fontSize: 12 }}
                     tickLine={{ stroke: "#555" }}
+                    height={50}
+                    angle={-30}
+                    textAnchor="end"
                   />
                   <YAxis 
                     stroke="#999" 
@@ -75,11 +78,11 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
                     animationDuration={300}
                   />
                   <Legend 
-                    verticalAlign="bottom" 
+                    verticalAlign="top" 
                     height={36}
                     iconType="circle"
                     iconSize={8}
-                    wrapperStyle={{ fontSize: '12px', paddingTop: '15px' }}
+                    wrapperStyle={{ fontSize: '12px' }}
                   />
                   <Bar 
                     dataKey="value" 

@@ -39,8 +39,8 @@ export function SalesDetailsTable({
       return seller.name;
     }
     
-    // More descriptive fallback for debugging
-    return `Vendedor (ID: ${sale.seller_id?.substring(0, 8) || 'N/A'})`;
+    // Last resort for debugging - show partial ID
+    return sale.seller_id ? `Vendedor ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
   };
 
   return (
@@ -61,46 +61,48 @@ export function SalesDetailsTable({
         </div>
       </CardHeader>
       <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Data</TableHead>
-              <TableHead>Veículo</TableHead>
-              <TableHead>Vendedor</TableHead>
-              <TableHead>Cliente</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredSales.length > 0 ? (
-              filteredSales.map(sale => {
-                const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
-                
-                return (
-                  <TableRow key={sale.id}>
-                    <TableCell>{format(new Date(sale.sale_date), 'dd/MM/yyyy')}</TableCell>
-                    <TableCell>
-                      {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 
-                       sale.vehicle ? `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}` : 
-                       'N/A'}
-                    </TableCell>
-                    <TableCell>{getSellerName(sale)}</TableCell>
-                    <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
-                    <TableCell className="text-right">
-                      {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                    </TableCell>
-                  </TableRow>
-                );
-              })
-            ) : (
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
-                  Nenhuma venda encontrada para o período e filtros selecionados.
-                </TableCell>
+                <TableHead>Data</TableHead>
+                <TableHead>Veículo</TableHead>
+                <TableHead>Vendedor</TableHead>
+                <TableHead>Cliente</TableHead>
+                <TableHead className="text-right">Valor</TableHead>
               </TableRow>
-            )}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredSales.length > 0 ? (
+                filteredSales.map(sale => {
+                  const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
+                  
+                  return (
+                    <TableRow key={sale.id}>
+                      <TableCell>{format(new Date(sale.sale_date), 'dd/MM/yyyy')}</TableCell>
+                      <TableCell>
+                        {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 
+                         sale.vehicle ? `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}` : 
+                         'N/A'}
+                      </TableCell>
+                      <TableCell>{getSellerName(sale)}</TableCell>
+                      <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
+                      <TableCell className="text-right">
+                        {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={5} className="text-center">
+                    Nenhuma venda encontrada para o período e filtros selecionados.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
       <CardFooter className="flex justify-between">
         <div className="text-sm text-muted-foreground">

@@ -33,7 +33,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
     generateSaleContract(sale);
   };
 
-  // Improved helper function to get seller name with better fallbacks
+  // Improved helper function to get seller name with comprehensive fallbacks
   const getSellerName = (sale: any) => {
     // First try to use the seller data directly from the sale object
     if (sale.seller?.first_name) {
@@ -47,7 +47,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
     }
     
     // Last resort fallback with seller_id for debugging
-    return `Vendedor (ID: ${sale.seller_id?.substring(0, 8) || 'N/A'})`;
+    return sale.seller_id ? `Vendedor ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
   };
 
   if (isLoading) {
@@ -67,7 +67,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
   }
 
   return (
-    <div>
+    <div className="overflow-x-auto">
       <Table>
         <TableHeader>
           <TableRow>
