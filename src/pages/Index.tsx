@@ -6,9 +6,9 @@ import { Car } from 'lucide-react';
 const Index = () => {
   const navigate = useNavigate();
   
-  // Redirect to auth page
+  // Redirect to auth page with forceHideBadge parameter
   useEffect(() => {
-    navigate('/auth');
+    navigate('/auth?forceHideBadge=true');
   }, [navigate]);
 
   return (
