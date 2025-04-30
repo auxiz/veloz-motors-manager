@@ -3,7 +3,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
 import { PlateSearchDialog } from "@/components/license-plate/PlateSearchDialog";
 import { vehicleSchema, VehicleFormData } from "./VehicleFormSchema";
 import { BasicInfoFields } from "./fields/BasicInfoFields";
@@ -12,6 +11,7 @@ import { SpecificationsFields } from "./fields/SpecificationsFields";
 import { PricingFields } from "./fields/PricingFields";
 import { NotesField } from "./fields/NotesField";
 import { PlateSearchButton } from "./PlateSearchButton";
+import { usePlateSearch } from "./hooks/usePlateSearch";
 
 interface VehicleFormProps {
   onSubmit: (data: VehicleFormData) => void;
@@ -22,8 +22,6 @@ interface VehicleFormProps {
 export type { VehicleFormData } from "./VehicleFormSchema";
 
 export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormProps) {
-  const [plateDialogOpen, setPlateDialogOpen] = useState(false);
-  
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
@@ -44,14 +42,7 @@ export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormPro
     },
   });
 
-  const handleVehicleDataSelected = (data: Partial<VehicleFormData>) => {
-    // Update form with data from API
-    Object.entries(data).forEach(([key, value]) => {
-      if (value) {
-        form.setValue(key as keyof VehicleFormData, value);
-      }
-    });
-  };
+  const { plateDialogOpen, setPlateDialogOpen, handleVehicleDataSelected } = usePlateSearch(form);
 
   return (
     <>
