@@ -1,27 +1,10 @@
 
-import { useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Car } from 'lucide-react';
+import React from 'react';
+import Home from './public/Home';
 
+// Instead of redirecting to auth, render the Home component directly
 const Index = () => {
-  const navigate = useNavigate();
-  
-  // Redirect to auth page with forceHideBadge parameter
-  useEffect(() => {
-    navigate('/auth?forceHideBadge=true');
-  }, [navigate]);
-
-  return (
-    <div className="min-h-screen flex items-center justify-center bg-veloz-black">
-      <div className="text-center">
-        <div className="flex justify-center mb-6">
-          <Car className="h-16 w-16 text-veloz-yellow animate-pulse" />
-        </div>
-        <h1 className="text-3xl font-bold mb-4 text-veloz-white">Carregando Veloz Motors</h1>
-        <p className="text-xl text-veloz-gray">Aguarde um momento...</p>
-      </div>
-    </div>
-  );
+  return <Home />;
 };
 
 export default Index;

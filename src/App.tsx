@@ -26,6 +26,7 @@ import Home from "./pages/public/Home"
 import Vehicles from "./pages/public/Vehicles"
 import VehicleDetails from "./pages/public/VehicleDetails"
 import Contact from "./pages/public/Contact"
+import Index from "./pages/Index"
 
 const queryClient = new QueryClient();
 
@@ -35,8 +36,8 @@ const App = () => (
       <BrowserRouter>
         <TooltipProvider>
           <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Home />} />
+            {/* Public Routes - Listed first to take priority */}
+            <Route path="/" element={<Index />} />
             <Route path="/veiculos" element={<Vehicles />} />
             <Route path="/veiculos/:id" element={<VehicleDetails />} />
             <Route path="/contato" element={<Contact />} />
