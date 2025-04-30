@@ -16,7 +16,7 @@ export const HomeBanner = () => {
       </div>
       
       <div className="container mx-auto px-4 py-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 items-center gap-8">
+        <div className="grid grid-cols-1 items-center gap-8">
           <div className="flex flex-col">
             <img 
               src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
@@ -38,16 +38,6 @@ export const HomeBanner = () => {
               <Link to="/contato" className="border-2 border-veloz-yellow bg-transparent hover:bg-veloz-yellow/10 text-veloz-yellow font-semibold px-6 py-3 rounded-lg flex items-center justify-center transition-colors duration-300">
                 Fale Conosco
               </Link>
-            </div>
-          </div>
-          <div className="hidden md:flex items-center justify-center">
-            <div className="relative">
-              <div className="absolute -inset-4 rounded-full bg-veloz-yellow/20 animate-pulse"></div>
-              <img 
-                src="/lovable-uploads/a996eb57-c4b8-453e-b36b-4afe67cc7cdd.png" 
-                alt="Carro destaque" 
-                className="relative z-10 max-h-80 object-contain"
-              />
             </div>
           </div>
         </div>
