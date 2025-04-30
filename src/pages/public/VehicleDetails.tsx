@@ -5,11 +5,13 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { Vehicle } from '@/hooks/useVehicles';
-import { Car, Calendar, Gauge, Fuel, ArrowLeft, MessageCircle } from 'lucide-react';
+import { Car, Calendar, Gauge, Fuel, ArrowLeft, MessageCircle, Calculator } from 'lucide-react';
+import { FinancingSimulatorContainer } from '@/components/public/financing/FinancingSimulatorContainer';
 
 const VehicleDetails = () => {
   const { id } = useParams<{ id: string }>();
   const [activeImage, setActiveImage] = useState<number>(0);
+  const [showFinancing, setShowFinancing] = useState<boolean>(false);
   
   const { data: vehicle, isLoading, isError } = useQuery({
     queryKey: ['vehicle', id],
@@ -195,17 +197,38 @@ const VehicleDetails = () => {
               </div>
             </div>
 
-            <a 
-              href={`https://wa.me/5511999999999?text=Olá! Estou interessado no veículo ${vehicle.brand} ${vehicle.model} ${vehicle.year} (${vehicle.id})`} 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="btn-primary w-full text-lg py-3 justify-center"
-            >
-              <MessageCircle size={20} />
-              Tenho interesse neste veículo
-            </a>
+            <div className="flex gap-4 mb-6">
+              <a 
+                href={`https://wa.me/5511999999999?text=Olá! Estou interessado no veículo ${vehicle.brand} ${vehicle.model} ${vehicle.year} (${vehicle.id})`} 
+                target="_blank" 
+                rel="noopener noreferrer" 
+                className="btn-primary flex-1 text-lg py-3 justify-center"
+              >
+                <MessageCircle size={20} />
+                Tenho interesse
+              </a>
+              
+              <button 
+                onClick={() => setShowFinancing(!showFinancing)} 
+                className="btn-secondary flex-1 text-lg py-3 justify-center"
+              >
+                <Calculator size={20} />
+                Simular Financiamento
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* Financing Simulator Section */}
+        {showFinancing && (
+          <div className="mt-8 pt-8 border-t border-veloz-gray">
+            <h2 className="text-2xl font-montserrat font-bold mb-6 text-white flex items-center gap-2">
+              <Calculator className="text-veloz-yellow" />
+              Simulação de Financiamento
+            </h2>
+            <FinancingSimulatorContainer initialVehiclePrice={vehicle.sale_price} />
+          </div>
+        )}
       </div>
     </PublicLayout>
   );
