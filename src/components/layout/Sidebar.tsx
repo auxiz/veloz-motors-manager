@@ -72,7 +72,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
             {isMobile && (
               <button 
                 onClick={onClose}
-                className="p-1 rounded-full hover:bg-veloz-gray text-veloz-white"
+                className="p-1.5 rounded-full hover:bg-veloz-gray text-veloz-white"
                 aria-label="Fechar menu"
               >
                 <X size={20} />

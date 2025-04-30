@@ -67,14 +67,14 @@ export function CashFlowChart({ transactions }: CashFlowChartProps) {
   };
   
   return (
-    <div className="h-[300px] w-full">
+    <div className="h-[300px] w-full relative z-0">
       <ChartContainer config={chartConfig}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
             margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-            barSize={20}
-            barGap={6}
+            barGap={8}
+            barSize={18}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
             <XAxis 

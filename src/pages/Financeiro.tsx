@@ -61,10 +61,10 @@ const Financeiro = () => {
 
   return (
     <AuthGuard allowedRoles={['administrator', 'financial']}>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
-            <h1 className="text-3xl font-bold mb-2">Gestão Financeira</h1>
+            <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Gestão Financeira</h1>
             <p className="text-muted-foreground">Controle o fluxo de caixa e monitore a lucratividade</p>
           </div>
           <Button
@@ -77,7 +77,7 @@ const Financeiro = () => {
         </div>
 
         {/* Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-veloz-gray border-veloz-gray">
             <CardHeader className="pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">Total Recebido</CardTitle>
@@ -128,7 +128,7 @@ const Financeiro = () => {
         </div>
         
         {/* Cash Balance and Chart */}
-        <div className="flex flex-col gap-8">
+        <div className="flex flex-col gap-6 md:gap-8">
           <Card className="bg-veloz-gray border-veloz-gray">
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
@@ -137,16 +137,14 @@ const Financeiro = () => {
               </div>
             </CardHeader>
             <Separator className="bg-veloz-gray/50" />
-            <CardContent className="pt-6">
-              <div className="relative z-10">
-                <CashFlowChart transactions={transactions} />
-              </div>
+            <CardContent className="pt-6 pb-8 relative">
+              <CashFlowChart transactions={transactions} />
             </CardContent>
           </Card>
 
           {/* Transactions Section */}
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-4 max-w-md">
+            <TabsList className="grid grid-cols-2 sm:grid-cols-4 max-w-md">
               <TabsTrigger value="all">Todas</TabsTrigger>
               <TabsTrigger value="income">Receitas</TabsTrigger>
               <TabsTrigger value="expense">Despesas</TabsTrigger>
@@ -164,10 +162,10 @@ const Financeiro = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="relative z-20">
+                  <div className="relative z-30">
                     <TransactionsFilter onFilterChange={setFilters} />
                   </div>
-                  <div className="relative z-10">
+                  <div className="relative z-20">
                     <TransactionsList 
                       transactionType={getTransactionType()}
                       status={activeTab === 'pending' ? 'pending' : undefined}
@@ -180,7 +178,10 @@ const Financeiro = () => {
           </Tabs>
         </div>
         
-        <NewTransactionDialog open={newTransactionDialogOpen} onOpenChange={setNewTransactionDialogOpen} />
+        <NewTransactionDialog 
+          open={newTransactionDialogOpen} 
+          onOpenChange={setNewTransactionDialogOpen} 
+        />
       </div>
     </AuthGuard>
   );

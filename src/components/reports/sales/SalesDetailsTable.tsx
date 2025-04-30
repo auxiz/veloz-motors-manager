@@ -36,11 +36,14 @@ export function SalesDetailsTable({
     // Then try finding the user in the users array using seller_id
     const seller = users.find(user => user.id === sale.seller_id);
     if (seller) {
-      return seller.name;
+      if (seller.profile?.first_name) {
+        return `${seller.profile.first_name} ${seller.profile.last_name || ''}`.trim();
+      }
+      return seller.name || seller.email.split('@')[0];
     }
     
     // Last resort for debugging - show partial ID
-    return sale.seller_id ? `Vendedor ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
+    return sale.seller_id ? `ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
   };
 
   return (
@@ -83,7 +86,7 @@ export function SalesDetailsTable({
                       <TableCell>
                         {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 
                          sale.vehicle ? `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}` : 
-                         'N/A'}
+                         'Veículo não encontrado'}
                       </TableCell>
                       <TableCell>{getSellerName(sale)}</TableCell>
                       <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>

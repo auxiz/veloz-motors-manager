@@ -23,11 +23,11 @@ const Relatorios = () => {
 
   return (
     <AuthGuard allowedRoles={['administrator', 'financial']}>
-      <div className="space-y-8">
+      <div className="space-y-6 md:space-y-8">
         <Card className="bg-veloz-gray border-veloz-gray">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <CardTitle className="text-2xl font-bold mb-1">Relatórios</CardTitle>
+              <CardTitle className="text-xl md:text-2xl font-bold mb-1">Relatórios</CardTitle>
               <p className="text-muted-foreground">Analise o desempenho do seu negócio com dados detalhados</p>
             </div>
             <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
@@ -43,7 +43,7 @@ const Relatorios = () => {
           <Separator className="bg-veloz-gray/50" />
           <CardContent className="pt-6">
             <Tabs defaultValue="sales" className="w-full">
-              <TabsList className="grid grid-cols-4 w-full max-w-3xl mb-4">
+              <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full max-w-3xl mb-6">
                 <TabsTrigger value="sales">Vendas</TabsTrigger>
                 <TabsTrigger value="inventory">Estoque</TabsTrigger>
                 <TabsTrigger value="financial">Financeiro</TabsTrigger>

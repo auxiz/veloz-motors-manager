@@ -63,7 +63,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
     });
   }, [transactions, transactionType, status, filters]);
   
-  const handleStatusToggle = async (id: string, currentStatus: 'paid' | 'pending', transaction: any) => {
+  const handleStatusToggle = async (id: string, currentStatus: 'paid' | 'pending') => {
     // Find the full transaction object
     const fullTransaction = transactions.find(t => t.id === id);
     
@@ -90,7 +90,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
 
   return (
     <>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto relative z-10">
         <Table>
           <TableHeader>
             <TableRow>
@@ -137,7 +137,7 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
                       variant="ghost"
                       size="sm"
                       className="opacity-70 hover:opacity-100"
-                      onClick={() => handleStatusToggle(transaction.id, transaction.status, transaction)}
+                      onClick={() => handleStatusToggle(transaction.id, transaction.status)}
                     >
                       {transaction.status === 'paid' ? (
                         <XCircle className="h-4 w-4 text-amber-500" />
