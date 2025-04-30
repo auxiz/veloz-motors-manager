@@ -6,7 +6,7 @@ import { Sale } from '@/types/sales';
 import { useUsers } from '@/hooks/useUsers';
 
 /**
- * Hook to fetch sales data from the database
+ * Hook to fetch sales data from the database with robust seller handling
  */
 export const useSalesQuery = () => {
   // Access users data to provide fallback for missing seller information
@@ -47,8 +47,6 @@ export const useSalesQuery = () => {
             last_name: sale.seller?.last_name || (sellerUser?.name?.split(' ').slice(1).join(' ') || '')
           };
 
-          console.log(`Sale ID: ${sale.id}, Seller:`, sellerObject);
-          
           return {
             ...sale,
             seller: sellerObject
@@ -63,7 +61,7 @@ export const useSalesQuery = () => {
   });
 
   /**
-   * Function to get sales by vehicle ID
+   * Function to get sales by vehicle ID with robust seller handling
    */
   const getSalesByVehicleId = async (vehicleId: string): Promise<Sale[]> => {
     try {
