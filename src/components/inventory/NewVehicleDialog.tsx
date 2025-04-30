@@ -28,6 +28,8 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
         year: data.year,
         color: data.color,
         plate: data.plate || null,
+        renavam: data.renavam || null,
+        chassis: data.chassis || null,
         mileage: data.mileage,
         fuel: data.fuel,
         transmission: data.transmission,

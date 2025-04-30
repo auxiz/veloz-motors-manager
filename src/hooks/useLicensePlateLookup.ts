@@ -74,7 +74,6 @@ export const useLicensePlateLookup = () => {
       model: veiculo.modelo,
       year: veiculo.ano_modelo,
       color: veiculo.cor,
-      plate: plate,
       chassis: veiculo.chassi,
       renavam: veiculo.renavam,
       // Other fields to be filled by user
