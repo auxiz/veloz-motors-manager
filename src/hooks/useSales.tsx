@@ -130,9 +130,76 @@ export const useSales = () => {
     },
   });
 
+  // New function to get sales by vehicle ID
+  const getSalesByVehicleId = async (vehicleId: string): Promise<Sale[]> => {
+    const { data, error } = await supabase
+      .from('sales')
+      .select('*')
+      .eq('vehicle_id', vehicleId);
+
+    if (error) {
+      console.error('Error fetching sales by vehicle ID:', error);
+      toast.error('Erro ao buscar vendas do veículo');
+      throw error;
+    }
+
+    return data || [];
+  };
+
+  // New delete sale mutation
+  const deleteSale = useMutation({
+    mutationFn: async (saleId: string) => {
+      // First get the sale to find related transactions
+      const { data: sale, error: fetchError } = await supabase
+        .from('sales')
+        .select('*')
+        .eq('id', saleId)
+        .single();
+
+      if (fetchError) {
+        console.error('Error fetching sale for deletion:', fetchError);
+        toast.error('Erro ao buscar detalhes da venda');
+        throw fetchError;
+      }
+
+      // Delete related financial transactions
+      const { error: transactionError } = await supabase
+        .from('financial_transactions')
+        .delete()
+        .eq('sale_id', saleId);
+
+      if (transactionError) {
+        console.error('Error deleting related transactions:', transactionError);
+        toast.error('Erro ao excluir transações financeiras relacionadas');
+        throw transactionError;
+      }
+
+      // Delete the sale record
+      const { error: deleteError } = await supabase
+        .from('sales')
+        .delete()
+        .eq('id', saleId);
+
+      if (deleteError) {
+        console.error('Error deleting sale:', deleteError);
+        toast.error('Erro ao excluir venda');
+        throw deleteError;
+      }
+
+      toast.success('Venda excluída com sucesso');
+      return sale;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales'] });
+      queryClient.invalidateQueries({ queryKey: ['transactions'] });
+    },
+  });
+
   return {
     sales,
     isLoading,
     addSale,
+    getSalesByVehicleId,
+    deleteSale,
   };
 };
