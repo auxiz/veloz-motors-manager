@@ -1,10 +1,9 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Checkbox } from '@/components/ui/checkbox';
 
 interface ForgotPasswordFormProps {
   resetForm: { email: string };
@@ -21,8 +20,6 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   toggleForgotPassword,
   loading,
 }) => {
-  const [captchaVerified, setCaptchaVerified] = useState(false);
-  
   return (
     <Card className="border-veloz-gray bg-veloz-gray">
       <CardHeader>
@@ -47,29 +44,12 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
           <p className="text-sm text-gray-400">
             Informe seu email e enviaremos instruções para redefinir sua senha.
           </p>
-          
-          {/* Simple CAPTCHA replacement */}
-          <div className="flex items-center space-x-2 pt-2">
-            <Checkbox 
-              id="captcha-reset" 
-              checked={captchaVerified}
-              onCheckedChange={(checked) => {
-                setCaptchaVerified(checked === true);
-              }}
-            />
-            <label
-              htmlFor="captcha-reset"
-              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-veloz-white"
-            >
-              Não sou um robô
-            </label>
-          </div>
         </CardContent>
         <CardFooter className="flex flex-col space-y-2">
           <Button 
             type="submit" 
             className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
-            disabled={loading || !captchaVerified}
+            disabled={loading}
           >
             {loading ? 'Enviando...' : 'Enviar instruções'}
           </Button>

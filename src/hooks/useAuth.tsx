@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -74,6 +73,7 @@ export function useAuth() {
   ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
+      // Removendo o captchaToken da solicitação para teste
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -82,11 +82,15 @@ export function useAuth() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Signup error:', error);
+        throw error;
+      }
 
       toast.success('Conta criada com sucesso! Verifique seu email.');
       return { error: null };
     } catch (error: any) {
+      console.error('Signup catch error:', error);
       toast.error(error.message || 'Erro ao criar conta');
       return { error: { message: error.message } };
     } finally {
@@ -101,6 +105,9 @@ export function useAuth() {
   ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
+      console.log('Attempting login with:', email);
+      
+      // Removendo o captchaToken da solicitação para teste
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -109,11 +116,16 @@ export function useAuth() {
         }
       });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
 
+      console.log('Login successful:', data);
       toast.success('Login realizado com sucesso!');
       return { error: null };
     } catch (error: any) {
+      console.error('Login catch error:', error);
       toast.error(error.message || 'Erro ao fazer login');
       return { error: { message: error.message } };
     } finally {
@@ -146,6 +158,8 @@ export function useAuth() {
   ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
+      
+      // Removendo o captchaToken da solicitação para teste
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         captchaToken,
         redirectTo: `${window.location.origin}/configuracoes`,

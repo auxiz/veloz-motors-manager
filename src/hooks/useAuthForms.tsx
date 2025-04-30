@@ -48,17 +48,18 @@ export function useAuthForms() {
     setError(null);
     
     try {
-      // Use a mock captcha token for development purposes
-      const captchaToken = "mock-captcha-token";
+      console.log('Submitting login with:', loginForm.email);
       
-      const { error } = await signIn(loginForm.email, loginForm.password, captchaToken);
+      const { error } = await signIn(loginForm.email, loginForm.password);
       if (error) {
         setError(error.message);
         return;
       }
+      
       toast.success('Login bem-sucedido');
       navigate('/dashboard');
     } catch (err: any) {
+      console.error('Login form error:', err);
       setError(err.message || 'Erro ao fazer login');
     }
   };
@@ -68,10 +69,7 @@ export function useAuthForms() {
     setError(null);
     
     try {
-      // Use a mock captcha token for development purposes
-      const captchaToken = "mock-captcha-token";
-      
-      const { error } = await signUp(registerForm.email, registerForm.password, captchaToken);
+      const { error } = await signUp(registerForm.email, registerForm.password);
       if (error) {
         setError(error.message);
         return;
@@ -93,10 +91,7 @@ export function useAuthForms() {
     }
     
     try {
-      // Use a mock captcha token for development purposes
-      const captchaToken = "mock-captcha-token";
-      
-      const { error } = await resetPassword(resetForm.email, captchaToken);
+      const { error } = await resetPassword(resetForm.email);
       if (error) {
         setError(error.message);
         return;
