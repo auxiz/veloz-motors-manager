@@ -8,9 +8,13 @@ import { ApplicationForm } from './ApplicationForm';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { calculateFinancing } from './utils/formatters';
 
-export const FinancingSimulatorContainer = () => {
-  const [vehiclePrice, setVehiclePrice] = useState(50000);
-  const [entryValue, setEntryValue] = useState(10000);
+interface FinancingSimulatorContainerProps {
+  initialVehiclePrice?: number;
+}
+
+export const FinancingSimulatorContainer: React.FC<FinancingSimulatorContainerProps> = ({ initialVehiclePrice = 50000 }) => {
+  const [vehiclePrice, setVehiclePrice] = useState(initialVehiclePrice);
+  const [entryValue, setEntryValue] = useState(Math.round(initialVehiclePrice * 0.2)); // Default 20% entry
   const [installments, setInstallments] = useState(36);
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [totalPayment, setTotalPayment] = useState<number | null>(null);

@@ -13,6 +13,23 @@ export const usePublicVehicles = (filters?: {
   sortBy?: 'price' | 'year';
   sortOrder?: 'asc' | 'desc';
 }) => {
+  // Get a single vehicle by ID
+  const getVehicleById = async (id: string) => {
+    const { data, error } = await supabase
+      .from('vehicles')
+      .select('*')
+      .eq('id', id)
+      .eq('status', 'in_stock')
+      .single();
+    
+    if (error) {
+      console.error('Error fetching vehicle:', error);
+      throw error;
+    }
+    
+    return data as Vehicle;
+  };
+
   const { data: vehicles = [], isLoading } = useQuery({
     queryKey: ['public-vehicles', filters],
     queryFn: async () => {
@@ -67,23 +84,6 @@ export const usePublicVehicles = (filters?: {
       return data as Vehicle[];
     },
   });
-  
-  // Get a single vehicle by ID
-  const getVehicleById = async (id: string) => {
-    const { data, error } = await supabase
-      .from('vehicles')
-      .select('*')
-      .eq('id', id)
-      .eq('status', 'in_stock')
-      .single();
-    
-    if (error) {
-      console.error('Error fetching vehicle:', error);
-      throw error;
-    }
-    
-    return data as Vehicle;
-  };
   
   // Get featured vehicles (for home page)
   const { data: featuredVehicles = [] } = useQuery({
