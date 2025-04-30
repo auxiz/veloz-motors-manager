@@ -28,9 +28,7 @@ export const PublicLayout = ({
               <Link to="/contato" className="text-lg text-white hover:text-veloz-yellow transition-colors duration-300 font-medium">
                 Contato
               </Link>
-              <Link to="/auth" className="bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-semibold px-4 py-2 rounded-lg transition-colors duration-300">
-                Área Restrita
-              </Link>
+              
             </nav>
 
             {/* Mobile Menu Button */}
