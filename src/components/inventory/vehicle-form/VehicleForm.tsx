@@ -13,6 +13,7 @@ import { NotesField } from "./fields/NotesField";
 import { PlateSearchButton } from "./PlateSearchButton";
 import { usePlateSearch } from "./hooks/usePlateSearch";
 import { PhotosField } from "./fields/PhotosField";
+import { StatusField } from "./fields/StatusField";
 
 interface VehicleFormProps {
   onSubmit: (data: VehicleFormData) => void;
@@ -40,7 +41,8 @@ export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormPro
       purchase_price: initialData?.purchase_price || 0,
       sale_price: initialData?.sale_price || 0,
       internal_notes: initialData?.internal_notes || "",
-      photos: initialData?.photos || []
+      photos: initialData?.photos || [],
+      status: initialData?.status || "in_stock",
     },
   });
 
@@ -58,7 +60,10 @@ export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormPro
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <BasicInfoFields form={form} />
-            <IdentificationFields form={form} />
+            <div className="space-y-6">
+              <StatusField form={form} />
+              <IdentificationFields form={form} />
+            </div>
             <SpecificationsFields form={form} />
             <PricingFields form={form} />
           </div>

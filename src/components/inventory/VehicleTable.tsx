@@ -11,6 +11,7 @@ import {
   TableRow
 } from "@/components/ui/table";
 import { Vehicle } from '@/hooks/useVehicles';
+import { Badge } from "@/components/ui/badge";
 
 interface VehicleTableProps {
   vehicles: Vehicle[];
@@ -36,6 +37,19 @@ export const VehicleTable = ({
       style: 'currency', 
       currency: 'BRL' 
     });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'in_stock':
+        return <Badge className="bg-blue-900 text-blue-200 hover:bg-blue-900">Em estoque</Badge>;
+      case 'reserved':
+        return <Badge className="bg-amber-900 text-amber-200 hover:bg-amber-900">Reservado</Badge>;
+      case 'sold':
+        return <Badge className="bg-green-900 text-green-200 hover:bg-green-900">Vendido</Badge>;
+      default:
+        return <Badge className="bg-purple-900 text-purple-200 hover:bg-purple-900">{status}</Badge>;
+    }
   };
 
   return (
@@ -83,14 +97,7 @@ export const VehicleTable = ({
             <TableCell>{vehicle.mileage.toLocaleString()}</TableCell>
             <TableCell>{formatCurrency(vehicle.sale_price)}</TableCell>
             <TableCell>
-              <span className={`px-2 py-1 rounded-full text-xs ${
-                vehicle.status === 'Em estoque' ? 'bg-blue-900 text-blue-200' :
-                vehicle.status === 'Reservado' ? 'bg-amber-900 text-amber-200' : 
-                vehicle.status === 'Vendido' ? 'bg-green-900 text-green-200' :
-                'bg-purple-900 text-purple-200'
-              }`}>
-                {vehicle.status}
-              </span>
+              {getStatusBadge(vehicle.status)}
             </TableCell>
             <TableCell>
               <div className="flex space-x-2">

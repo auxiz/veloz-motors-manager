@@ -35,7 +35,7 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
         transmission: data.transmission,
         purchase_price: data.purchase_price,
         sale_price: data.sale_price,
-        status: 'in_stock',
+        status: data.status,
         entry_date: new Date().toISOString(),
         photos: data.photos || null,
         internal_notes: data.internal_notes || '',

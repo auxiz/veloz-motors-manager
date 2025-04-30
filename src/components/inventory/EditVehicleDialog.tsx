@@ -43,7 +43,8 @@ export const EditVehicleDialog = ({
         purchase_price: data.purchase_price,
         sale_price: data.sale_price,
         internal_notes: data.internal_notes || null,
-        photos: data.photos || vehicle.photos
+        photos: data.photos || vehicle.photos,
+        status: data.status
       });
       onOpenChange(false);
     } catch (error) {
@@ -83,7 +84,8 @@ export const EditVehicleDialog = ({
             purchase_price: vehicle.purchase_price,
             sale_price: vehicle.sale_price,
             internal_notes: vehicle.internal_notes || '',
-            photos: vehicle.photos
+            photos: vehicle.photos,
+            status: vehicle.status
           }}
         />
       </DialogContent>

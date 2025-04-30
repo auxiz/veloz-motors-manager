@@ -16,7 +16,10 @@ export const vehicleSchema = z.object({
   purchase_price: z.coerce.number().min(0, "Preço de compra é obrigatório"),
   sale_price: z.coerce.number().min(0, "Preço de venda é obrigatório"),
   internal_notes: z.string().optional(),
-  photos: z.array(z.string()).optional()
+  photos: z.array(z.string()).optional(),
+  status: z.enum(["in_stock", "reserved", "sold"], {
+    required_error: "Status é obrigatório",
+  }).default("in_stock"),
 });
 
 export type VehicleFormData = z.infer<typeof vehicleSchema>;

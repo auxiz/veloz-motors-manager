@@ -1,8 +1,10 @@
+
 import React from 'react';
 import { Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Vehicle } from '@/hooks/useVehicles';
+import { Badge } from "@/components/ui/badge";
 
 interface VehicleCardProps {
   vehicle: Vehicle;
@@ -16,6 +18,19 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
       style: 'currency', 
       currency: 'BRL' 
     });
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case 'in_stock':
+        return <Badge className="bg-blue-900 text-blue-200 hover:bg-blue-900">Em estoque</Badge>;
+      case 'reserved':
+        return <Badge className="bg-amber-900 text-amber-200 hover:bg-amber-900">Reservado</Badge>;
+      case 'sold':
+        return <Badge className="bg-green-900 text-green-200 hover:bg-green-900">Vendido</Badge>;
+      default:
+        return <Badge className="bg-purple-900 text-purple-200 hover:bg-purple-900">{status}</Badge>;
+    }
   };
 
   return (
@@ -33,14 +48,7 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
           </div>
         )}
         <div className="absolute top-0 right-0 m-2">
-          <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-            vehicle.status === 'Em estoque' ? 'bg-blue-900 text-blue-200' :
-            vehicle.status === 'Reservado' ? 'bg-amber-900 text-amber-200' : 
-            vehicle.status === 'Vendido' ? 'bg-green-900 text-green-200' :
-            'bg-purple-900 text-purple-200'
-          }`}>
-            {vehicle.status}
-          </span>
+          {getStatusBadge(vehicle.status)}
         </div>
       </div>
       <CardContent className="p-4">
