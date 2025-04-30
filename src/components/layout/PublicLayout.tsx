@@ -16,7 +16,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
               <img 
                 src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
                 alt="Veloz Motors Logo" 
-                className="h-10 md:h-12"
+                className="h-14 md:h-16"
               />
             </Link>
 
@@ -66,7 +66,7 @@ export const PublicLayout = ({ children }: { children: React.ReactNode }) => {
                 <img 
                   src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
                   alt="Veloz Motors Logo" 
-                  className="h-12"
+                  className="h-16"
                 />
               </div>
               <p className="text-white">Seu parceiro de confiança na busca pelo veículo ideal.</p>
