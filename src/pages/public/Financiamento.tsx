@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React from 'react';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { FinancingSimulator } from '@/components/public/FinancingSimulator';
 
