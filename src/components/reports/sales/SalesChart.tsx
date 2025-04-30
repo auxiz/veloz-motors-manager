@@ -45,12 +45,12 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
         </CardHeader>
         <Separator className="bg-veloz-gray/50" />
         <CardContent className="pt-6">
-          <div className="h-[400px] w-full">
+          <div className="h-[450px] w-full">
             <ChartContainer config={chartConfig}>
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart 
                   data={chartData}
-                  margin={{ top: 10, right: 30, left: 20, bottom: 60 }}
+                  margin={{ top: 10, right: 30, left: 20, bottom: 80 }}
                   barGap={12}
                   barSize={24}
                 >
@@ -62,20 +62,23 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
                     tick={{ fontSize: 11 }}
                     tickLine={{ stroke: "#555" }}
                     height={80}
-                    angle={-40}
+                    angle={-30}
                     textAnchor="end"
+                    tickMargin={10}
                   />
                   <YAxis 
                     stroke="#999" 
                     tickFormatter={formatYAxis}
                     tick={{ fontSize: 12 }}
                     tickLine={{ stroke: "#555" }}
-                    width={50}
+                    width={60}
+                    tickMargin={8}
                   />
                   <Tooltip 
                     content={<ChartTooltipContent />} 
                     cursor={{ opacity: 0.3 }}
                     animationDuration={300}
+                    wrapperStyle={{ zIndex: 1000 }}
                   />
                   <Legend 
                     verticalAlign="top" 

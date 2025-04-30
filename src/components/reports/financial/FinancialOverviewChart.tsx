@@ -56,7 +56,7 @@ export function FinancialOverviewChart({
       </CardHeader>
       <Separator className="bg-border/50" />
       <CardContent className="pt-6">
-        <div className="h-[400px]">
+        <div className="h-[450px]">
           <ChartContainer config={chartConfig}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart 
@@ -72,18 +72,22 @@ export function FinancialOverviewChart({
                   padding={{ left: 10, right: 10 }}
                   tick={{ fontSize: 12 }}
                   tickLine={{ stroke: "#555" }}
+                  height={50}
+                  tickMargin={10}
                 />
                 <YAxis 
                   stroke="#999" 
                   tickFormatter={formatYAxis}
                   tick={{ fontSize: 12 }}
                   tickLine={{ stroke: "#555" }}
-                  width={50}
+                  width={60}
+                  tickMargin={8}
                 />
                 <Tooltip 
                   content={<ChartTooltipContent />} 
                   cursor={{ opacity: 0.3 }}
                   animationDuration={300}
+                  wrapperStyle={{ zIndex: 1000 }}
                 />
                 <Legend 
                   verticalAlign="bottom" 

@@ -67,14 +67,14 @@ export function CashFlowChart({ transactions }: CashFlowChartProps) {
   };
   
   return (
-    <div className="h-[300px] w-full relative z-0">
+    <div className="h-[350px] w-full relative z-0 mb-4">
       <ChartContainer config={chartConfig}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart
             data={chartData}
-            margin={{ top: 20, right: 30, left: 20, bottom: 40 }}
-            barGap={8}
-            barSize={18}
+            margin={{ top: 20, right: 30, left: 20, bottom: 50 }}
+            barGap={10}
+            barSize={16}
           >
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#333" />
             <XAxis 
@@ -82,8 +82,9 @@ export function CashFlowChart({ transactions }: CashFlowChartProps) {
               tick={{ fill: '#999', fontSize: 12 }}
               tickLine={{ stroke: '#555' }}
               axisLine={{ stroke: '#555' }}
-              height={50}
+              height={60}
               padding={{ left: 10, right: 10 }}
+              tickMargin={8}
             />
             <YAxis 
               tickFormatter={formatYAxis}
@@ -91,10 +92,12 @@ export function CashFlowChart({ transactions }: CashFlowChartProps) {
               tickLine={{ stroke: '#555' }}
               axisLine={{ stroke: '#555' }}
               width={60}
+              tickMargin={8}
             />
             <Tooltip
               content={<ChartTooltipContent />}
               cursor={{ fill: 'rgba(255, 255, 255, 0.1)' }}
+              wrapperStyle={{ zIndex: 1000 }}
             />
             <Legend 
               verticalAlign="top" 

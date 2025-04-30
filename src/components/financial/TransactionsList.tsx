@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale';
 import { Edit, CheckCircle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EditTransactionDialog } from './edit-transaction/EditTransactionDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface TransactionsListProps {
   transactionType?: 'income' | 'expense';
@@ -45,10 +46,10 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
       }
       
       // Filter by category
-      if (filters.category && transaction.category !== filters.category) return false;
+      if (filters.category && filters.category !== 'all' && transaction.category !== filters.category) return false;
       
       // Filter by status from filter component
-      if (filters.status && transaction.status !== filters.status) return false;
+      if (filters.status && filters.status !== 'all' && transaction.status !== filters.status) return false;
       
       // Filter by search term
       if (filters.search) {
@@ -89,24 +90,24 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
   }
 
   return (
-    <>
+    <TooltipProvider>
       <div className="overflow-x-auto relative z-10">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Descrição</TableHead>
-              <TableHead>Categoria</TableHead>
-              <TableHead>Data</TableHead>
-              <TableHead className="text-right">Valor</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right relative">Ações</TableHead>
+              <TableHead className="w-1/4">Descrição</TableHead>
+              <TableHead className="w-1/6">Categoria</TableHead>
+              <TableHead className="w-1/6">Data</TableHead>
+              <TableHead className="text-right w-1/6">Valor</TableHead>
+              <TableHead className="w-1/6">Status</TableHead>
+              <TableHead className="text-right w-28">Ações</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredTransactions.map((transaction) => (
               <TableRow key={transaction.id} className="group">
-                <TableCell className="font-medium">{transaction.description}</TableCell>
-                <TableCell>{transaction.category}</TableCell>
+                <TableCell className="font-medium truncate max-w-[200px]">{transaction.description}</TableCell>
+                <TableCell className="truncate max-w-[120px]">{transaction.category}</TableCell>
                 <TableCell>
                   <span className={isPast(new Date(transaction.due_date)) && transaction.status === 'pending' ? 'text-red-500' : ''}>
                     {format(new Date(transaction.due_date), 'dd/MM/yyyy', { locale: ptBR })}
@@ -122,32 +123,45 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
                     {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
                   </Badge>
                 </TableCell>
-                <TableCell className="text-right space-x-2">
-                  <div className="flex justify-end gap-2">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="opacity-70 hover:opacity-100"
-                      onClick={() => setEditingTransaction(transaction.id)}
-                    >
-                      <Edit className="h-4 w-4" />
-                      <span className="sr-only">Editar</span>
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="opacity-70 hover:opacity-100"
-                      onClick={() => handleStatusToggle(transaction.id, transaction.status)}
-                    >
-                      {transaction.status === 'paid' ? (
-                        <XCircle className="h-4 w-4 text-amber-500" />
-                      ) : (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
-                      )}
-                      <span className="sr-only">
+                <TableCell className="text-right p-2">
+                  <div className="flex justify-end gap-1">
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          onClick={() => setEditingTransaction(transaction.id)}
+                        >
+                          <Edit className="h-4 w-4" />
+                          <span className="sr-only">Editar</span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Editar</TooltipContent>
+                    </Tooltip>
+                    
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="h-8 w-8 opacity-70 hover:opacity-100"
+                          onClick={() => handleStatusToggle(transaction.id, transaction.status)}
+                        >
+                          {transaction.status === 'paid' ? (
+                            <XCircle className="h-4 w-4 text-amber-500" />
+                          ) : (
+                            <CheckCircle className="h-4 w-4 text-green-500" />
+                          )}
+                          <span className="sr-only">
+                            {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
+                          </span>
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>
                         {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
-                      </span>
-                    </Button>
+                      </TooltipContent>
+                    </Tooltip>
                   </div>
                 </TableCell>
               </TableRow>
@@ -165,6 +179,6 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
           }}
         />
       )}
-    </>
+    </TooltipProvider>
   );
 };

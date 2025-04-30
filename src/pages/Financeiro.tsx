@@ -137,7 +137,7 @@ const Financeiro = () => {
               </div>
             </CardHeader>
             <Separator className="bg-veloz-gray/50" />
-            <CardContent className="pt-6 pb-8 relative">
+            <CardContent className="pt-6 pb-4 relative">
               <CashFlowChart transactions={transactions} />
             </CardContent>
           </Card>
@@ -162,10 +162,10 @@ const Financeiro = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
-                  <div className="relative z-30">
+                  <div className="relative">
                     <TransactionsFilter onFilterChange={setFilters} />
                   </div>
-                  <div className="relative z-20">
+                  <div className="relative">
                     <TransactionsList 
                       transactionType={getTransactionType()}
                       status={activeTab === 'pending' ? 'pending' : undefined}
