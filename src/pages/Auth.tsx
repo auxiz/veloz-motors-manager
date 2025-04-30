@@ -13,7 +13,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 
 const Auth = () => {
   const navigate = useNavigate();
-  const { signIn, signUp, loading, user } = useAuth();
+  const { signIn, signUp, loading, user, resetPassword } = useAuth();
   const [loginForm, setLoginForm] = useState({
     email: '',
     password: '',
@@ -23,7 +23,11 @@ const Auth = () => {
     email: '',
     password: '',
   });
+  const [resetForm, setResetForm] = useState({
+    email: '',
+  });
   const [error, setError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   
   // If already authenticated, redirect to dashboard
   useEffect(() => {
@@ -42,6 +46,13 @@ const Auth = () => {
   const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setRegisterForm({
       ...registerForm,
+      [e.target.id]: e.target.value,
+    });
+  };
+
+  const handleResetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setResetForm({
+      ...resetForm,
       [e.target.id]: e.target.value,
     });
   };
@@ -80,6 +91,123 @@ const Auth = () => {
     }
   };
 
+  const handleResetSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    
+    if (!resetForm.email) {
+      setError('Por favor, informe seu email.');
+      return;
+    }
+    
+    try {
+      const { error } = await resetPassword(resetForm.email);
+      if (error) {
+        setError(error.message);
+        return;
+      }
+      
+      toast.success('Email de recuperação enviado com sucesso. Verifique sua caixa de entrada.');
+      setShowForgotPassword(false);
+    } catch (err: any) {
+      setError(err.message || 'Erro ao enviar email de recuperação');
+    }
+  };
+
+  const toggleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowForgotPassword(!showForgotPassword);
+    setError(null);
+  };
+
+  const renderLoginForm = () => (
+    <form onSubmit={handleLoginSubmit}>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder="seu@email.com"
+            required
+            className="bg-veloz-black border-veloz-gray text-veloz-white"
+            value={loginForm.email}
+            onChange={handleLoginChange}
+          />
+        </div>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <Label htmlFor="password">Senha</Label>
+            <a 
+              href="#" 
+              className="text-sm text-veloz-yellow hover:underline"
+              onClick={toggleForgotPassword}
+            >
+              Esqueceu a senha?
+            </a>
+          </div>
+          <Input 
+            id="password" 
+            type="password"
+            placeholder="••••••••" 
+            required 
+            className="bg-veloz-black border-veloz-gray text-veloz-white"
+            value={loginForm.password}
+            onChange={handleLoginChange}
+          />
+        </div>
+      </CardContent>
+      <CardFooter>
+        <Button 
+          type="submit" 
+          className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
+          disabled={loading}
+        >
+          {loading ? 'Entrando...' : 'Entrar'}
+        </Button>
+      </CardFooter>
+    </form>
+  );
+
+  const renderForgotPasswordForm = () => (
+    <form onSubmit={handleResetSubmit}>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="email">Email</Label>
+          <Input 
+            id="email" 
+            type="email" 
+            placeholder="seu@email.com"
+            required
+            className="bg-veloz-black border-veloz-gray text-veloz-white"
+            value={resetForm.email}
+            onChange={handleResetChange}
+          />
+        </div>
+        <p className="text-sm text-gray-400">
+          Informe seu email e enviaremos instruções para redefinir sua senha.
+        </p>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-2">
+        <Button 
+          type="submit" 
+          className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
+          disabled={loading}
+        >
+          {loading ? 'Enviando...' : 'Enviar instruções'}
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          className="w-full text-veloz-white"
+          onClick={toggleForgotPassword}
+        >
+          Voltar ao login
+        </Button>
+      </CardFooter>
+    </form>
+  );
+
   return (
     <div className="min-h-screen bg-veloz-black flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md animate-fade-in">
@@ -107,54 +235,11 @@ const Auth = () => {
           <TabsContent value="login">
             <Card className="border-veloz-gray bg-veloz-gray">
               <CardHeader>
-                <h2 className="text-2xl font-bold text-center text-veloz-white">Acesse sua conta</h2>
+                <h2 className="text-2xl font-bold text-center text-veloz-white">
+                  {showForgotPassword ? 'Recuperar Senha' : 'Acesse sua conta'}
+                </h2>
               </CardHeader>
-              <form onSubmit={handleLoginSubmit}>
-                <CardContent className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input 
-                      id="email" 
-                      type="email" 
-                      placeholder="seu@email.com"
-                      required
-                      className="bg-veloz-black border-veloz-gray text-veloz-white"
-                      value={loginForm.email}
-                      onChange={handleLoginChange}
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Senha</Label>
-                      <a 
-                        href="#" 
-                        className="text-sm text-veloz-yellow hover:underline"
-                        onClick={(e) => e.preventDefault()}
-                      >
-                        Esqueceu a senha?
-                      </a>
-                    </div>
-                    <Input 
-                      id="password" 
-                      type="password"
-                      placeholder="••••••••" 
-                      required 
-                      className="bg-veloz-black border-veloz-gray text-veloz-white"
-                      value={loginForm.password}
-                      onChange={handleLoginChange}
-                    />
-                  </div>
-                </CardContent>
-                <CardFooter>
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
-                    disabled={loading}
-                  >
-                    {loading ? 'Entrando...' : 'Entrar'}
-                  </Button>
-                </CardFooter>
-              </form>
+              {showForgotPassword ? renderForgotPasswordForm() : renderLoginForm()}
             </Card>
           </TabsContent>
           

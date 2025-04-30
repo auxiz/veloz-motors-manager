@@ -126,6 +126,23 @@ export function useAuth() {
     }
   };
 
+  const resetPassword = async (email: string): Promise<{ error: AuthError | null }> => {
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/configuracoes`,
+      });
+      
+      if (error) throw error;
+      
+      return { error: null };
+    } catch (error: any) {
+      return { error: { message: error.message } };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateUserProfile = async (updates: Partial<UserProfile>): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
@@ -158,6 +175,7 @@ export function useAuth() {
     signUp,
     signIn,
     signOut,
+    resetPassword,
     updateUserProfile
   };
 }
