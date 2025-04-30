@@ -2,25 +2,15 @@
 import React, { useState } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import * as z from 'zod';
-import { FormField, FormItem, FormLabel, FormControl, FormMessage, Form } from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { formatCurrency } from '@/lib/utils';
-import { NewCustomerForm } from '@/components/customers/NewCustomerForm';
-
-const saleSchema = z.object({
-  vehicleId: z.string().min(1, { message: 'Selecione um veículo' }),
-  customerId: z.string().min(1, { message: 'Selecione um cliente' }),
-  finalPrice: z.number().min(1, { message: 'Digite um valor válido' }),
-  paymentMethod: z.string().min(1, { message: 'Selecione uma forma de pagamento' }),
-  commissionType: z.enum(['fixed', 'percentage']),
-  commissionValue: z.number().min(0, { message: 'Digite um valor válido para comissão' }),
-});
-
-type SaleFormValues = z.infer<typeof saleSchema>;
+import { Form } from '@/components/ui/form';
+import { saleSchema, SaleFormValues } from './form/FormSchema';
+import { VehicleSelect } from './form/VehicleSelect';
+import { CustomerSelect } from './form/CustomerSelect';
+import { PaymentMethodSelect } from './form/PaymentMethodSelect';
+import { FinalPriceInput } from './form/FinalPriceInput';
+import { CommissionFields } from './form/CommissionFields';
+import { CommissionPreview } from './form/CommissionPreview';
+import { SubmitButton } from './form/SubmitButton';
 
 interface SaleFormProps {
   vehicles: any[];
@@ -70,211 +60,36 @@ export const SaleForm: React.FC<SaleFormProps> = ({ vehicles, customers, onSubmi
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleFinalSubmit)} className="space-y-6">
         {/* Vehicle Selection */}
-        <FormField
-          control={form.control}
-          name="vehicleId"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Veículo</FormLabel>
-              <Select
-                onValueChange={(value) => {
-                  field.onChange(value);
-                  handleVehicleChange(value);
-                }}
-                defaultValue={field.value}
-              >
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione um veículo" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-veloz-black border-veloz-gray max-h-[300px]">
-                  {vehicles.length > 0 ? (
-                    vehicles.map((vehicle) => (
-                      <SelectItem key={vehicle.id} value={vehicle.id}>
-                        {vehicle.brand} {vehicle.model} {vehicle.version} ({vehicle.year}) - {formatCurrency(vehicle.sale_price)}
-                      </SelectItem>
-                    ))
-                  ) : (
-                    <div className="p-2 text-center text-muted-foreground">
-                      Nenhum veículo disponível
-                    </div>
-                  )}
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
+        <VehicleSelect 
+          form={form} 
+          vehicles={vehicles} 
+          onVehicleChange={handleVehicleChange} 
         />
 
         {/* Customer Selection with Tabs */}
-        <div className="space-y-2">
-          <FormLabel>Cliente</FormLabel>
-          <Tabs value={customerTab} onValueChange={setCustomerTab}>
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="existing">Cliente Existente</TabsTrigger>
-              <TabsTrigger value="new">Novo Cliente</TabsTrigger>
-            </TabsList>
-            <TabsContent value="existing" className="pt-4">
-              <FormField
-                control={form.control}
-                name="customerId"
-                render={({ field }) => (
-                  <FormItem>
-                    <Select
-                      onValueChange={field.onChange}
-                      defaultValue={field.value}
-                      value={newCustomerId || field.value}
-                    >
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Selecione um cliente" />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className="bg-veloz-black border-veloz-gray max-h-[300px]">
-                        {customers.map((customer) => (
-                          <SelectItem key={customer.id} value={customer.id}>
-                            {customer.name} ({customer.document})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </TabsContent>
-            <TabsContent value="new" className="pt-4">
-              <NewCustomerForm
-                onCustomerCreated={handleNewCustomerCreated}
-                embedded={true}
-              />
-            </TabsContent>
-          </Tabs>
-        </div>
+        <CustomerSelect 
+          form={form} 
+          customers={customers} 
+          customerTab={customerTab}
+          setCustomerTab={setCustomerTab}
+          newCustomerId={newCustomerId}
+          onNewCustomerCreated={handleNewCustomerCreated}
+        />
 
         {/* Payment Method */}
-        <FormField
-          control={form.control}
-          name="paymentMethod"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Forma de Pagamento</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Selecione a forma de pagamento" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent className="bg-veloz-black border-veloz-gray">
-                  <SelectItem value="cash">À Vista</SelectItem>
-                  <SelectItem value="financing">Financiamento</SelectItem>
-                  <SelectItem value="consignment">Consignação</SelectItem>
-                  <SelectItem value="exchange">Troca</SelectItem>
-                </SelectContent>
-              </Select>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <PaymentMethodSelect form={form} />
 
         {/* Final Price */}
-        <FormField
-          control={form.control}
-          name="finalPrice"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Valor Final</FormLabel>
-              <FormControl>
-                <Input
-                  type="number"
-                  placeholder="Valor da venda"
-                  {...field}
-                  onChange={(e) => field.onChange(Number(e.target.value))}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+        <FinalPriceInput form={form} />
 
         {/* Commission Settings */}
-        <div className="grid grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="commissionType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Tipo de Comissão</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Tipo de comissão" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent className="bg-veloz-black border-veloz-gray">
-                    <SelectItem value="fixed">Valor Fixo (R$)</SelectItem>
-                    <SelectItem value="percentage">Percentual (%)</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          
-          <FormField
-            control={form.control}
-            name="commissionValue"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Valor da Comissão {form.watch('commissionType') === 'percentage' ? '(%)' : '(R$)'}</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    step={form.watch('commissionType') === 'percentage' ? '0.01' : '1'}
-                    placeholder={form.watch('commissionType') === 'percentage' ? 'Porcentagem' : 'Valor em R$'}
-                    {...field}
-                    onChange={(e) => field.onChange(Number(e.target.value))}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-        </div>
+        <CommissionFields form={form} />
 
         {/* Commission Preview */}
-        {selectedVehicle && (
-          <div className="p-4 bg-veloz-black rounded-md">
-            <div className="flex justify-between items-center text-sm">
-              <span className="text-gray-400">Valor da Venda:</span>
-              <span className="text-veloz-yellow font-semibold">
-                {formatCurrency(form.watch('finalPrice'))}
-              </span>
-            </div>
-            <div className="flex justify-between items-center text-sm mt-1">
-              <span className="text-gray-400">Comissão Estimada:</span>
-              <span className="text-veloz-yellow font-semibold">
-                {formatCurrency(
-                  form.watch('commissionType') === 'fixed'
-                    ? form.watch('commissionValue')
-                    : (form.watch('finalPrice') * form.watch('commissionValue')) / 100
-                )}
-              </span>
-            </div>
-          </div>
-        )}
+        <CommissionPreview selectedVehicle={selectedVehicle} watch={form.watch} />
 
         {/* Submit Button */}
-        <div className="flex justify-end">
-          <Button 
-            type="submit" 
-            className="bg-veloz-yellow hover:bg-yellow-500 text-black font-semibold"
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Registrando...' : 'Registrar Venda'}
-          </Button>
-        </div>
+        <SubmitButton isSubmitting={isSubmitting} />
       </form>
     </Form>
   );
