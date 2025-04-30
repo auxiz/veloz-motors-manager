@@ -18,6 +18,8 @@ interface ApplicationFormProps {
   installments: number;
   monthlyPayment: number | null;
   totalPayment: number | null;
+  financingAmount: number | null;
+  interestRate: number | null;
 }
 
 export const ApplicationForm: React.FC<ApplicationFormProps> = ({
@@ -25,7 +27,9 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
   entryValue,
   installments,
   monthlyPayment,
-  totalPayment
+  totalPayment,
+  financingAmount,
+  interestRate
 }) => {
   const isMobile = useIsMobile();
   const form = useForm<FormValues>({
@@ -55,7 +59,9 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
         body: JSON.stringify({
           ...data,
           monthlyPayment: monthlyPayment || 0,
-          totalPayment: totalPayment || 0
+          totalPayment: totalPayment || 0,
+          financingAmount: financingAmount || 0,
+          interestRate: interestRate || 0
         })
       });
       

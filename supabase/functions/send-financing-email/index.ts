@@ -18,11 +18,17 @@ interface FinancingRequest {
   installments: number;
   monthlyPayment: number;
   totalPayment: number;
+  financingAmount: number;
+  interestRate: number;
 }
 
 function formatDate(dateStr: string): string {
   const date = new Date(dateStr);
   return date.toLocaleDateString('pt-BR');
+}
+
+function formatInterestRate(rate: number): string {
+  return `${(rate * 100).toFixed(2)}%`;
 }
 
 serve(async (req: Request) => {
@@ -56,7 +62,9 @@ serve(async (req: Request) => {
           entry_value: requestData.entryValue,
           installments: requestData.installments,
           monthly_payment: requestData.monthlyPayment,
-          total_payment: requestData.totalPayment
+          total_payment: requestData.totalPayment,
+          financing_amount: requestData.financingAmount,
+          interest_rate: requestData.interestRate
         })
       }
     ).then(r => r.json());
@@ -85,6 +93,8 @@ serve(async (req: Request) => {
             <ul>
               <li><strong>Valor do Veículo:</strong> ${formatCurrency(requestData.vehiclePrice)}</li>
               <li><strong>Valor de Entrada:</strong> ${formatCurrency(requestData.entryValue)}</li>
+              <li><strong>Valor Financiado:</strong> ${formatCurrency(requestData.financingAmount)}</li>
+              <li><strong>Taxa de Juros:</strong> ${formatInterestRate(requestData.interestRate)} a.m.</li>
               <li><strong>Número de Parcelas:</strong> ${requestData.installments}</li>
               <li><strong>Valor da Parcela:</strong> ${formatCurrency(requestData.monthlyPayment)}</li>
               <li><strong>Valor Total:</strong> ${formatCurrency(requestData.totalPayment)}</li>

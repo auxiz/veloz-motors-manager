@@ -1,4 +1,3 @@
-
 // Format CPF input
 export const formatCPF = (value: string) => {
   const digits = value.replace(/\D/g, '');
@@ -37,6 +36,19 @@ export const formatWhatsApp = (value: string) => {
   return value;
 };
 
+// Get dynamic interest rate based on entry percentage
+export const getDynamicInterestRate = (vehiclePrice: number, entryValue: number): number => {
+  const entryPercentage = (entryValue / vehiclePrice) * 100;
+  
+  if (entryPercentage >= 40) {
+    return 0.0110; // 1.10% for entry ≥ 40%
+  } else if (entryPercentage >= 20) {
+    return 0.0130; // 1.30% for entry between 20% and 39.99%
+  } else {
+    return 0.0149; // 1.49% for entry < 20%
+  }
+};
+
 // Financing calculation
 export const calculateFinancing = (
   vehiclePrice: number, 
@@ -44,23 +56,33 @@ export const calculateFinancing = (
   installments: number
 ) => {
   if (vehiclePrice <= 0 || installments <= 0) {
-    return { monthlyPayment: null, totalPayment: null };
+    return { 
+      monthlyPayment: null, 
+      totalPayment: null,
+      financingAmount: null,
+      interestRate: null 
+    };
   }
 
   // Financing amount is vehicle price minus entry value
   const financingAmount = vehiclePrice - entryValue;
   
-  // Monthly interest rate (1.49%)
-  const monthlyInterest = 0.0149;
+  // Get dynamic interest rate based on entry percentage
+  const interestRate = getDynamicInterestRate(vehiclePrice, entryValue);
   
   // Calculate monthly payment using compound interest formula
   // PMT = P * r * (1 + r)^n / ((1 + r)^n - 1)
   // where P is principal (financing amount), r is interest rate, n is number of periods
-  const monthlyPayment = financingAmount * monthlyInterest * Math.pow(1 + monthlyInterest, installments) / 
-                      (Math.pow(1 + monthlyInterest, installments) - 1);
+  const monthlyPayment = financingAmount * interestRate * Math.pow(1 + interestRate, installments) / 
+                      (Math.pow(1 + interestRate, installments) - 1);
   
   // Total payment is monthly payment times number of installments
   const totalPayment = monthlyPayment * installments;
   
-  return { monthlyPayment, totalPayment };
+  return { 
+    monthlyPayment, 
+    totalPayment, 
+    financingAmount,
+    interestRate 
+  };
 };

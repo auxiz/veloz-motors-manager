@@ -14,13 +14,17 @@ export const FinancingSimulatorContainer = () => {
   const [installments, setInstallments] = useState(36);
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [totalPayment, setTotalPayment] = useState<number | null>(null);
+  const [financingAmount, setFinancingAmount] = useState<number | null>(null);
+  const [interestRate, setInterestRate] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
   // Calculate the financing values when inputs change
   useEffect(() => {
-    const { monthlyPayment, totalPayment } = calculateFinancing(vehiclePrice, entryValue, installments);
+    const { monthlyPayment, totalPayment, financingAmount, interestRate } = calculateFinancing(vehiclePrice, entryValue, installments);
     setMonthlyPayment(monthlyPayment);
     setTotalPayment(totalPayment);
+    setFinancingAmount(financingAmount);
+    setInterestRate(interestRate);
   }, [vehiclePrice, entryValue, installments]);
 
   return (
@@ -39,6 +43,8 @@ export const FinancingSimulatorContainer = () => {
         installments={installments}
         monthlyPayment={monthlyPayment}
         totalPayment={totalPayment}
+        financingAmount={financingAmount}
+        interestRate={interestRate}
       />
     </div>
   );

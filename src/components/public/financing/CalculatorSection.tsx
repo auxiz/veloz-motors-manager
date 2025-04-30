@@ -25,13 +25,20 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
 }) => {
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [totalPayment, setTotalPayment] = useState<number | null>(null);
+  const [financingAmount, setFinancingAmount] = useState<number | null>(null);
+  const [interestRate, setInterestRate] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    const { monthlyPayment, totalPayment } = calculateFinancing(vehiclePrice, entryValue, installments);
+    const { monthlyPayment, totalPayment, financingAmount, interestRate } = calculateFinancing(vehiclePrice, entryValue, installments);
     setMonthlyPayment(monthlyPayment);
     setTotalPayment(totalPayment);
+    setFinancingAmount(financingAmount);
+    setInterestRate(interestRate);
   }, [vehiclePrice, entryValue, installments]);
+
+  // Calculate entry percentage for display
+  const entryPercentage = ((entryValue / vehiclePrice) * 100).toFixed(1);
 
   return (
     <div className={`bg-veloz-gray rounded-lg ${isMobile ? 'p-4' : 'p-6 md:p-8'} shadow-lg mb-6`}>
@@ -54,7 +61,7 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
         
         {/* Entry Value Slider */}
         <SimulatorSlider
-          label="Valor de Entrada"
+          label={`Valor de Entrada (${entryPercentage}%)`}
           value={entryValue}
           min={0}
           max={vehiclePrice * 0.9}
@@ -78,6 +85,8 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
         <SimulatorResult
           monthlyPayment={monthlyPayment}
           totalPayment={totalPayment}
+          financingAmount={financingAmount}
+          interestRate={interestRate}
         />
       </div>
     </div>
