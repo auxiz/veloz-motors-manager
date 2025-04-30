@@ -1,11 +1,9 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 import LoginForm from './LoginForm';
-import RegisterForm from './RegisterForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
 interface AuthPageProps {
@@ -14,13 +12,10 @@ interface AuthPageProps {
   toggleForgotPassword: (e: React.MouseEvent) => void;
   loading: boolean;
   handleLoginSubmit: (e: React.FormEvent) => Promise<void>;
-  handleRegisterSubmit: (e: React.FormEvent) => Promise<void>;
   handleResetSubmit: (e: React.FormEvent) => Promise<void>;
   loginForm: { email: string; password: string };
-  registerForm: { name: string; email: string; password: string };
   resetForm: { email: string };
   handleLoginChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleRegisterChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleResetChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
@@ -30,13 +25,10 @@ const AuthPage: React.FC<AuthPageProps> = ({
   toggleForgotPassword,
   loading,
   handleLoginSubmit,
-  handleRegisterSubmit,
   handleResetSubmit,
   loginForm,
-  registerForm,
   resetForm,
   handleLoginChange,
-  handleRegisterChange,
   handleResetChange,
 }) => {
   return (
@@ -54,48 +46,32 @@ const AuthPage: React.FC<AuthPageProps> = ({
           Área Administrativa
         </h2>
         
-        <Tabs defaultValue="login" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 mb-6">
-            <TabsTrigger value="login">Login</TabsTrigger>
-            <TabsTrigger value="register">Cadastro</TabsTrigger>
-          </TabsList>
-          
-          {error && (
-            <Alert variant="destructive" className="mb-4">
-              <AlertCircle className="h-4 w-4" />
-              <AlertDescription>{error}</AlertDescription>
-            </Alert>
-          )}
-          
-          <TabsContent value="login">
-            {showForgotPassword ? (
-              <ForgotPasswordForm
-                resetForm={resetForm}
-                handleResetChange={handleResetChange}
-                handleResetSubmit={handleResetSubmit}
-                toggleForgotPassword={toggleForgotPassword}
-                loading={loading}
-              />
-            ) : (
-              <LoginForm
-                loginForm={loginForm}
-                handleLoginChange={handleLoginChange}
-                handleLoginSubmit={handleLoginSubmit}
-                toggleForgotPassword={toggleForgotPassword}
-                loading={loading}
-              />
-            )}
-          </TabsContent>
-          
-          <TabsContent value="register">
-            <RegisterForm
-              registerForm={registerForm}
-              handleRegisterChange={handleRegisterChange}
-              handleRegisterSubmit={handleRegisterSubmit}
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        
+        <div className="w-full">
+          {showForgotPassword ? (
+            <ForgotPasswordForm
+              resetForm={resetForm}
+              handleResetChange={handleResetChange}
+              handleResetSubmit={handleResetSubmit}
+              toggleForgotPassword={toggleForgotPassword}
               loading={loading}
             />
-          </TabsContent>
-        </Tabs>
+          ) : (
+            <LoginForm
+              loginForm={loginForm}
+              handleLoginChange={handleLoginChange}
+              handleLoginSubmit={handleLoginSubmit}
+              toggleForgotPassword={toggleForgotPassword}
+              loading={loading}
+            />
+          )}
+        </div>
         
         <div className="mt-8 pt-6 border-t border-gray-800 text-center">
           <p className="text-sm text-gray-400">

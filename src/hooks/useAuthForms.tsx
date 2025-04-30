@@ -6,13 +6,8 @@ import { useNavigate } from 'react-router-dom';
 
 export function useAuthForms() {
   const navigate = useNavigate();
-  const { signIn, signUp, resetPassword, loading } = useAuth();
+  const { signIn, resetPassword, loading } = useAuth();
   const [loginForm, setLoginForm] = useState({
-    email: '',
-    password: '',
-  });
-  const [registerForm, setRegisterForm] = useState({
-    name: '',
     email: '',
     password: '',
   });
@@ -25,13 +20,6 @@ export function useAuthForms() {
   const handleLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLoginForm({
       ...loginForm,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const handleRegisterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setRegisterForm({
-      ...registerForm,
       [e.target.id]: e.target.value,
     });
   };
@@ -61,23 +49,6 @@ export function useAuthForms() {
     } catch (err: any) {
       console.error('Login form error:', err);
       setError(err.message || 'Erro ao fazer login');
-    }
-  };
-
-  const handleRegisterSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    
-    try {
-      const { error } = await signUp(registerForm.email, registerForm.password);
-      if (error) {
-        setError(error.message);
-        return;
-      }
-      
-      toast.success('Conta criada com sucesso! Verifique seu email.');
-    } catch (err: any) {
-      setError(err.message || 'Erro ao criar conta');
     }
   };
 
@@ -112,16 +83,13 @@ export function useAuthForms() {
 
   return {
     loginForm,
-    registerForm,
     resetForm,
     error,
     showForgotPassword,
     loading,
     handleLoginChange,
-    handleRegisterChange,
     handleResetChange,
     handleLoginSubmit,
-    handleRegisterSubmit,
     handleResetSubmit,
     toggleForgotPassword,
   };
