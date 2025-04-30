@@ -3,7 +3,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Download, FileText } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Separator } from '@/components/ui/separator';
 import { format } from 'date-fns';
@@ -30,6 +30,13 @@ export function FinancialOverviewChart({
     profit: { label: 'Lucro' },
   };
 
+  // Format large values for better readability in the chart
+  const formatYAxis = (value: number) => {
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+    return value;
+  };
+
   return (
     <Card>
       <CardHeader>
@@ -51,16 +58,69 @@ export function FinancialOverviewChart({
       <CardContent className="pt-6">
         <div className="h-[400px]">
           <ChartContainer config={chartConfig}>
-            <BarChart data={monthlyData}>
-              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-              <XAxis dataKey="month" stroke="#999" />
-              <YAxis stroke="#999" />
-              <Tooltip content={<ChartTooltipContent />} />
-              <Legend />
-              <Bar dataKey="revenue" name="Receitas" fill="#4ade80" />
-              <Bar dataKey="expenses" name="Despesas" fill="#f87171" />
-              <Line type="monotone" dataKey="profit" name="Lucro" stroke="#facc15" strokeWidth={2} />
-            </BarChart>
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart 
+                data={monthlyData}
+                margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+                barGap={8}
+                barSize={24}
+              >
+                <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+                <XAxis 
+                  dataKey="month" 
+                  stroke="#999" 
+                  padding={{ left: 10, right: 10 }}
+                  tick={{ fontSize: 12 }}
+                  tickLine={{ stroke: "#555" }}
+                />
+                <YAxis 
+                  stroke="#999" 
+                  tickFormatter={formatYAxis}
+                  tick={{ fontSize: 12 }}
+                  tickLine={{ stroke: "#555" }}
+                  width={50}
+                />
+                <Tooltip 
+                  content={<ChartTooltipContent />} 
+                  cursor={{ opacity: 0.3 }}
+                  animationDuration={300}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36}
+                  iconType="circle"
+                  iconSize={8}
+                  wrapperStyle={{ fontSize: '12px', paddingTop: '15px' }}
+                />
+                <Bar 
+                  dataKey="revenue" 
+                  name="Receitas" 
+                  fill="#4ade80" 
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={800}
+                  isAnimationActive={true}
+                />
+                <Bar 
+                  dataKey="expenses" 
+                  name="Despesas" 
+                  fill="#f87171" 
+                  radius={[4, 4, 0, 0]}
+                  animationDuration={800}
+                  isAnimationActive={true}
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="profit" 
+                  name="Lucro" 
+                  stroke="#facc15" 
+                  strokeWidth={3}
+                  dot={{ r: 4, strokeWidth: 2 }}
+                  activeDot={{ r: 6 }}
+                  animationDuration={1200}
+                  isAnimationActive={true}
+                />
+              </BarChart>
+            </ResponsiveContainer>
           </ChartContainer>
         </div>
       </CardContent>

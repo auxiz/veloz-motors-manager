@@ -2,7 +2,7 @@
 import React, { useState, useMemo } from 'react';
 import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -79,6 +79,13 @@ export const CashFlowChart = ({ transactions }: CashFlowChartProps) => {
     balance: { label: 'Saldo' },
   };
 
+  // Format large values for better readability in the chart
+  const formatYAxis = (value: number) => {
+    if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
+    if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
+    return value;
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-end">
@@ -94,18 +101,46 @@ export const CashFlowChart = ({ transactions }: CashFlowChartProps) => {
         </Select>
       </div>
       
-      <div className="h-[300px]">
+      <div className="h-[300px] z-10">
         <ChartContainer config={chartConfig}>
-          <BarChart data={chartData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#333" />
-            <XAxis dataKey="name" stroke="#999" />
-            <YAxis stroke="#999" />
-            <Tooltip content={<ChartTooltipContent />} />
-            <Legend />
-            <Bar dataKey="income" name="Receitas" fill="#4ade80" />
-            <Bar dataKey="expense" name="Despesas" fill="#f87171" />
-            <Bar dataKey="balance" name="Saldo" fill="#facc15" />
-          </BarChart>
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart 
+              data={chartData} 
+              margin={{ top: 10, right: 30, left: 20, bottom: 30 }}
+              barGap={8}
+              barSize={16}
+            >
+              <CartesianGrid strokeDasharray="3 3" stroke="#333" />
+              <XAxis 
+                dataKey="name" 
+                stroke="#999" 
+                padding={{ left: 10, right: 10 }} 
+                tick={{ fontSize: 12 }}
+                tickLine={{ stroke: "#555" }}
+              />
+              <YAxis 
+                stroke="#999" 
+                tickFormatter={formatYAxis} 
+                tick={{ fontSize: 12 }}
+                tickLine={{ stroke: "#555" }}
+                width={50}
+              />
+              <Tooltip 
+                content={<ChartTooltipContent />} 
+                cursor={{ opacity: 0.3 }}
+              />
+              <Legend 
+                verticalAlign="bottom" 
+                height={36} 
+                iconType="circle" 
+                iconSize={8} 
+                wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }}
+              />
+              <Bar dataKey="income" name="Receitas" fill="#4ade80" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="expense" name="Despesas" fill="#f87171" radius={[2, 2, 0, 0]} />
+              <Bar dataKey="balance" name="Saldo" fill="#facc15" radius={[2, 2, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
         </ChartContainer>
       </div>
     </div>

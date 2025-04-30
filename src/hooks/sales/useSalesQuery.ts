@@ -17,7 +17,8 @@ export const useSalesQuery = () => {
         .select(`
           *,
           vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
-          customer:customers(name, document)
+          customer:customers(name, document),
+          seller:profiles(first_name, last_name, id)
         `)
         .order('created_at', { ascending: false });
 
@@ -38,7 +39,12 @@ export const useSalesQuery = () => {
   const getSalesByVehicleId = async (vehicleId: string): Promise<Sale[]> => {
     const { data, error } = await supabase
       .from('sales')
-      .select('*')
+      .select(`
+        *,
+        vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
+        customer:customers(name, document),
+        seller:profiles(first_name, last_name, id)
+      `)
       .eq('vehicle_id', vehicleId);
 
     if (error) {

@@ -26,6 +26,23 @@ export function SalesDetailsTable({
   downloadCSV,
   downloadPDF
 }: SalesDetailsTableProps) {
+  // Helper function to get the seller name
+  const getSellerName = (sale: Sale) => {
+    // First try using the joined seller data
+    if (sale.seller?.first_name) {
+      return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
+    }
+    
+    // Then try finding the user in the users array
+    const seller = users.find(user => user.id === sale.seller_id);
+    if (seller) {
+      return seller.name;
+    }
+    
+    // Last resort fallback
+    return 'Vendedor';
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
@@ -58,15 +75,16 @@ export function SalesDetailsTable({
             {filteredSales.length > 0 ? (
               filteredSales.map(sale => {
                 const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
-                const seller = users.find(user => user.id === sale.seller_id);
                 
                 return (
                   <TableRow key={sale.id}>
                     <TableCell>{format(new Date(sale.sale_date), 'dd/MM/yyyy')}</TableCell>
                     <TableCell>
-                      {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 'N/A'}
+                      {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 
+                       sale.vehicle ? `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}` : 
+                       'N/A'}
                     </TableCell>
-                    <TableCell>{seller ? seller.name : 'N/A'}</TableCell>
+                    <TableCell>{getSellerName(sale)}</TableCell>
                     <TableCell>{sale.customer?.name || 'N/A'}</TableCell>
                     <TableCell className="text-right">
                       {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}

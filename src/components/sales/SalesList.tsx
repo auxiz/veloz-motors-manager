@@ -34,9 +34,20 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
   };
 
   // Helper function to get seller name
-  const getSellerName = (sellerId: string) => {
-    const seller = users.find(user => user.id === sellerId);
-    return seller ? seller.name : sellerId.substring(0, 8);
+  const getSellerName = (sale: any) => {
+    // First try to use the seller data from the joined profiles table
+    if (sale.seller?.first_name) {
+      return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
+    }
+    
+    // Fallback to users data if available
+    const seller = users.find(user => user.id === sale.seller_id);
+    if (seller) {
+      return seller.name;
+    }
+    
+    // Last resort fallback
+    return 'Vendedor';
   };
 
   if (isLoading) {
@@ -83,7 +94,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
                 {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
               </TableCell>
               <TableCell>{sale.customer?.name}</TableCell>
-              <TableCell>{getSellerName(sale.seller_id)}</TableCell>
+              <TableCell>{getSellerName(sale)}</TableCell>
               <TableCell>{formatCurrency(sale.final_price)}</TableCell>
               <TableCell>
                 <Badge
