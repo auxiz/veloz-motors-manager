@@ -36,8 +36,8 @@ export function useResetPasswordForm() {
         return;
       }
       
-      toast.success('Email de recuperação enviado com sucesso. Verifique sua caixa de entrada.');
-      // Return void instead of success object to match expected type
+      toast.success('Email de recuperação enviado com sucesso. Verifique sua caixa de entrada e clique no link para redefinir sua senha.');
+      // Return void as expected by the type
     } catch (err: any) {
       setError(err.message || 'Erro ao enviar email de recuperação');
     }

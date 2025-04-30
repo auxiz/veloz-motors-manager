@@ -11,6 +11,7 @@ import { MainLayout } from "./components/layout/MainLayout"
 
 // Pages
 import Auth from "./pages/Auth"
+import ResetPassword from "./pages/ResetPassword"
 import Dashboard from "./pages/Dashboard"
 import Estoque from "./pages/Estoque"
 import Vendas from "./pages/Vendas"
@@ -42,8 +43,9 @@ const App = () => (
             <Route path="/veiculos/:id" element={<VehicleDetails />} />
             <Route path="/contato" element={<Contact />} />
             
-            {/* Admin Routes */}
+            {/* Auth Routes */}
             <Route path="/auth" element={<Auth />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             
             <Route element={<MainLayout />}>
               <Route path="/dashboard" element={

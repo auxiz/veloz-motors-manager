@@ -100,10 +100,10 @@ export function useAuthActions() {
     try {
       setLoading(true);
       
-      // Removendo o captchaToken da solicitação para teste
+      // Alterando o redirectTo para a nova página de redefinição de senha
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
         captchaToken,
-        redirectTo: `${window.location.origin}/configuracoes`,
+        redirectTo: `${window.location.origin}/reset-password`,
       });
       
       if (error) throw error;
