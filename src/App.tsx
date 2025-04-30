@@ -21,6 +21,7 @@ import Relatorios from "./pages/Relatorios"
 import Configuracoes from "./pages/Configuracoes"
 import NotFound from "./pages/NotFound"
 import { AuthGuard } from "./components/auth/AuthGuard"
+import ConsultaPlaca from "./pages/ConsultaPlaca"
 
 // Public Pages
 import Home from "./pages/public/Home"
@@ -58,6 +59,11 @@ const App = () => (
               <Route path="/estoque" element={
                 <AuthGuard>
                   <Estoque />
+                </AuthGuard>
+              } />
+              <Route path="/consulta-placa" element={
+                <AuthGuard>
+                  <ConsultaPlaca />
                 </AuthGuard>
               } />
               <Route path="/vendas" element={

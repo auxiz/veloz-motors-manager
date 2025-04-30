@@ -11,6 +11,8 @@ export type Vehicle = {
   year: number;
   color: string;
   plate: string | null;
+  renavam: string | null;
+  chassis: string | null;
   mileage: number;
   fuel: string;
   transmission: string;

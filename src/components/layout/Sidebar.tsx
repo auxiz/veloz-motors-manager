@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Car, User, DollarSign, File, Package, BarChart, Settings } from 'lucide-react';
+import { Car, User, DollarSign, File, Package, BarChart, Settings, Search } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
 
 type SidebarProps = {
@@ -20,6 +20,7 @@ export const Sidebar = ({ open }: SidebarProps) => {
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },
     { name: 'Estoque', path: '/estoque', icon: <Car size={20} />, visible: true },
+    { name: 'Consulta por Placa', path: '/consulta-placa', icon: <Search size={20} />, visible: true },
     { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: canAccessVendas },
     { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: true },
     { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: canAccessFinanceiro },

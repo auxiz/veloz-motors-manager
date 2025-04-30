@@ -4,3 +4,7 @@ project_id = "lmevzqjaxzbvsyiswwby"
 
 [functions.send-financing-email]
 verify_jwt = false
+
+[functions.license-plate-lookup]
+verify_jwt = false
+
