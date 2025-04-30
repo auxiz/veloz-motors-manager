@@ -26,21 +26,21 @@ export function SalesDetailsTable({
   downloadCSV,
   downloadPDF
 }: SalesDetailsTableProps) {
-  // Helper function to get the seller name
+  // Enhanced helper function to get the seller name with better fallbacks
   const getSellerName = (sale: Sale) => {
-    // First try using the joined seller data
+    // First try using the joined seller data from the sale object
     if (sale.seller?.first_name) {
       return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
     }
     
-    // Then try finding the user in the users array
+    // Then try finding the user in the users array using seller_id
     const seller = users.find(user => user.id === sale.seller_id);
     if (seller) {
       return seller.name;
     }
     
-    // Last resort fallback
-    return 'Vendedor';
+    // More descriptive fallback for debugging
+    return `Vendedor (ID: ${sale.seller_id?.substring(0, 8) || 'N/A'})`;
   };
 
   return (
@@ -85,7 +85,7 @@ export function SalesDetailsTable({
                        'N/A'}
                     </TableCell>
                     <TableCell>{getSellerName(sale)}</TableCell>
-                    <TableCell>{sale.customer?.name || 'N/A'}</TableCell>
+                    <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
                     <TableCell className="text-right">
                       {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                     </TableCell>

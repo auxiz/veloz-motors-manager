@@ -33,9 +33,9 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
     generateSaleContract(sale);
   };
 
-  // Helper function to get seller name
+  // Improved helper function to get seller name with better fallbacks
   const getSellerName = (sale: any) => {
-    // First try to use the seller data from the joined profiles table
+    // First try to use the seller data directly from the sale object
     if (sale.seller?.first_name) {
       return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
     }
@@ -46,8 +46,8 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
       return seller.name;
     }
     
-    // Last resort fallback
-    return 'Vendedor';
+    // Last resort fallback with seller_id for debugging
+    return `Vendedor (ID: ${sale.seller_id?.substring(0, 8) || 'N/A'})`;
   };
 
   if (isLoading) {
@@ -93,7 +93,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
               <TableCell>
                 {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
               </TableCell>
-              <TableCell>{sale.customer?.name}</TableCell>
+              <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
               <TableCell>{getSellerName(sale)}</TableCell>
               <TableCell>{formatCurrency(sale.final_price)}</TableCell>
               <TableCell>
