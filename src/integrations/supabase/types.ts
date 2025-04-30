@@ -101,6 +101,48 @@ export type Database = {
           },
         ]
       }
+      financing_requests: {
+        Row: {
+          birthdate: string
+          cpf: string
+          created_at: string
+          entry_value: number
+          has_cnh: boolean
+          id: string
+          installments: number
+          monthly_payment: number
+          total_payment: number
+          vehicle_price: number
+          whatsapp: string
+        }
+        Insert: {
+          birthdate: string
+          cpf: string
+          created_at?: string
+          entry_value: number
+          has_cnh?: boolean
+          id?: string
+          installments: number
+          monthly_payment: number
+          total_payment: number
+          vehicle_price: number
+          whatsapp: string
+        }
+        Update: {
+          birthdate?: string
+          cpf?: string
+          created_at?: string
+          entry_value?: number
+          has_cnh?: boolean
+          id?: string
+          installments?: number
+          monthly_payment?: number
+          total_payment?: number
+          vehicle_price?: number
+          whatsapp?: string
+        }
+        Relationships: []
+      }
       notification_settings: {
         Row: {
           created_at: string | null

@@ -48,11 +48,10 @@ export const ApplicationForm: React.FC<ApplicationFormProps> = ({
       toast.loading("Enviando solicitação...");
       
       // Send the data to our edge function
-      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/send-financing-email`, {
+      const response = await fetch("https://lmevzqjaxzbvsyiswwby.supabase.co/functions/v1/send-financing-email", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${supabase.supabaseKey}`
         },
         body: JSON.stringify({
           ...data,
