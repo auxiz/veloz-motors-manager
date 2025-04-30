@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -79,6 +80,9 @@ export function useAuth() {
       // Remove any potential extra spaces from email and password
       const trimmedEmail = email.trim();
       const trimmedPassword = password;
+      
+      // Always provide detailed console logs for debugging
+      console.log('Login credentials:', { email: trimmedEmail, passwordLength: trimmedPassword.length });
 
       // Basic Supabase login without extra options
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -88,7 +92,7 @@ export function useAuth() {
 
       if (error) {
         console.error('Login error:', error);
-        throw error;
+        return { error };
       }
 
       console.log('Login successful:', data);
@@ -96,7 +100,6 @@ export function useAuth() {
       return { error: null };
     } catch (error: any) {
       console.error('Login catch error:', error);
-      toast.error(error.message || 'Erro ao fazer login');
       return { error: { message: error.message } };
     } finally {
       setLoading(false);
