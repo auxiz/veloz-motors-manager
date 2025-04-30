@@ -9,6 +9,7 @@ import { ptBR } from 'date-fns/locale';
 import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateSaleContract } from '@/lib/contractGenerator';
+import { useUsers } from '@/hooks/useUsers';
 
 interface SalesListProps {
   filter?: 'cash' | 'financing' | 'other';
@@ -16,6 +17,7 @@ interface SalesListProps {
 
 export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
   const { sales, isLoading } = useSales();
+  const { users } = useUsers();
 
   // Apply filter if provided
   const filteredSales = filter 
@@ -29,6 +31,12 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
 
   const handleGenerateContract = (sale: any) => {
     generateSaleContract(sale);
+  };
+
+  // Helper function to get seller name
+  const getSellerName = (sellerId: string) => {
+    const seller = users.find(user => user.id === sellerId);
+    return seller ? seller.name : sellerId.substring(0, 8);
   };
 
   if (isLoading) {
@@ -75,7 +83,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
                 {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
               </TableCell>
               <TableCell>{sale.customer?.name}</TableCell>
-              <TableCell>{sale.seller_id ? sale.seller_id.substring(0, 8) : 'N/A'}</TableCell>
+              <TableCell>{getSellerName(sale.seller_id)}</TableCell>
               <TableCell>{formatCurrency(sale.final_price)}</TableCell>
               <TableCell>
                 <Badge

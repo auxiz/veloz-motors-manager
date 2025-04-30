@@ -55,6 +55,10 @@ export function useUsers() {
   // Override user profile role for development if needed
   const enhancedUser = () => {
     const user = mockUserIfNeeded();
+    
+    // Log for debugging
+    console.log("Auth user details:", auth.user?.email, "Role:", auth.user?.profile?.role);
+    
     // If user exists but profile doesn't have a role, set as administrator
     if (user && (!user.profile || !user.profile.role)) {
       return {

@@ -20,7 +20,7 @@ type HeaderProps = {
 
 export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   const navigate = useNavigate();
-  const { signOut } = useUsers();
+  const { user, signOut } = useUsers();
   
   const handleLogout = async () => {
     const result = await signOut();
@@ -66,7 +66,7 @@ export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
               <div className="w-8 h-8 rounded-full bg-veloz-gray flex items-center justify-center">
                 <User size={18} />
               </div>
-              <span className="hidden md:block">Admin</span>
+              <span className="hidden md:block">{user?.email || 'Admin'}</span>
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-56">

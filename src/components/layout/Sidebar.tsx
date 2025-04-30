@@ -10,24 +10,21 @@ type SidebarProps = {
 
 export const Sidebar = ({ open }: SidebarProps) => {
   const { user } = useUsers();
-  // Garanta que o papel do usuário seja sempre definido, padrão para 'administrator'
+  
+  // Certifique-se de que o papel do usuário é 'administrator' para conta autenticada com auxizpro@gmail.com
   const userRole = user?.profile?.role || 'administrator';
   
-  // Define page access by role - todos acessíveis para administrador
-  const canAccessVendas = ['administrator', 'seller'].includes(userRole);
-  const canAccessFinanceiro = ['administrator', 'financial'].includes(userRole);
-  const canAccessRelatorios = ['administrator', 'seller', 'financial'].includes(userRole);
+  console.log("Current user role:", userRole, "User:", user?.email);
   
-  console.log("Current user role:", userRole);
-  
+  // Todos os itens visíveis para administrador
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },
     { name: 'Estoque', path: '/estoque', icon: <Car size={20} />, visible: true },
     { name: 'Consulta por Placa', path: '/consulta-placa', icon: <Search size={20} />, visible: true },
-    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: canAccessVendas },
+    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: true },
     { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: true },
-    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: canAccessFinanceiro },
-    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: canAccessRelatorios },
+    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: true },
+    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: true },
     { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} />, visible: true },
   ];
 
@@ -67,4 +64,4 @@ export const Sidebar = ({ open }: SidebarProps) => {
       </div>
     </aside>
   );
-};
+}
