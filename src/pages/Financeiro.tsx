@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -12,7 +11,6 @@ import { NewTransactionDialog } from '@/components/financial/NewTransactionDialo
 import { CashFlowChart } from '@/components/financial/CashFlowChart';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Separator } from '@/components/ui/separator';
-
 const Financeiro = () => {
   const [newTransactionDialogOpen, setNewTransactionDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
@@ -21,36 +19,37 @@ const Financeiro = () => {
     endDate: null as Date | null,
     category: '',
     status: '',
-    search: '',
+    search: ''
   });
-
-  const { transactions, isLoading } = useTransactions();
+  const {
+    transactions,
+    isLoading
+  } = useTransactions();
 
   // Calculate summary statistics
-  const summary = transactions.reduce(
-    (acc, transaction) => {
-      const amount = Number(transaction.amount);
-      
-      if (transaction.type === 'income') {
-        if (transaction.status === 'paid') {
-          acc.totalReceived += amount;
-        } else {
-          acc.totalToReceive += amount;
-        }
-      } else if (transaction.type === 'expense') {
-        if (transaction.status === 'paid') {
-          acc.totalPaid += amount;
-        } else {
-          acc.totalPending += amount;
-        }
+  const summary = transactions.reduce((acc, transaction) => {
+    const amount = Number(transaction.amount);
+    if (transaction.type === 'income') {
+      if (transaction.status === 'paid') {
+        acc.totalReceived += amount;
+      } else {
+        acc.totalToReceive += amount;
       }
-      
-      return acc;
-    },
-    { totalReceived: 0, totalToReceive: 0, totalPaid: 0, totalPending: 0 }
-  );
-
-  const netBalance = (summary.totalReceived - summary.totalPaid);
+    } else if (transaction.type === 'expense') {
+      if (transaction.status === 'paid') {
+        acc.totalPaid += amount;
+      } else {
+        acc.totalPending += amount;
+      }
+    }
+    return acc;
+  }, {
+    totalReceived: 0,
+    totalToReceive: 0,
+    totalPaid: 0,
+    totalPending: 0
+  });
+  const netBalance = summary.totalReceived - summary.totalPaid;
 
   // Function to determine which transactions to display based on the active tab
   const getTransactionType = (): 'income' | 'expense' | undefined => {
@@ -58,19 +57,14 @@ const Financeiro = () => {
     if (activeTab === 'expense') return 'expense';
     return undefined;
   };
-
-  return (
-    <AuthGuard allowedRoles={['administrator', 'financial']}>
+  return <AuthGuard allowedRoles={['administrator', 'financial']}>
       <div className="space-y-6 md:space-y-8">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Gestão Financeira</h1>
             <p className="text-muted-foreground">Controle o fluxo de caixa e monitore a lucratividade</p>
           </div>
-          <Button
-            className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold"
-            onClick={() => setNewTransactionDialogOpen(true)}
-          >
+          <Button className="bg-veloz-yellow hover:bg-yellow-500 text-black font-bold" onClick={() => setNewTransactionDialogOpen(true)}>
             <Plus size={18} className="mr-2" />
             Nova Transação
           </Button>
@@ -137,7 +131,7 @@ const Financeiro = () => {
               </div>
             </CardHeader>
             <Separator className="bg-veloz-gray/50" />
-            <CardContent className="pt-6 pb-4 relative">
+            <CardContent className="pt-6 pb-4 relative py-[150px]">
               <CashFlowChart transactions={transactions} />
             </CardContent>
           </Card>
@@ -166,11 +160,7 @@ const Financeiro = () => {
                     <TransactionsFilter onFilterChange={setFilters} />
                   </div>
                   <div className="relative">
-                    <TransactionsList 
-                      transactionType={getTransactionType()}
-                      status={activeTab === 'pending' ? 'pending' : undefined}
-                      filters={filters}
-                    />
+                    <TransactionsList transactionType={getTransactionType()} status={activeTab === 'pending' ? 'pending' : undefined} filters={filters} />
                   </div>
                 </div>
               </CardContent>
@@ -178,13 +168,8 @@ const Financeiro = () => {
           </Tabs>
         </div>
         
-        <NewTransactionDialog 
-          open={newTransactionDialogOpen} 
-          onOpenChange={setNewTransactionDialogOpen} 
-        />
+        <NewTransactionDialog open={newTransactionDialogOpen} onOpenChange={setNewTransactionDialogOpen} />
       </div>
-    </AuthGuard>
-  );
+    </AuthGuard>;
 };
-
 export default Financeiro;
