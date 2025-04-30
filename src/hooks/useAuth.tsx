@@ -13,6 +13,7 @@ export function useAuth() {
     // Set up auth state listener FIRST
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, currentSession) => {
+        console.log('Auth state change:', event, currentSession?.user?.email);
         setSession(currentSession);
         setUser(currentSession?.user ?? null);
         
@@ -27,6 +28,7 @@ export function useAuth() {
 
     // THEN check for existing session
     supabase.auth.getSession().then(({ data: { session: currentSession } }) => {
+      console.log('Got existing session:', currentSession?.user?.email);
       setSession(currentSession);
       setUser(currentSession?.user ?? null);
       if (currentSession?.user) {
@@ -66,6 +68,41 @@ export function useAuth() {
     }
   };
 
+  const signIn = async (
+    email: string, 
+    password: string
+  ): Promise<{ error: AuthError | null }> => {
+    try {
+      setLoading(true);
+      console.log('Attempting login with:', email);
+      
+      // Remove any potential extra spaces from email and password
+      const trimmedEmail = email.trim();
+      const trimmedPassword = password;
+
+      // Basic Supabase login without extra options
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: trimmedEmail,
+        password: trimmedPassword,
+      });
+
+      if (error) {
+        console.error('Login error:', error);
+        throw error;
+      }
+
+      console.log('Login successful:', data);
+      toast.success('Login realizado com sucesso!');
+      return { error: null };
+    } catch (error: any) {
+      console.error('Login catch error:', error);
+      toast.error(error.message || 'Erro ao fazer login');
+      return { error: { message: error.message } };
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const signUp = async (
     email: string, 
     password: string,
@@ -92,41 +129,6 @@ export function useAuth() {
     } catch (error: any) {
       console.error('Signup catch error:', error);
       toast.error(error.message || 'Erro ao criar conta');
-      return { error: { message: error.message } };
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const signIn = async (
-    email: string, 
-    password: string,
-    captchaToken?: string
-  ): Promise<{ error: AuthError | null }> => {
-    try {
-      setLoading(true);
-      console.log('Attempting login with:', email);
-      
-      // Removendo o captchaToken da solicitação para teste
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-        options: {
-          captchaToken
-        }
-      });
-
-      if (error) {
-        console.error('Login error:', error);
-        throw error;
-      }
-
-      console.log('Login successful:', data);
-      toast.success('Login realizado com sucesso!');
-      return { error: null };
-    } catch (error: any) {
-      console.error('Login catch error:', error);
-      toast.error(error.message || 'Erro ao fazer login');
       return { error: { message: error.message } };
     } finally {
       setLoading(false);
@@ -204,10 +206,9 @@ export function useAuth() {
     user,
     session,
     loading,
-    signUp,
     signIn,
-    signOut,
+    signOut: signOut || (async () => ({ error: null })),
     resetPassword,
-    updateUserProfile
+    updateUserProfile: updateUserProfile || (async () => ({ error: null }))
   };
 }

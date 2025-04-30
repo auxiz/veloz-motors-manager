@@ -47,7 +47,9 @@ export function useAuthForms() {
     try {
       console.log('Submitting login with:', loginForm.email);
       
+      // Pass email and password directly without captchaToken
       const { error } = await signIn(loginForm.email, loginForm.password);
+      
       if (error) {
         console.error('Login error:', error);
         
