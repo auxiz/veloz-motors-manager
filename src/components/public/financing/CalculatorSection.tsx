@@ -29,6 +29,7 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
   const [interestRate, setInterestRate] = useState<number | null>(null);
   const isMobile = useIsMobile();
 
+  // Calculate results when inputs change
   useEffect(() => {
     const { monthlyPayment, totalPayment, financingAmount, interestRate } = calculateFinancing(vehiclePrice, entryValue, installments);
     setMonthlyPayment(monthlyPayment);

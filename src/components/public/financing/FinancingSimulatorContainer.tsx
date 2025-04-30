@@ -1,35 +1,30 @@
 
-import React, { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { formSchema, FormValues } from './FormSchema';
+import React from 'react';
 import { CalculatorSection } from './CalculatorSection';
 import { ApplicationForm } from './ApplicationForm';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { calculateFinancing } from './utils/formatters';
+import { useFinancing } from './hooks/useFinancing';
 
 interface FinancingSimulatorContainerProps {
   initialVehiclePrice?: number;
 }
 
 export const FinancingSimulatorContainer: React.FC<FinancingSimulatorContainerProps> = ({ initialVehiclePrice = 50000 }) => {
-  const [vehiclePrice, setVehiclePrice] = useState(initialVehiclePrice);
-  const [entryValue, setEntryValue] = useState(Math.round(initialVehiclePrice * 0.2)); // Default 20% entry
-  const [installments, setInstallments] = useState(36);
-  const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
-  const [totalPayment, setTotalPayment] = useState<number | null>(null);
-  const [financingAmount, setFinancingAmount] = useState<number | null>(null);
-  const [interestRate, setInterestRate] = useState<number | null>(null);
   const isMobile = useIsMobile();
-
-  // Calculate the financing values when inputs change
-  useEffect(() => {
-    const { monthlyPayment, totalPayment, financingAmount, interestRate } = calculateFinancing(vehiclePrice, entryValue, installments);
-    setMonthlyPayment(monthlyPayment);
-    setTotalPayment(totalPayment);
-    setFinancingAmount(financingAmount);
-    setInterestRate(interestRate);
-  }, [vehiclePrice, entryValue, installments]);
+  
+  // Use our custom hook for financing logic
+  const {
+    vehiclePrice,
+    entryValue,
+    installments,
+    monthlyPayment,
+    totalPayment,
+    financingAmount,
+    interestRate,
+    setVehiclePrice,
+    setEntryValue,
+    setInstallments
+  } = useFinancing({ initialVehiclePrice });
 
   return (
     <div className={`max-w-3xl mx-auto ${isMobile ? 'px-4' : ''}`}>
