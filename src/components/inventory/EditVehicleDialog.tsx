@@ -54,6 +54,13 @@ export const EditVehicleDialog = ({
 
   if (!vehicle) return null;
 
+  // Ensure status is one of the allowed values from the schema
+  const vehicleStatus = vehicle.status === 'in_stock' || 
+                       vehicle.status === 'reserved' || 
+                       vehicle.status === 'sold' 
+                       ? vehicle.status 
+                       : 'in_stock';
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="bg-veloz-gray border-veloz-gray max-w-3xl">
@@ -85,7 +92,7 @@ export const EditVehicleDialog = ({
             sale_price: vehicle.sale_price,
             internal_notes: vehicle.internal_notes || '',
             photos: vehicle.photos,
-            status: vehicle.status
+            status: vehicleStatus
           }}
         />
       </DialogContent>
