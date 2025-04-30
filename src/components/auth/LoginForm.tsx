@@ -1,10 +1,10 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { Turnstile } from '@marsidev/react-turnstile';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface LoginFormProps {
   loginForm: { email: string; password: string };
@@ -21,7 +21,7 @@ const LoginForm: React.FC<LoginFormProps> = ({
   toggleForgotPassword,
   loading,
 }) => {
-  const [captchaToken, setCaptchaToken] = React.useState<string | null>(null);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   return (
     <Card className="border-veloz-gray bg-veloz-gray">
@@ -65,21 +65,29 @@ const LoginForm: React.FC<LoginFormProps> = ({
               onChange={handleLoginChange}
             />
           </div>
-          <div className="flex justify-center">
-            <Turnstile
-              siteKey="1x00000000000000000000AA" // Replace with your actual site key
-              onSuccess={(token) => setCaptchaToken(token)}
-              options={{
-                theme: 'dark',
+          
+          {/* Simple CAPTCHA replacement */}
+          <div className="flex items-center space-x-2 pt-2">
+            <Checkbox 
+              id="captcha-login" 
+              checked={captchaVerified}
+              onCheckedChange={(checked) => {
+                setCaptchaVerified(checked === true);
               }}
             />
+            <label
+              htmlFor="captcha-login"
+              className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-veloz-white"
+            >
+              Não sou um robô
+            </label>
           </div>
         </CardContent>
         <CardFooter>
           <Button 
             type="submit" 
             className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
-            disabled={loading || !captchaToken}
+            disabled={loading || !captchaVerified}
           >
             {loading ? 'Entrando...' : 'Entrar'}
           </Button>

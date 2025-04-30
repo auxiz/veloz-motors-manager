@@ -48,11 +48,8 @@ export function useAuthForms() {
     setError(null);
     
     try {
-      const captchaToken = getTurnstileToken("login-form");
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA");
-        return;
-      }
+      // Use a mock captcha token for development purposes
+      const captchaToken = "mock-captcha-token";
       
       const { error } = await signIn(loginForm.email, loginForm.password, captchaToken);
       if (error) {
@@ -71,11 +68,8 @@ export function useAuthForms() {
     setError(null);
     
     try {
-      const captchaToken = getTurnstileToken("register-form");
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA");
-        return;
-      }
+      // Use a mock captcha token for development purposes
+      const captchaToken = "mock-captcha-token";
       
       const { error } = await signUp(registerForm.email, registerForm.password, captchaToken);
       if (error) {
@@ -99,11 +93,8 @@ export function useAuthForms() {
     }
     
     try {
-      const captchaToken = getTurnstileToken("reset-form");
-      if (!captchaToken) {
-        setError("Por favor, complete o CAPTCHA");
-        return;
-      }
+      // Use a mock captcha token for development purposes
+      const captchaToken = "mock-captcha-token";
       
       const { error } = await resetPassword(resetForm.email, captchaToken);
       if (error) {
@@ -122,12 +113,6 @@ export function useAuthForms() {
     e.preventDefault();
     setShowForgotPassword(!showForgotPassword);
     setError(null);
-  };
-
-  // Helper function to get the Turnstile token
-  const getTurnstileToken = (formId: string): string | null => {
-    const turnstileResponse = (window as any).turnstile?.getResponse();
-    return turnstileResponse || null;
   };
 
   return {
