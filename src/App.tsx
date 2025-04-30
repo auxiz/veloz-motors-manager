@@ -27,6 +27,7 @@ import Home from "./pages/public/Home"
 import Vehicles from "./pages/public/Vehicles"
 import VehicleDetails from "./pages/public/VehicleDetails"
 import Contact from "./pages/public/Contact"
+import Financiamento from "./pages/public/Financiamento"
 import Index from "./pages/Index"
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
             <Route path="/veiculos" element={<Vehicles />} />
             <Route path="/veiculos/:id" element={<VehicleDetails />} />
             <Route path="/contato" element={<Contact />} />
+            <Route path="/financiamento" element={<Financiamento />} />
             
             {/* Auth Routes */}
             <Route path="/auth" element={<Auth />} />
