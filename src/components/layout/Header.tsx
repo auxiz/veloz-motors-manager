@@ -26,13 +26,18 @@ export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
 
   return (
     <header className="h-16 bg-veloz-black border-b border-veloz-gray flex items-center justify-between px-6">
-      <div className="flex items-center">
+      <div className="flex items-center gap-4">
         <button 
           onClick={toggleSidebar}
           className="p-2 rounded-md hover:bg-veloz-gray text-veloz-white"
         >
           <Menu size={24} />
         </button>
+        <img 
+          src="/lovable-uploads/1c755dab-2a03-4def-a7f2-3a0c00105f4b.png" 
+          alt="Veloz Motors Logo" 
+          className="h-8 hidden md:block" 
+        />
       </div>
       
       <div className="flex items-center space-x-4">

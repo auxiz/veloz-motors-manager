@@ -20,7 +20,7 @@ export const VehicleCard = ({ vehicle, featured }: VehicleCardProps) => {
 
   return (
     <Link to={`/veiculos/${vehicle.id}`}>
-      <Card className={`overflow-hidden transition-transform duration-300 hover:-translate-y-1 hover:shadow-lg bg-veloz-gray border-veloz-gray ${featured ? 'border-veloz-yellow' : ''}`}>
+      <Card className={`overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:shadow-lg bg-veloz-gray border-veloz-gray ${featured ? 'border-veloz-yellow border-2' : ''}`}>
         <div className="relative h-48 overflow-hidden bg-veloz-black">
           {vehicle.photos && vehicle.photos.length > 0 ? (
             <img 
@@ -45,7 +45,7 @@ export const VehicleCard = ({ vehicle, featured }: VehicleCardProps) => {
           </h3>
           <div className="flex justify-between items-center mt-2">
             <div className="text-sm text-white">
-              {vehicle.year} • {vehicle.mileage} km • {vehicle.fuel}
+              {vehicle.year} • {vehicle.mileage.toLocaleString('pt-BR')} km • {vehicle.fuel}
             </div>
           </div>
           <div className="mt-3">
