@@ -1,8 +1,8 @@
 
 import React, { useState, useMemo } from 'react';
-import { format, subMonths, startOfMonth, endOfMonth } from 'date-fns';
+import { format, subMonths } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
@@ -80,20 +80,18 @@ export const CashFlowChart = ({ transactions }: CashFlowChartProps) => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <div className="flex justify-end">
-        <div className="relative z-30"> {/* Added a wrapper with its own z-index */}
-          <Select value={period} onValueChange={(value) => setPeriod(value as '3' | '6' | '12')}>
-            <SelectTrigger className="w-[180px] bg-background">
-              <SelectValue placeholder="Período" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="3">Últimos 3 meses</SelectItem>
-              <SelectItem value="6">Últimos 6 meses</SelectItem>
-              <SelectItem value="12">Últimos 12 meses</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <Select value={period} onValueChange={(value) => setPeriod(value as '3' | '6' | '12')}>
+          <SelectTrigger className="w-[180px] bg-veloz-black border-veloz-gray">
+            <SelectValue placeholder="Período" />
+          </SelectTrigger>
+          <SelectContent className="bg-veloz-black border-veloz-gray">
+            <SelectItem value="3">Últimos 3 meses</SelectItem>
+            <SelectItem value="6">Últimos 6 meses</SelectItem>
+            <SelectItem value="12">Últimos 12 meses</SelectItem>
+          </SelectContent>
+        </Select>
       </div>
       
       <div className="h-[300px]">

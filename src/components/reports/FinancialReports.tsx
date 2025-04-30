@@ -5,10 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Button } from '@/components/ui/button';
 import { Download, FileText } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, LineChart, Line } from 'recharts';
 import { ChartContainer, ChartTooltipContent } from '@/components/ui/chart';
 import { format, isWithinInterval, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { Separator } from '@/components/ui/separator';
 
 interface FinancialReportsProps {
   dateRange: {
@@ -87,7 +88,7 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
   });
   
   const monthlyData = Object.values(financialByMonth).sort((a, b) => 
-    parseISO(a.month).getTime() - parseISO(b.month).getTime()
+    new Date(a.month).getTime() - new Date(b.month).getTime()
   );
 
   // Chart configuration
@@ -124,6 +125,7 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
 
   return (
     <div className="space-y-6">
+      {/* Summary Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <Card>
           <CardHeader className="pb-2">
@@ -162,6 +164,7 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
         </Card>
       </div>
 
+      {/* Financial Overview Chart */}
       <Card>
         <CardHeader>
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -178,7 +181,8 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
             </div>
           </div>
         </CardHeader>
-        <CardContent>
+        <Separator className="bg-border/50" />
+        <CardContent className="pt-6">
           <div className="h-[400px]">
             <ChartContainer config={chartConfig}>
               <BarChart data={monthlyData}>
@@ -196,12 +200,15 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
         </CardContent>
       </Card>
 
+      {/* Details Tables */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Categories Table */}
         <Card>
           <CardHeader>
             <CardTitle>Despesas por Categoria</CardTitle>
           </CardHeader>
-          <CardContent>
+          <Separator className="bg-border/50" />
+          <CardContent className="pt-4">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -237,11 +244,13 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
           </CardContent>
         </Card>
 
+        {/* Monthly Summary Table */}
         <Card>
           <CardHeader>
             <CardTitle>Resumo Mensal</CardTitle>
           </CardHeader>
-          <CardContent>
+          <Separator className="bg-border/50" />
+          <CardContent className="pt-4">
             <Table>
               <TableHeader>
                 <TableRow>

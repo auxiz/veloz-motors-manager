@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,6 +11,7 @@ import { TransactionsFilter } from '@/components/financial/TransactionsFilter';
 import { NewTransactionDialog } from '@/components/financial/NewTransactionDialog';
 import { CashFlowChart } from '@/components/financial/CashFlowChart';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { Separator } from '@/components/ui/separator';
 
 const Financeiro = () => {
   const [newTransactionDialogOpen, setNewTransactionDialogOpen] = useState(false);
@@ -74,6 +76,7 @@ const Financeiro = () => {
           </Button>
         </div>
 
+        {/* Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           <Card className="bg-veloz-gray border-veloz-gray">
             <CardHeader className="pb-2">
@@ -124,23 +127,24 @@ const Financeiro = () => {
           </Card>
         </div>
         
+        {/* Cash Balance and Chart */}
         <div className="flex flex-col gap-8">
           <Card className="bg-veloz-gray border-veloz-gray">
-            <CardHeader>
+            <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
-            </CardHeader>
-            <CardContent className="relative">
-              <div className="flex items-center justify-center mb-4">
-                <span className={`text-3xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {formatCurrency(netBalance)}
-                </span>
+              <div className={`text-xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
+                {formatCurrency(netBalance)}
               </div>
+            </CardHeader>
+            <Separator className="bg-veloz-gray/50" />
+            <CardContent className="pt-6">
               <div className="relative z-10">
                 <CashFlowChart transactions={transactions} />
               </div>
             </CardContent>
           </Card>
 
+          {/* Transactions Section */}
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="grid grid-cols-4 max-w-md">
               <TabsTrigger value="all">Todas</TabsTrigger>
@@ -158,12 +162,12 @@ const Financeiro = () => {
                   {activeTab === 'pending' && 'Transações Pendentes'}
                 </CardTitle>
               </CardHeader>
-              <CardContent className="relative">
+              <CardContent>
                 <div className="space-y-6">
-                  <div className="relative z-30">
+                  <div className="relative z-20">
                     <TransactionsFilter onFilterChange={setFilters} />
                   </div>
-                  <div className="relative z-20">
+                  <div className="relative z-10">
                     <TransactionsList 
                       transactionType={getTransactionType()}
                       status={activeTab === 'pending' ? 'pending' : undefined}

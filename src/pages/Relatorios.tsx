@@ -8,8 +8,9 @@ import { InventoryReports } from '@/components/reports/InventoryReports';
 import { FinancialReports } from '@/components/reports/FinancialReports';
 import { SalesPerformanceReports } from '@/components/reports/SalesPerformanceReports';
 import { ScheduledReportsManager } from '@/components/reports/ScheduledReportsManager';
-import { format, subMonths } from 'date-fns';
+import { subMonths } from 'date-fns';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { Separator } from '@/components/ui/separator';
 
 const Relatorios = () => {
   const [dateRange, setDateRange] = useState<{
@@ -23,40 +24,50 @@ const Relatorios = () => {
   return (
     <AuthGuard allowedRoles={['administrator', 'financial']}>
       <div className="space-y-8">
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">Relatórios</h1>
-            <p className="text-muted-foreground">Analise o desempenho do seu negócio com dados detalhados</p>
-          </div>
-          <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
-        </div>
+        <Card className="bg-veloz-gray border-veloz-gray">
+          <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div>
+              <CardTitle className="text-2xl font-bold mb-1">Relatórios</CardTitle>
+              <p className="text-muted-foreground">Analise o desempenho do seu negócio com dados detalhados</p>
+            </div>
+            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+          </CardHeader>
+        </Card>
 
         <ScheduledReportsManager />
 
-        <Tabs defaultValue="sales" className="w-full">
-          <TabsList className="grid grid-cols-4 w-full max-w-3xl mb-4">
-            <TabsTrigger value="sales">Vendas</TabsTrigger>
-            <TabsTrigger value="inventory">Estoque</TabsTrigger>
-            <TabsTrigger value="financial">Financeiro</TabsTrigger>
-            <TabsTrigger value="performance">Desempenho</TabsTrigger>
-          </TabsList>
-          
-          <TabsContent value="sales">
-            <SalesReports dateRange={dateRange} />
-          </TabsContent>
-          
-          <TabsContent value="inventory">
-            <InventoryReports dateRange={dateRange} />
-          </TabsContent>
-          
-          <TabsContent value="financial">
-            <FinancialReports dateRange={dateRange} />
-          </TabsContent>
-          
-          <TabsContent value="performance">
-            <SalesPerformanceReports dateRange={dateRange} />
-          </TabsContent>
-        </Tabs>
+        <Card className="bg-veloz-gray border-veloz-gray">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-xl">Relatórios Disponíveis</CardTitle>
+          </CardHeader>
+          <Separator className="bg-veloz-gray/50" />
+          <CardContent className="pt-6">
+            <Tabs defaultValue="sales" className="w-full">
+              <TabsList className="grid grid-cols-4 w-full max-w-3xl mb-4">
+                <TabsTrigger value="sales">Vendas</TabsTrigger>
+                <TabsTrigger value="inventory">Estoque</TabsTrigger>
+                <TabsTrigger value="financial">Financeiro</TabsTrigger>
+                <TabsTrigger value="performance">Desempenho</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="sales">
+                <SalesReports dateRange={dateRange} />
+              </TabsContent>
+              
+              <TabsContent value="inventory">
+                <InventoryReports dateRange={dateRange} />
+              </TabsContent>
+              
+              <TabsContent value="financial">
+                <FinancialReports dateRange={dateRange} />
+              </TabsContent>
+              
+              <TabsContent value="performance">
+                <SalesPerformanceReports dateRange={dateRange} />
+              </TabsContent>
+            </Tabs>
+          </CardContent>
+        </Card>
       </div>
     </AuthGuard>
   );
