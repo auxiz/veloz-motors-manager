@@ -18,13 +18,13 @@ export const useSalesQuery = () => {
     queryFn: async () => {
       console.log('Fetching sales...');
       try {
+        // First, fetch the sales data without attempting to join with profiles
         const { data, error } = await supabase
           .from('sales')
           .select(`
             *,
             vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
-            customer:customers(name, document),
-            seller:profiles(first_name, last_name, id, avatar_url)
+            customer:customers(name, document)
           `)
           .order('created_at', { ascending: false });
 
@@ -36,19 +36,42 @@ export const useSalesQuery = () => {
 
         console.log('Sales fetched successfully, count:', data?.length);
         
-        // Transform the data to match the Sale type with enhanced seller handling
+        // Now, fetch seller information separately
+        const sellerIds = data
+          .map((sale: any) => sale.seller_id)
+          .filter((id: string) => id) // Filter out any null/undefined IDs
+          .filter((id: string, index: number, self: string[]) => self.indexOf(id) === index); // Unique IDs
+        
+        let sellerProfiles: any[] = [];
+        if (sellerIds.length > 0) {
+          const { data: profilesData, error: profilesError } = await supabase
+            .from('profiles')
+            .select('id, first_name, last_name, avatar_url')
+            .in('id', sellerIds);
+            
+          if (profilesError) {
+            console.warn('Error fetching seller profiles:', profilesError.message);
+          } else {
+            sellerProfiles = profilesData || [];
+          }
+        }
+        
+        // Map the data to match the Sale type with enhanced seller handling
         return data.map((sale: any) => {
+          // Find seller profile in our separately fetched profiles
+          const sellerProfile = sellerProfiles.find(profile => profile.id === sale.seller_id);
+          
           // Try to find the user data if the seller profile is missing or incomplete
           const sellerUser = users.find(user => user.id === sale.seller_id);
           
           // Prepare a proper seller object with comprehensive fallbacks
           const sellerObject = {
-            id: sale.seller?.id || sale.seller_id || null,
-            first_name: sale.seller?.first_name || 
+            id: sale.seller_id || null,
+            first_name: sellerProfile?.first_name || 
                        (sellerUser?.profile?.first_name) || 
                        (sellerUser?.name?.split(' ')[0]) || 
                        'Vendedor',
-            last_name: sale.seller?.last_name || 
+            last_name: sellerProfile?.last_name || 
                       (sellerUser?.profile?.last_name) || 
                       (sellerUser?.name?.split(' ').slice(1).join(' ')) || 
                       ''
@@ -76,13 +99,13 @@ export const useSalesQuery = () => {
     try {
       console.log(`Fetching sales for vehicle ID: ${vehicleId}`);
       
+      // Fetch sales without attempting to join with profiles
       const { data, error } = await supabase
         .from('sales')
         .select(`
           *,
           vehicle:vehicles(brand, model, version, year, color, transmission, fuel),
-          customer:customers(name, document),
-          seller:profiles(first_name, last_name, id)
+          customer:customers(name, document)
         `)
         .eq('vehicle_id', vehicleId);
 
@@ -94,20 +117,43 @@ export const useSalesQuery = () => {
 
       console.log(`Found ${data.length} sales for vehicle ${vehicleId}`);
 
+      // Now, fetch seller information separately for these sales
+      const sellerIds = data
+        .map((sale: any) => sale.seller_id)
+        .filter((id: string) => id) // Filter out any null/undefined IDs
+        .filter((id: string, index: number, self: string[]) => self.indexOf(id) === index); // Unique IDs
+      
+      let sellerProfiles: any[] = [];
+      if (sellerIds.length > 0) {
+        const { data: profilesData, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name, avatar_url')
+          .in('id', sellerIds);
+          
+        if (profilesError) {
+          console.warn('Error fetching seller profiles:', profilesError.message);
+        } else {
+          sellerProfiles = profilesData || [];
+        }
+      }
+      
       // Use the same comprehensive seller handling logic for consistency
       return data.map((sale: any) => {
+        // Find seller profile in our separately fetched profiles
+        const sellerProfile = sellerProfiles.find(profile => profile.id === sale.seller_id);
+        
         // Try to find the user data if the seller profile is missing
         const sellerUser = users.find(user => user.id === sale.seller_id);
         
         return {
           ...sale,
           seller: {
-            id: sale.seller?.id || sale.seller_id || null,
-            first_name: sale.seller?.first_name || 
+            id: sale.seller_id || null,
+            first_name: sellerProfile?.first_name || 
                       (sellerUser?.profile?.first_name) || 
                       (sellerUser?.name?.split(' ')[0]) || 
                       'Vendedor',
-            last_name: sale.seller?.last_name || 
+            last_name: sellerProfile?.last_name || 
                       (sellerUser?.profile?.last_name) || 
                       (sellerUser?.name?.split(' ').slice(1).join(' ')) || 
                       ''
