@@ -1,6 +1,7 @@
 
-import { format, isWithinInterval } from 'date-fns';
+import { isWithinInterval } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import { format } from 'date-fns';
 
 export interface Transaction {
   id: string;
@@ -97,32 +98,4 @@ export function getFinancialDataByMonth(filteredTransactions: Transaction[]) {
   return Object.values(financialByMonth).sort((a, b) => 
     new Date(a.month).getTime() - new Date(b.month).getTime()
   );
-}
-
-export function generateCSVContent(monthlyData: MonthlyData[]) {
-  const headers = ['Mês', 'Receitas', 'Despesas', 'Lucro'];
-  
-  const rows = monthlyData.map(data => [
-    data.month,
-    data.revenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    data.expenses.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-    data.profit.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-  ]);
-  
-  let csvContent = headers.join(',') + '\n';
-  csvContent += rows.map(row => row.join(',')).join('\n');
-  
-  return csvContent;
-}
-
-export function downloadCSV(content: string, filename: string) {
-  const blob = new Blob([content], { type: 'text/csv;charset=utf-8;' });
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement('a');
-  
-  link.setAttribute('href', url);
-  link.setAttribute('download', filename);
-  link.click();
-  
-  URL.revokeObjectURL(url);
 }

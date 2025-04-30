@@ -1,19 +1,10 @@
 
 import React from 'react';
-import { useTransactions } from '@/hooks/useTransactions';
-import { format } from 'date-fns';
+import { useFinancialData } from '@/hooks/reports/useFinancialData';
 import { FinancialSummaryCards } from './financial/FinancialSummaryCards';
 import { FinancialOverviewChart } from './financial/FinancialOverviewChart';
 import { ExpensesByCategoryTable } from './financial/ExpensesByCategoryTable';
 import { MonthlySummaryTable } from './financial/MonthlySummaryTable';
-import { 
-  filterTransactionsByDateRange,
-  calculateTotals,
-  getExpensesByCategory,
-  getFinancialDataByMonth,
-  generateCSVContent,
-  downloadCSV
-} from './financial/financial-utils';
 
 interface FinancialReportsProps {
   dateRange: {
@@ -23,25 +14,15 @@ interface FinancialReportsProps {
 }
 
 export function FinancialReports({ dateRange }: FinancialReportsProps) {
-  const { transactions } = useTransactions();
-  
-  // Filter transactions by date range
-  const filteredTransactions = filterTransactionsByDateRange(transactions, dateRange);
-  
-  // Calculate totals
-  const { totalRevenue, totalExpenses, profit } = calculateTotals(filteredTransactions);
-  
-  // Get expenses by category
-  const categoryData = getExpensesByCategory(filteredTransactions);
-  
-  // Get financial data by month
-  const monthlyData = getFinancialDataByMonth(filteredTransactions);
-  
-  // Download as CSV
-  const handleDownloadCSV = () => {
-    const csvContent = generateCSVContent(monthlyData);
-    downloadCSV(csvContent, `relatorio-financeiro-${format(new Date(), 'yyyy-MM-dd')}.csv`);
-  };
+  // Use our new hook to handle all data processing
+  const { 
+    totalRevenue, 
+    totalExpenses, 
+    profit,
+    categoryData,
+    monthlyData,
+    downloadCSV
+  } = useFinancialData({ dateRange });
 
   return (
     <div className="space-y-6">
@@ -55,7 +36,7 @@ export function FinancialReports({ dateRange }: FinancialReportsProps) {
       {/* Financial Overview Chart */}
       <FinancialOverviewChart 
         monthlyData={monthlyData}
-        onDownloadCSV={handleDownloadCSV}
+        onDownloadCSV={downloadCSV}
       />
 
       {/* Details Tables */}
