@@ -34,7 +34,7 @@ export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
           <Menu size={24} />
         </button>
         <img 
-          src="/lovable-uploads/1c755dab-2a03-4def-a7f2-3a0c00105f4b.png" 
+          src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
           alt="Veloz Motors Logo" 
           className="h-8 hidden md:block" 
         />

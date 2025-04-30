@@ -37,7 +37,7 @@ export const HomeBanner = () => {
           </div>
           <div className="mt-8 md:mt-0 hidden md:block">
             <img 
-              src="/lovable-uploads/a996eb57-c4b8-453e-b36b-4afe67cc7cdd.png" 
+              src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
               alt="Veloz Motors" 
               className="h-48 lg:h-64 object-contain"
             />
