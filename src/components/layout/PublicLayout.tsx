@@ -14,7 +14,7 @@ export const PublicLayout = ({
           <div className="flex justify-between items-center">
             {/* Logo */}
             <Link to="/" className="flex items-center">
-              <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-20 md:h-20\\n" />
+              <img src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" alt="Veloz Motors Logo" className="h-30 md:h-30\\\\n" />
             </Link>
 
             {/* Desktop Navigation */}
