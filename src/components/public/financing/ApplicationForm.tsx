@@ -9,8 +9,10 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { formSchema, FormValues } from './FormSchema';
 import { formatCPF, formatWhatsApp } from './utils/formatters';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 export const ApplicationForm: React.FC = () => {
+  const isMobile = useIsMobile();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -31,9 +33,9 @@ export const ApplicationForm: React.FC = () => {
   };
 
   return (
-    <div className="bg-veloz-gray rounded-lg p-6 md:p-8 shadow-lg">
-      <h2 className="text-2xl font-bold text-veloz-yellow mb-6 flex items-center">
-        <CreditCard className="mr-2" size={24} />
+    <div className={`bg-veloz-gray rounded-lg ${isMobile ? 'p-4' : 'p-6 md:p-8'} shadow-lg`}>
+      <h2 className="text-xl md:text-2xl font-bold text-veloz-yellow mb-6 flex items-center">
+        <CreditCard className="mr-2" size={isMobile ? 20 : 24} />
         Solicitar Financiamento
       </h2>
       
@@ -49,12 +51,13 @@ export const ApplicationForm: React.FC = () => {
                 <FormControl>
                   <Input
                     {...field}
-                    prefix={<User size={18} />}
+                    prefix={<User size={isMobile ? 16 : 18} />}
                     placeholder="000.000.000-00"
                     onChange={(e) => {
                       const formattedValue = formatCPF(e.target.value);
                       field.onChange(formattedValue);
                     }}
+                    className={isMobile ? "h-12 text-base" : ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -72,8 +75,9 @@ export const ApplicationForm: React.FC = () => {
                 <FormControl>
                   <Input
                     {...field}
-                    prefix={<Calendar size={18} />}
+                    prefix={<Calendar size={isMobile ? 16 : 18} />}
                     type="date"
+                    className={isMobile ? "h-12 text-base" : ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -91,12 +95,13 @@ export const ApplicationForm: React.FC = () => {
                 <FormControl>
                   <Input
                     {...field}
-                    prefix={<Phone size={18} />}
+                    prefix={<Phone size={isMobile ? 16 : 18} />}
                     placeholder="(00) 00000-0000"
                     onChange={(e) => {
                       const formattedValue = formatWhatsApp(e.target.value);
                       field.onChange(formattedValue);
                     }}
+                    className={isMobile ? "h-12 text-base" : ""}
                   />
                 </FormControl>
                 <FormMessage />
@@ -114,6 +119,7 @@ export const ApplicationForm: React.FC = () => {
                   <Checkbox
                     checked={field.value}
                     onCheckedChange={field.onChange}
+                    className={isMobile ? "h-5 w-5" : ""}
                   />
                 </FormControl>
                 <FormLabel className="text-white font-normal mt-0">
@@ -126,7 +132,7 @@ export const ApplicationForm: React.FC = () => {
           
           <Button 
             type="submit" 
-            className="w-full bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-bold"
+            className={`w-full bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-bold ${isMobile ? 'text-base h-14' : ''}`}
           >
             Enviar Solicitação
           </Button>

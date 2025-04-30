@@ -4,6 +4,7 @@ import { Calculator } from 'lucide-react';
 import { SimulatorSlider } from './SimulatorSlider';
 import { SimulatorResult } from './SimulatorResult';
 import { calculateFinancing } from './utils/formatters';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface CalculatorSectionProps {
   vehiclePrice: number;
@@ -24,6 +25,7 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
 }) => {
   const [monthlyPayment, setMonthlyPayment] = useState<number | null>(null);
   const [totalPayment, setTotalPayment] = useState<number | null>(null);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const { monthlyPayment, totalPayment } = calculateFinancing(vehiclePrice, entryValue, installments);
@@ -32,9 +34,9 @@ export const CalculatorSection: React.FC<CalculatorSectionProps> = ({
   }, [vehiclePrice, entryValue, installments]);
 
   return (
-    <div className="bg-veloz-gray rounded-lg p-6 md:p-8 shadow-lg mb-8">
-      <h2 className="text-2xl font-bold text-veloz-yellow mb-6 flex items-center">
-        <Calculator className="mr-2" size={24} />
+    <div className={`bg-veloz-gray rounded-lg ${isMobile ? 'p-4' : 'p-6 md:p-8'} shadow-lg mb-6`}>
+      <h2 className="text-xl md:text-2xl font-bold text-veloz-yellow mb-6 flex items-center">
+        <Calculator className="mr-2" size={isMobile ? 20 : 24} />
         Simulador de Financiamento
       </h2>
       
