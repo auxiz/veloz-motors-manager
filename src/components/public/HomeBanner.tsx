@@ -18,11 +18,6 @@ export const HomeBanner = () => {
       <div className="container mx-auto px-4 py-12 relative z-10">
         <div className="grid grid-cols-1 items-center gap-8">
           <div className="flex flex-col">
-            <img 
-              src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png" 
-              alt="Veloz Motors" 
-              className="h-24 md:h-28 mb-8 object-contain"
-            />
             <h1 className="text-4xl md:text-5xl lg:text-6xl font-montserrat font-bold mb-6">
               <span className="text-white">Encontre seu</span>
               <span className="block text-veloz-yellow">veículo ideal</span>
