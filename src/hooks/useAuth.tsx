@@ -67,12 +67,19 @@ export function useAuth() {
     }
   };
 
-  const signUp = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
+  const signUp = async (
+    email: string, 
+    password: string,
+    captchaToken?: string
+  ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: {
+          captchaToken
+        }
       });
 
       if (error) throw error;
@@ -87,12 +94,19 @@ export function useAuth() {
     }
   };
 
-  const signIn = async (email: string, password: string): Promise<{ error: AuthError | null }> => {
+  const signIn = async (
+    email: string, 
+    password: string,
+    captchaToken?: string
+  ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
+        options: {
+          captchaToken
+        }
       });
 
       if (error) throw error;
@@ -126,10 +140,14 @@ export function useAuth() {
     }
   };
 
-  const resetPassword = async (email: string): Promise<{ error: AuthError | null }> => {
+  const resetPassword = async (
+    email: string,
+    captchaToken?: string
+  ): Promise<{ error: AuthError | null }> => {
     try {
       setLoading(true);
       const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        captchaToken,
         redirectTo: `${window.location.origin}/configuracoes`,
       });
       
