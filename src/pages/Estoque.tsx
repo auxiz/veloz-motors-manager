@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useVehicles } from '@/hooks/useVehicles';
+import { useVehicles, Vehicle } from '@/hooks/useVehicles';
 import { Card } from '@/components/ui/card';
 import { Car, ChevronDown, ChevronUp } from 'lucide-react';
 import { InventoryHeader } from '@/components/inventory/InventoryHeader';
@@ -8,6 +8,8 @@ import { InventorySearch } from '@/components/inventory/InventorySearch';
 import { VehicleCard } from '@/components/inventory/VehicleCard';
 import { VehicleTable } from '@/components/inventory/VehicleTable';
 import { NewVehicleDialog } from '@/components/inventory/NewVehicleDialog';
+import { EditVehicleDialog } from '@/components/inventory/EditVehicleDialog';
+import { DeleteVehicleDialog } from '@/components/inventory/DeleteVehicleDialog';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 
 const Estoque = () => {
@@ -16,8 +18,11 @@ const Estoque = () => {
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   const [novoVeiculoDialogOpen, setNovoVeiculoDialogOpen] = useState(false);
+  const [editVehicleDialogOpen, setEditVehicleDialogOpen] = useState(false);
+  const [deleteVehicleDialogOpen, setDeleteVehicleDialogOpen] = useState(false);
+  const [selectedVehicle, setSelectedVehicle] = useState<Vehicle | null>(null);
   
-  const { vehicles, isLoading } = useVehicles();
+  const { vehicles, isLoading, deleteVehicle } = useVehicles();
 
   const handleSort = (field: string) => {
     if (sortField === field) {
@@ -31,6 +36,28 @@ const Estoque = () => {
   const getSortIcon = (field: string) => {
     if (sortField !== field) return null;
     return sortDirection === 'asc' ? <ChevronUp size={16} /> : <ChevronDown size={16} />;
+  };
+
+  const handleEditVehicle = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setEditVehicleDialogOpen(true);
+  };
+
+  const handleDeleteVehicle = (vehicle: Vehicle) => {
+    setSelectedVehicle(vehicle);
+    setDeleteVehicleDialogOpen(true);
+  };
+
+  const confirmDeleteVehicle = async () => {
+    if (!selectedVehicle) return;
+    
+    try {
+      await deleteVehicle.mutateAsync(selectedVehicle.id);
+      setDeleteVehicleDialogOpen(false);
+      setSelectedVehicle(null);
+    } catch (error) {
+      console.error('Error deleting vehicle:', error);
+    }
   };
 
   const filteredVeiculos = vehicles.filter(veiculo => 
@@ -72,12 +99,19 @@ const Estoque = () => {
               sortDirection={sortDirection}
               onSort={handleSort}
               getSortIcon={getSortIcon}
+              onEditVehicle={handleEditVehicle}
+              onDeleteVehicle={handleDeleteVehicle}
             />
           </Card>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredVeiculos.map((vehicle) => (
-              <VehicleCard key={vehicle.id} vehicle={vehicle} />
+              <VehicleCard 
+                key={vehicle.id} 
+                vehicle={vehicle} 
+                onEditVehicle={handleEditVehicle}
+                onDeleteVehicle={handleDeleteVehicle}
+              />
             ))}
           </div>
         )}
@@ -85,6 +119,19 @@ const Estoque = () => {
         <NewVehicleDialog 
           open={novoVeiculoDialogOpen}
           onOpenChange={setNovoVeiculoDialogOpen}
+        />
+
+        <EditVehicleDialog 
+          open={editVehicleDialogOpen}
+          onOpenChange={setEditVehicleDialogOpen}
+          vehicle={selectedVehicle}
+        />
+
+        <DeleteVehicleDialog 
+          open={deleteVehicleDialogOpen}
+          onOpenChange={setDeleteVehicleDialogOpen}
+          onConfirm={confirmDeleteVehicle}
+          vehicleName={selectedVehicle ? `${selectedVehicle.brand} ${selectedVehicle.model}` : ''}
         />
       </div>
     </AuthGuard>

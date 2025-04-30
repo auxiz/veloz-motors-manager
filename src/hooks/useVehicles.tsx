@@ -90,6 +90,26 @@ export const useVehicles = () => {
     },
   });
 
+  const deleteVehicle = useMutation({
+    mutationFn: async (id: string) => {
+      const { error } = await supabase
+        .from('vehicles')
+        .delete()
+        .eq('id', id);
+
+      if (error) {
+        toast.error('Erro ao excluir veículo');
+        throw error;
+      }
+
+      toast.success('Veículo excluído com sucesso!');
+      return id;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['vehicles'] });
+    },
+  });
+
   const updateVehicleStatus = useMutation({
     mutationFn: async ({ id, status }: { id: string, status: string }) => {
       const { data, error } = await supabase
@@ -116,6 +136,7 @@ export const useVehicles = () => {
     isLoading,
     addVehicle,
     updateVehicle,
+    deleteVehicle,
     updateVehicleStatus,
   };
 };

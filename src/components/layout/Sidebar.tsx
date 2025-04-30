@@ -16,15 +16,15 @@ export const Sidebar = ({ open }: SidebarProps) => {
   
   console.log("Current user role:", userRole, "User:", user?.email);
   
-  // Todos os itens visíveis para administrador
+  // Definir visibilidade dos itens baseado no papel do usuário
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },
     { name: 'Estoque', path: '/estoque', icon: <Car size={20} />, visible: true },
     { name: 'Consulta por Placa', path: '/consulta-placa', icon: <Search size={20} />, visible: true },
-    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: true },
+    { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: ['administrator', 'seller'].includes(userRole) },
     { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: true },
-    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: true },
-    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: true },
+    { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: ['administrator', 'financial'].includes(userRole) },
+    { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: ['administrator', 'seller', 'financial'].includes(userRole) },
     { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} />, visible: true },
   ];
 

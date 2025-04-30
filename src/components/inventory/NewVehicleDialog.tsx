@@ -37,7 +37,7 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
         sale_price: data.sale_price,
         status: 'in_stock',
         entry_date: new Date().toISOString(),
-        photos: null,
+        photos: data.photos || null,
         internal_notes: data.internal_notes || '',
       });
       onOpenChange(false);

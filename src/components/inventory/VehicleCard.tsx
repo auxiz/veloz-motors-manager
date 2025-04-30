@@ -1,29 +1,16 @@
-
 import React from 'react';
 import { Edit } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  version: string | null;
-  year: number;
-  plate: string | null;
-  mileage: number;
-  transmission: string;
-  fuel: string;
-  sale_price: number;
-  status: string;
-  photos: string[] | null;
-}
+import { Vehicle } from '@/hooks/useVehicles';
 
 interface VehicleCardProps {
   vehicle: Vehicle;
+  onEditVehicle: (vehicle: Vehicle) => void;
+  onDeleteVehicle: (vehicle: Vehicle) => void;
 }
 
-export const VehicleCard = ({ vehicle }: VehicleCardProps) => {
+export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: VehicleCardProps) => {
   const formatCurrency = (value: number) => {
     return value.toLocaleString('pt-BR', { 
       style: 'currency', 
@@ -89,11 +76,21 @@ export const VehicleCard = ({ vehicle }: VehicleCardProps) => {
         </div>
         
         <div className="border-t border-veloz-black mt-4 pt-4 flex justify-between">
-          <Button variant="outline" size="sm" className="border-veloz-yellow text-veloz-yellow hover:bg-veloz-yellow hover:text-veloz-black">
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-veloz-yellow text-veloz-yellow hover:bg-veloz-yellow hover:text-veloz-black"
+            onClick={() => onEditVehicle(vehicle)}
+          >
             <Edit size={16} className="mr-2" /> Editar
           </Button>
-          <Button variant="outline" size="sm" className="border-veloz-gray text-veloz-white">
-            Detalhes
+          <Button 
+            variant="outline" 
+            size="sm" 
+            className="border-veloz-gray text-veloz-white"
+            onClick={() => onDeleteVehicle(vehicle)}
+          >
+            Excluir
           </Button>
         </div>
       </CardContent>

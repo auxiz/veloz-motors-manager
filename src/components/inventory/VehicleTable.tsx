@@ -10,18 +10,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  version: string | null;
-  year: number;
-  plate: string | null;
-  mileage: number;
-  sale_price: number;
-  status: string;
-}
+import { Vehicle } from '@/hooks/useVehicles';
 
 interface VehicleTableProps {
   vehicles: Vehicle[];
@@ -29,6 +18,8 @@ interface VehicleTableProps {
   sortDirection: 'asc' | 'desc';
   onSort: (field: string) => void;
   getSortIcon: (field: string) => React.ReactNode;
+  onEditVehicle: (vehicle: Vehicle) => void;
+  onDeleteVehicle: (vehicle: Vehicle) => void;
 }
 
 export const VehicleTable = ({
@@ -36,7 +27,9 @@ export const VehicleTable = ({
   sortField,
   sortDirection,
   onSort,
-  getSortIcon
+  getSortIcon,
+  onEditVehicle,
+  onDeleteVehicle
 }: VehicleTableProps) => {
   const formatCurrency = (value: number) => {
     return value.toLocaleString('pt-BR', { 
@@ -101,10 +94,20 @@ export const VehicleTable = ({
             </TableCell>
             <TableCell>
               <div className="flex space-x-2">
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-veloz-gray">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 border-veloz-gray"
+                  onClick={() => onEditVehicle(vehicle)}
+                >
                   <Edit size={16} />
                 </Button>
-                <Button variant="outline" size="sm" className="h-8 w-8 p-0 border-veloz-gray">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="h-8 w-8 p-0 border-veloz-gray"
+                  onClick={() => onDeleteVehicle(vehicle)}
+                >
                   <Trash size={16} />
                 </Button>
               </div>
