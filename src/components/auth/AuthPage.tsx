@@ -47,9 +47,9 @@ const AuthPage: React.FC<AuthPageProps> = ({
         </h2>
         
         {error && (
-          <Alert variant="destructive" className="mb-4 border-red-600 bg-red-900/20">
-            <AlertCircle className="h-4 w-4 text-red-400" />
-            <AlertDescription className="text-red-100">{error}</AlertDescription>
+          <Alert variant="destructive" className="mb-4">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
         
