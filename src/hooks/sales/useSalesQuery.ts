@@ -29,7 +29,8 @@ export const useSalesQuery = () => {
       }
 
       console.log('Sales fetched:', data);
-      return data as Sale[];
+      // Use a type assertion to handle the case where the Supabase response doesn't exactly match our Sale type
+      return data as unknown as Sale[];
     },
   });
 
@@ -53,7 +54,7 @@ export const useSalesQuery = () => {
       throw error;
     }
 
-    return data || [];
+    return data as unknown as Sale[];
   };
 
   return {

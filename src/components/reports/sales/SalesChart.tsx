@@ -21,10 +21,10 @@ export function SalesChart({ chartData, filterBar }: SalesChartProps) {
   };
 
   // Format large values for better readability
-  const formatYAxis = (value: number) => {
+  const formatYAxis = (value: number): string => {
     if (value >= 1000000) return `${(value / 1000000).toFixed(1)}M`;
     if (value >= 1000) return `${(value / 1000).toFixed(1)}K`;
-    return value;
+    return value.toString();
   };
 
   return (

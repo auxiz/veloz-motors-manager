@@ -22,8 +22,8 @@ export type Sale = {
     document: string;
   };
   seller?: {
-    id: string;
+    id?: string;
     first_name?: string;
     last_name?: string;
-  };
+  } | null;
 };
