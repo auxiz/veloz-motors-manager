@@ -1,6 +1,7 @@
+
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Phone, Menu, X } from 'lucide-react';
+import { Phone, Menu, X, CreditCard } from 'lucide-react';
 export const PublicLayout = ({
   children
 }: {
@@ -28,7 +29,10 @@ export const PublicLayout = ({
               <Link to="/contato" className="text-lg text-white hover:text-veloz-yellow transition-colors duration-300 font-medium">
                 Contato
               </Link>
-              
+              <Link to="/financiamento" className="bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-bold px-4 py-2 rounded-lg flex items-center transition-transform hover:scale-105">
+                <CreditCard size={18} className="mr-2" />
+                Simule o Financiamento
+              </Link>
             </nav>
 
             {/* Mobile Menu Button */}
@@ -56,6 +60,10 @@ export const PublicLayout = ({
                 </Link>
                 <Link to="/contato" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-veloz-yellow py-2 border-b border-gray-700">
                   Contato
+                </Link>
+                <Link to="/financiamento" onClick={() => setMobileMenuOpen(false)} className="bg-veloz-yellow text-veloz-black font-medium py-2 px-4 rounded-lg mb-2 flex items-center justify-center">
+                  <CreditCard size={16} className="mr-2" />
+                  Simule o Financiamento
                 </Link>
                 <Link to="/auth" onClick={() => setMobileMenuOpen(false)} className="text-white hover:text-veloz-yellow py-2">
                   Área Restrita
