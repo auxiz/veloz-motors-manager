@@ -21,6 +21,12 @@ import Configuracoes from "./pages/Configuracoes"
 import NotFound from "./pages/NotFound"
 import { AuthGuard } from "./components/auth/AuthGuard"
 
+// Public Pages
+import Home from "./pages/public/Home"
+import Vehicles from "./pages/public/Vehicles"
+import VehicleDetails from "./pages/public/VehicleDetails"
+import Contact from "./pages/public/Contact"
+
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -29,7 +35,13 @@ const App = () => (
       <BrowserRouter>
         <TooltipProvider>
           <Routes>
-            <Route path="/" element={<Navigate to="/auth" replace />} />
+            {/* Public Routes */}
+            <Route path="/" element={<Home />} />
+            <Route path="/veiculos" element={<Vehicles />} />
+            <Route path="/veiculos/:id" element={<VehicleDetails />} />
+            <Route path="/contato" element={<Contact />} />
+            
+            {/* Admin Routes */}
             <Route path="/auth" element={<Auth />} />
             
             <Route element={<MainLayout />}>
