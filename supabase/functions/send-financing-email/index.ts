@@ -98,7 +98,7 @@ serve(async (req: Request) => {
       </html>
     `;
 
-    // Send email using API
+    // Send email using Resend API
     const emailResponse = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {

@@ -11,7 +11,6 @@ import { formSchema, FormValues } from './FormSchema';
 import { formatCPF, formatWhatsApp } from './utils/formatters';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from "sonner";
-import { supabase } from '@/integrations/supabase/client';
 
 interface ApplicationFormProps {
   vehiclePrice: number;
