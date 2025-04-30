@@ -1,1 +1,6 @@
+
+# Reference: https://supabase.com/docs/guides/functions/quickstart#configuration
 project_id = "lmevzqjaxzbvsyiswwby"
+
+[functions.send-financing-email]
+verify_jwt = false

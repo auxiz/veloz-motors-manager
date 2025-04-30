@@ -10,15 +10,31 @@ import { Button } from '@/components/ui/button';
 import { formSchema, FormValues } from './FormSchema';
 import { formatCPF, formatWhatsApp } from './utils/formatters';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { toast } from "sonner";
+import { supabase } from '@/integrations/supabase/client';
 
-export const ApplicationForm: React.FC = () => {
+interface ApplicationFormProps {
+  vehiclePrice: number;
+  entryValue: number;
+  installments: number;
+  monthlyPayment: number | null;
+  totalPayment: number | null;
+}
+
+export const ApplicationForm: React.FC<ApplicationFormProps> = ({
+  vehiclePrice,
+  entryValue,
+  installments,
+  monthlyPayment,
+  totalPayment
+}) => {
   const isMobile = useIsMobile();
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      vehiclePrice: 50000,
-      entryValue: 10000,
-      installments: 36,
+      vehiclePrice,
+      entryValue,
+      installments,
       cpf: '',
       birthdate: '',
       whatsapp: '',
@@ -27,9 +43,43 @@ export const ApplicationForm: React.FC = () => {
   });
 
   const onSubmit = async (data: FormValues) => {
-    console.log('Form submitted', data);
-    // Here you would typically send this data to your backend
-    alert("Dados enviados com sucesso! Em breve, nossa equipe entrará em contato.");
+    try {
+      // Show loading toast
+      toast.loading("Enviando solicitação...");
+      
+      // Send the data to our edge function
+      const response = await fetch(`${supabase.supabaseUrl}/functions/v1/send-financing-email`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${supabase.supabaseKey}`
+        },
+        body: JSON.stringify({
+          ...data,
+          monthlyPayment: monthlyPayment || 0,
+          totalPayment: totalPayment || 0
+        })
+      });
+      
+      const result = await response.json();
+      
+      // Dismiss the loading toast
+      toast.dismiss();
+      
+      if (result.success) {
+        // Show success toast
+        toast.success("Solicitação enviada com sucesso! Em breve entraremos em contato.");
+        form.reset(); // Reset form after successful submission
+      } else {
+        // Show error toast
+        toast.error("Falha ao enviar solicitação. Por favor tente novamente.");
+        console.error("Error sending financing request:", result);
+      }
+    } catch (error) {
+      toast.dismiss();
+      toast.error("Erro ao processar sua solicitação. Por favor tente novamente.");
+      console.error("Submission error:", error);
+    }
   };
 
   return (

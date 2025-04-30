@@ -3,6 +3,7 @@ import React from 'react';
 import { PublicLayout } from '@/components/layout/PublicLayout';
 import { FinancingSimulator } from '@/components/public/FinancingSimulator';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { Toaster } from 'sonner';
 
 const Financiamento = () => {
   const isMobile = useIsMobile();
@@ -14,6 +15,7 @@ const Financiamento = () => {
           Simule o Financiamento
         </h1>
         <FinancingSimulator />
+        <Toaster richColors position={isMobile ? "bottom-center" : "top-right"} />
       </div>
     </PublicLayout>
   );
