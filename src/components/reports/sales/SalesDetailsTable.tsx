@@ -8,6 +8,7 @@ import { format } from 'date-fns';
 import { Sale } from '@/types/sales';
 import { Vehicle } from '@/hooks/useVehicles';
 import { User } from '@/hooks/useUsers';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SalesDetailsTableProps {
   filteredSales: Sale[];
@@ -26,24 +27,49 @@ export function SalesDetailsTable({
   downloadCSV,
   downloadPDF
 }: SalesDetailsTableProps) {
-  // Enhanced helper function to get the seller name with better fallbacks
+  // Enhanced comprehensive helper function to get the seller name with multi-level fallbacks
   const getSellerName = (sale: Sale) => {
-    // First try using the joined seller data from the sale object
+    // 1. First try using the joined seller data from the sale object
     if (sale.seller?.first_name) {
       return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
     }
     
-    // Then try finding the user in the users array using seller_id
+    // 2. Try finding the user in the users array using seller_id
     const seller = users.find(user => user.id === sale.seller_id);
     if (seller) {
+      // Check for profile data
       if (seller.profile?.first_name) {
         return `${seller.profile.first_name} ${seller.profile.last_name || ''}`.trim();
       }
-      return seller.name || seller.email.split('@')[0];
+      // Fall back to name or email
+      if (seller.name) return seller.name;
+      if (seller.email) return seller.email.split('@')[0];
     }
     
-    // Last resort for debugging - show partial ID
-    return sale.seller_id ? `ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
+    // 3. If we have seller_id, show partial ID for debugging
+    if (sale.seller_id) {
+      return `ID: ${sale.seller_id.substring(0, 6)}...`;
+    }
+    
+    // 4. Last resort
+    return 'Vendedor não identificado';
+  };
+  
+  // Function to get vehicle info with fallback
+  const getVehicleInfo = (sale: Sale) => {
+    // First try from the joined vehicle data
+    if (sale.vehicle?.brand) {
+      return `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}`;
+    }
+    
+    // Fall back to lookup in vehicles array
+    const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
+    if (vehicle) {
+      return `${vehicle.brand} ${vehicle.model} ${vehicle.year}`;
+    }
+    
+    // Last resort
+    return 'Veículo não encontrado';
   };
 
   return (
@@ -77,28 +103,52 @@ export function SalesDetailsTable({
             </TableHeader>
             <TableBody>
               {filteredSales.length > 0 ? (
-                filteredSales.map(sale => {
-                  const vehicle = vehicles.find(v => v.id === sale.vehicle_id);
-                  
-                  return (
-                    <TableRow key={sale.id}>
-                      <TableCell>{format(new Date(sale.sale_date), 'dd/MM/yyyy')}</TableCell>
-                      <TableCell>
-                        {vehicle ? `${vehicle.brand} ${vehicle.model} ${vehicle.year}` : 
-                         sale.vehicle ? `${sale.vehicle.brand} ${sale.vehicle.model} ${sale.vehicle.year}` : 
-                         'Veículo não encontrado'}
-                      </TableCell>
-                      <TableCell>{getSellerName(sale)}</TableCell>
-                      <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
-                      <TableCell className="text-right">
-                        {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })
+                filteredSales.map(sale => (
+                  <TableRow key={sale.id}>
+                    <TableCell>{format(new Date(sale.sale_date), 'dd/MM/yyyy')}</TableCell>
+                    <TableCell>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help">
+                              {getVehicleInfo(sale)}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>
+                              <strong>ID:</strong> {sale.vehicle_id.substring(0, 8)}...<br />
+                              {sale.vehicle?.color && <><strong>Cor:</strong> {sale.vehicle.color}<br /></>}
+                              {sale.vehicle?.fuel && <><strong>Combustível:</strong> {sale.vehicle.fuel}<br /></>}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell>{getSellerName(sale)}</TableCell>
+                    <TableCell>
+                      <TooltipProvider>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <span className="cursor-help">
+                              {sale.customer?.name || 'Cliente não especificado'}
+                            </span>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {sale.customer?.document && 
+                              <p><strong>Documento:</strong> {sale.customer.document}</p>
+                            }
+                          </TooltipContent>
+                        </Tooltip>
+                      </TooltipProvider>
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {Number(sale.final_price).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    </TableCell>
+                  </TableRow>
+                ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center">
+                  <TableCell colSpan={5} className="text-center py-8">
                     Nenhuma venda encontrada para o período e filtros selecionados.
                   </TableCell>
                 </TableRow>

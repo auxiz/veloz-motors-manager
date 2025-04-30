@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,11 +11,13 @@ import { NewSaleDialog } from '@/components/sales/NewSaleDialog';
 import { useUsers } from '@/hooks/useUsers';
 import { toast } from 'sonner';
 import { AuthGuard } from '@/components/auth/AuthGuard';
+import { supabase } from '@/integrations/supabase/client';
 
 const Vendas = () => {
   const [newSaleDialogOpen, setNewSaleDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
   const { user, isAuthChecking } = useUsers();
+  const { refreshSales } = useSales();
   const [filters, setFilters] = useState({
     startDate: null as Date | null,
     endDate: null as Date | null,
@@ -22,6 +25,40 @@ const Vendas = () => {
     status: '',
     search: '',
   });
+
+  // Set up realtime updates for sales
+  useEffect(() => {
+    // Subscribe to realtime changes
+    const channel = supabase
+      .channel('sales-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'sales'
+        },
+        (payload) => {
+          console.log('Sales table updated:', payload.eventType);
+          refreshSales();
+          
+          const eventMessages = {
+            INSERT: 'Nova venda registrada',
+            UPDATE: 'Venda atualizada',
+            DELETE: 'Venda removida'
+          };
+          
+          // Show toast notification
+          toast.info(eventMessages[payload.eventType as keyof typeof eventMessages] || 'Vendas atualizadas');
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [refreshSales]);
 
   // Log authentication state for debugging
   useEffect(() => {

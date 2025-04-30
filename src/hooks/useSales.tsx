@@ -7,7 +7,7 @@ import { useSalesMutations } from './sales/useSalesMutations';
  * Main hook for sales operations, composing all sales-related hooks
  */
 export const useSales = () => {
-  const { sales, isLoading, getSalesByVehicleId } = useSalesQuery();
+  const { sales, isLoading, getSalesByVehicleId, refreshSales } = useSalesQuery();
   const { addSale, deleteSale } = useSalesMutations();
 
   return {
@@ -16,6 +16,7 @@ export const useSales = () => {
     addSale,
     getSalesByVehicleId,
     deleteSale,
+    refreshSales,
   };
 };
 

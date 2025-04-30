@@ -10,6 +10,7 @@ import { FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { generateSaleContract } from '@/lib/contractGenerator';
 import { useUsers } from '@/hooks/useUsers';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface SalesListProps {
   filter?: 'cash' | 'financing' | 'other';
@@ -33,21 +34,34 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
     generateSaleContract(sale);
   };
 
-  // Improved helper function to get seller name with comprehensive fallbacks
+  // Enhanced comprehensive seller name function with detailed fallbacks
   const getSellerName = (sale: any) => {
-    // First try to use the seller data directly from the sale object
+    // Try multiple paths to get the seller name with detailed fallbacks
+    
+    // 1. First try from the sale.seller object (from join)
     if (sale.seller?.first_name) {
       return `${sale.seller.first_name} ${sale.seller.last_name || ''}`.trim();
     }
     
-    // Fallback to users data if available
-    const seller = users.find(user => user.id === sale.seller_id);
-    if (seller) {
-      return seller.name;
+    // 2. Try to match seller_id with users data
+    if (sale.seller_id) {
+      const seller = users.find(user => user.id === sale.seller_id);
+      if (seller) {
+        // If user has profile data
+        if (seller.profile?.first_name) {
+          return `${seller.profile.first_name} ${seller.profile.last_name || ''}`.trim();
+        }
+        // Fall back to user name or email
+        if (seller.name) return seller.name;
+        if (seller.email) return seller.email.split('@')[0];
+      }
+      
+      // 3. If we at least have seller_id, show a partial ID for debugging
+      return `ID: ${sale.seller_id.substring(0, 6)}...`;
     }
     
-    // Last resort fallback with seller_id for debugging
-    return sale.seller_id ? `Vendedor ID: ${sale.seller_id.substring(0, 6)}...` : 'Vendedor não identificado';
+    // 4. Last resort
+    return 'Vendedor não identificado';
   };
 
   if (isLoading) {
@@ -65,6 +79,20 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
       </div>
     );
   }
+
+  // Function to get payment method display name
+  const getPaymentMethodName = (method: string) => {
+    const methods: Record<string, string> = {
+      'cash': 'À Vista',
+      'financing': 'Financiamento',
+      'consignment': 'Consignação',
+      'exchange': 'Troca',
+      'bank_transfer': 'Transferência',
+      'installments': 'Parcelado'
+    };
+    
+    return methods[method] || method;
+  };
 
   return (
     <div className="overflow-x-auto">
@@ -91,7 +119,22 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
                 }
               </TableCell>
               <TableCell>
-                {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <span className="cursor-help">
+                        {sale.vehicle?.brand} {sale.vehicle?.model} {sale.vehicle?.version}
+                      </span>
+                    </TooltipTrigger>
+                    <TooltipContent className="max-w-xs">
+                      <p>
+                        <strong>Ano:</strong> {sale.vehicle?.year}<br />
+                        <strong>Cor:</strong> {sale.vehicle?.color}<br />
+                        <strong>Combustível:</strong> {sale.vehicle?.fuel}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
               </TableCell>
               <TableCell>{sale.customer?.name || 'Cliente não especificado'}</TableCell>
               <TableCell>{getSellerName(sale)}</TableCell>
@@ -104,10 +147,7 @@ export const SalesList: React.FC<SalesListProps> = ({ filter }) => {
                     'bg-orange-700'
                   }`}
                 >
-                  {sale.payment_method === 'cash' ? 'À Vista' :
-                   sale.payment_method === 'financing' ? 'Financiamento' :
-                   sale.payment_method === 'consignment' ? 'Consignação' :
-                   'Troca'}
+                  {getPaymentMethodName(sale.payment_method)}
                 </Badge>
               </TableCell>
               <TableCell>{formatCurrency(sale.commission_amount)}</TableCell>
