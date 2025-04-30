@@ -98,6 +98,11 @@ export const PublicLayout = ({
                 <li><Link to="/contato" className="text-white hover:text-veloz-yellow transition-colors">Contato</Link></li>
                 <li><Link to="/auth" className="text-white hover:text-veloz-yellow transition-colors">Área Restrita</Link></li>
               </ul>
+              <div className="mt-6">
+                <Link to="/auth" className="bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-semibold px-4 py-2 rounded-lg transition-colors duration-300 inline-block">
+                  Área Restrita
+                </Link>
+              </div>
             </div>
             <div>
               <h3 className="text-xl font-semibold text-veloz-yellow mb-6">Contato</h3>
