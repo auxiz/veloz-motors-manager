@@ -5,7 +5,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Button } from '@/components/ui/button';
 import { Download, FileText } from 'lucide-react';
 import { format } from 'date-fns';
-import { Sale } from '@/hooks/useSales';
+import { Sale } from '@/types/sales';
 import { Vehicle } from '@/hooks/useVehicles';
 import { User } from '@/hooks/useUsers';
 
