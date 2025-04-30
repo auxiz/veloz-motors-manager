@@ -10,6 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useUsers } from '@/hooks/useUsers';
+import { toast } from 'sonner';
 
 type HeaderProps = {
   toggleSidebar: () => void;
@@ -18,10 +20,19 @@ type HeaderProps = {
 
 export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
   const navigate = useNavigate();
+  const { signOut } = useUsers();
   
-  const handleLogout = () => {
-    // Will be implemented with Supabase Auth
-    navigate('/auth');
+  const handleLogout = async () => {
+    const result = await signOut();
+    if (!result.error) {
+      navigate('/auth');
+    } else {
+      toast.error('Erro ao fazer logout: ' + result.error.message);
+    }
+  };
+
+  const handleNotificationsClick = () => {
+    toast.info('Você não possui novas notificações');
   };
 
   return (
@@ -41,7 +52,10 @@ export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
       </div>
       
       <div className="flex items-center space-x-4">
-        <button className="p-2 rounded-full hover:bg-veloz-gray text-veloz-white relative">
+        <button 
+          className="p-2 rounded-full hover:bg-veloz-gray text-veloz-white relative"
+          onClick={handleNotificationsClick}
+        >
           <Bell size={20} />
           <span className="absolute top-1 right-1 w-2 h-2 bg-veloz-yellow rounded-full"></span>
         </button>
@@ -58,7 +72,7 @@ export const Header = ({ toggleSidebar, sidebarOpen }: HeaderProps) => {
           <DropdownMenuContent className="w-56">
             <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/perfil')}>
+            <DropdownMenuItem className="cursor-pointer" onClick={() => navigate('/configuracoes')}>
               <User className="mr-2 h-4 w-4" />
               <span>Perfil</span>
             </DropdownMenuItem>

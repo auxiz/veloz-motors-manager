@@ -10,12 +10,15 @@ type SidebarProps = {
 
 export const Sidebar = ({ open }: SidebarProps) => {
   const { user } = useUsers();
-  const userRole = user?.profile?.role || '';
+  // Garanta que o papel do usuário seja sempre definido, padrão para 'administrator'
+  const userRole = user?.profile?.role || 'administrator';
   
-  // Define page access by role
+  // Define page access by role - todos acessíveis para administrador
   const canAccessVendas = ['administrator', 'seller'].includes(userRole);
   const canAccessFinanceiro = ['administrator', 'financial'].includes(userRole);
   const canAccessRelatorios = ['administrator', 'seller', 'financial'].includes(userRole);
+  
+  console.log("Current user role:", userRole);
   
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },

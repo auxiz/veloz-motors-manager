@@ -37,11 +37,11 @@ export function useUsers() {
       console.log('Using mock user for development');
       return {
         id: '00000000-0000-0000-0000-000000000001',
-        email: 'demo@example.com',
+        email: 'admin@example.com',
         profile: {
           id: '00000000-0000-0000-0000-000000000001',
-          first_name: 'Usuário',
-          last_name: 'Demonstração',
+          first_name: 'Administrador',
+          last_name: 'Sistema',
           role: 'administrator' as const,
           avatar_url: null,
           updated_at: new Date().toISOString(),
@@ -52,10 +52,27 @@ export function useUsers() {
     return auth.user;
   };
 
+  // Override user profile role for development if needed
+  const enhancedUser = () => {
+    const user = mockUserIfNeeded();
+    // If user exists but profile doesn't have a role, set as administrator
+    if (user && (!user.profile || !user.profile.role)) {
+      return {
+        ...user,
+        profile: {
+          ...(user.profile || {}),
+          role: 'administrator' as const
+        }
+      };
+    }
+    return user;
+  };
+
   return {
     ...auth,
     ...userData,
-    user: mockUserIfNeeded(),
-    isAuthChecking
+    user: enhancedUser(),
+    isAuthChecking,
+    signOut: auth.signOut
   };
 }
