@@ -22,6 +22,8 @@ export function useAuthForms() {
       ...loginForm,
       [e.target.id]: e.target.value,
     });
+    // Clear error when user starts typing
+    setError(null);
   };
 
   const handleResetChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -29,18 +31,32 @@ export function useAuthForms() {
       ...resetForm,
       [e.target.id]: e.target.value,
     });
+    // Clear error when user starts typing
+    setError(null);
   };
 
   const handleLoginSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     
+    if (!loginForm.email || !loginForm.password) {
+      setError('Por favor, preencha todos os campos.');
+      return;
+    }
+    
     try {
       console.log('Submitting login with:', loginForm.email);
       
       const { error } = await signIn(loginForm.email, loginForm.password);
       if (error) {
-        setError(error.message);
+        console.error('Login error:', error);
+        
+        // Provide more user-friendly error messages
+        if (error.message.includes('Invalid login credentials')) {
+          setError('Email ou senha incorretos. Verifique suas credenciais e tente novamente.');
+        } else {
+          setError(error.message || 'Erro ao fazer login. Tente novamente.');
+        }
         return;
       }
       
@@ -48,7 +64,7 @@ export function useAuthForms() {
       navigate('/dashboard');
     } catch (err: any) {
       console.error('Login form error:', err);
-      setError(err.message || 'Erro ao fazer login');
+      setError(err.message || 'Erro ao fazer login. Tente novamente.');
     }
   };
 
