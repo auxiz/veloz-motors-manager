@@ -1,5 +1,6 @@
 
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
@@ -39,15 +40,19 @@ const AuthPage: React.FC<AuthPageProps> = ({
   handleResetChange,
 }) => {
   return (
-    <div className="min-h-screen bg-veloz-black flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md animate-fade-in">
+    <div className="min-h-screen bg-gradient-to-br from-veloz-black to-[#1a1a1a] flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bg-veloz-black border border-gray-800 rounded-2xl shadow-2xl p-6 animate-fade-in">
         <div className="flex justify-center mb-8">
           <img 
-            src="/lovable-uploads/e5725817-aa18-4795-ac65-ef0ef4f65f98.png"
+            src="/lovable-uploads/4f3db420-b53b-4adc-9b5a-07a1d090a696.png"
             alt="Veloz Motors" 
             className="h-24" 
           />
         </div>
+        
+        <h2 className="text-2xl font-bold text-center text-white mb-6">
+          Área Administrativa
+        </h2>
         
         <Tabs defaultValue="login" className="w-full">
           <TabsList className="grid w-full grid-cols-2 mb-6">
@@ -92,9 +97,14 @@ const AuthPage: React.FC<AuthPageProps> = ({
           </TabsContent>
         </Tabs>
         
-        <p className="text-center mt-6 text-sm text-gray-400">
-          © 2025 Veloz Motors. Todos os direitos reservados.
-        </p>
+        <div className="mt-8 pt-6 border-t border-gray-800 text-center">
+          <p className="text-sm text-gray-400">
+            © {new Date().getFullYear()} Veloz Motors. Todos os direitos reservados.
+          </p>
+          <Link to="/" className="text-sm text-veloz-yellow hover:text-yellow-400 mt-2 block">
+            Voltar para o site
+          </Link>
+        </div>
       </div>
     </div>
   );

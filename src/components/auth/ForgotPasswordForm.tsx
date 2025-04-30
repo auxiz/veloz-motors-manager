@@ -1,9 +1,10 @@
 
 import React from 'react';
-import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
+import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { Mail, ArrowLeft } from 'lucide-react';
 
 interface ForgotPasswordFormProps {
   resetForm: { email: string };
@@ -21,34 +22,32 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
   loading,
 }) => {
   return (
-    <Card className="border-veloz-gray bg-veloz-gray">
-      <CardHeader>
-        <h2 className="text-2xl font-bold text-center text-veloz-white">
-          Recuperar Senha
-        </h2>
-      </CardHeader>
+    <Card className="border-none shadow-none bg-transparent">
       <form onSubmit={handleResetSubmit}>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6 pt-4">
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input 
-              id="email" 
-              type="email" 
-              placeholder="seu@email.com"
-              required
-              className="bg-veloz-black border-veloz-gray text-veloz-white"
-              value={resetForm.email}
-              onChange={handleResetChange}
-            />
+            <Label htmlFor="email" className="text-white">Email</Label>
+            <div className="relative">
+              <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
+              <Input 
+                id="email" 
+                type="email" 
+                placeholder="seu@email.com"
+                required
+                className="bg-veloz-gray/50 border-gray-700 text-white pl-10 focus-visible:ring-veloz-yellow"
+                value={resetForm.email}
+                onChange={handleResetChange}
+              />
+            </div>
           </div>
           <p className="text-sm text-gray-400">
             Informe seu email e enviaremos instruções para redefinir sua senha.
           </p>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-2">
+        <CardFooter className="flex flex-col space-y-3 pt-2 pb-0">
           <Button 
             type="submit" 
-            className="w-full bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
+            className="w-full bg-veloz-yellow hover:bg-amber-500 text-veloz-black font-semibold py-5"
             disabled={loading}
           >
             {loading ? 'Enviando...' : 'Enviar instruções'}
@@ -56,9 +55,10 @@ const ForgotPasswordForm: React.FC<ForgotPasswordFormProps> = ({
           <Button
             type="button"
             variant="ghost"
-            className="w-full text-veloz-white"
+            className="w-full text-veloz-white hover:bg-veloz-gray/50 flex items-center justify-center gap-2"
             onClick={toggleForgotPassword}
           >
+            <ArrowLeft size={16} />
             Voltar ao login
           </Button>
         </CardFooter>
