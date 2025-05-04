@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Car, User, DollarSign, File, Package, BarChart, Settings, Search, X } from 'lucide-react';
+import { Car, User, DollarSign, File, Package, BarChart, Settings, Search, X, MessageSquare } from 'lucide-react';
 import { useUsers } from '@/hooks/useUsers';
 import { useIsMobile } from '@/hooks/use-mobile';
 
@@ -29,6 +29,7 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
     { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: userRole !== 'investor' },
     { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: ['administrator', 'financial'].includes(userRole) },
     { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: ['administrator', 'seller', 'financial'].includes(userRole) },
+    { name: 'WhatsApp CRM', path: '/whatsapp', icon: <MessageSquare size={20} />, visible: ['administrator', 'seller'].includes(userRole) },
     { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} />, visible: true },
   ];
 
