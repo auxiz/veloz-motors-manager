@@ -60,7 +60,8 @@ const WhatsAppConnection: React.FC = () => {
               </span>
             </div>
             
-            {connectionStatus === 'connecting' && qrCode && (
+            {/* QR Code Display - Now shows when connecting OR when QR code is available */}
+            {qrCode && (
               <div className="my-4">
                 <p className="text-center mb-2">Escaneie este QR code com WhatsApp no seu celular</p>
                 <img src={qrCode} alt="WhatsApp QR Code" className="mx-auto max-w-xs" />

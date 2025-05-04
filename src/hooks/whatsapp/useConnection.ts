@@ -24,7 +24,12 @@ export const useConnection = () => {
       }
       
       if (data.qrCode) {
+        console.log('QR Code recebido:', data.qrCode.substring(0, 50) + '...');
         setQrCode(data.qrCode);
+        toast.success('QR Code gerado com sucesso. Escaneie com seu celular.');
+      } else {
+        console.log('QR Code não recebido na resposta:', data);
+        toast.error('QR Code não foi recebido. Tente novamente.');
       }
       
       return true;
