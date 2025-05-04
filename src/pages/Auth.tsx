@@ -10,9 +10,9 @@ const Auth = () => {
   const { user } = useAuth();
   const authForms = useAuthForms();
   
-  // If already authenticated, redirect to dashboard
+  // If already authenticated and approved, redirect to dashboard
   useEffect(() => {
-    if (user) {
+    if (user?.profile?.status === 'approved' || user?.profile?.role === 'administrator') {
       navigate('/dashboard');
     }
   }, [user, navigate]);

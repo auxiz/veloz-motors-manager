@@ -9,6 +9,7 @@ export interface UserProfile {
   updated_at: string;
   created_at: string;
   role: 'administrator' | 'seller' | 'dispatcher' | 'financial' | 'investor';
+  status: 'pending' | 'approved' | 'rejected';
 }
 
 export interface AuthError {

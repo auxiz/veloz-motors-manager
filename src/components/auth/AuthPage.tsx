@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, CheckCircle, Clock } from 'lucide-react';
 import LoginForm from './LoginForm';
 import ForgotPasswordForm from './ForgotPasswordForm';
 
@@ -17,6 +17,7 @@ interface AuthPageProps {
   resetForm: { email: string };
   handleLoginChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleResetChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  userStatus?: 'pending' | 'approved' | 'rejected';
 }
 
 const AuthPage: React.FC<AuthPageProps> = ({
@@ -30,6 +31,7 @@ const AuthPage: React.FC<AuthPageProps> = ({
   resetForm,
   handleLoginChange,
   handleResetChange,
+  userStatus,
 }) => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-veloz-black to-[#1a1a1a] flex flex-col items-center justify-center p-4">
@@ -50,6 +52,35 @@ const AuthPage: React.FC<AuthPageProps> = ({
           <Alert variant="destructive" className="mb-4 border-red-600 bg-red-900/20">
             <AlertCircle className="h-4 w-4 text-red-400" />
             <AlertDescription className="text-red-100">{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {userStatus === 'pending' && (
+          <Alert className="mb-4 border-yellow-600 bg-yellow-900/20">
+            <Clock className="h-4 w-4 text-yellow-400" />
+            <AlertDescription className="text-yellow-100">
+              Sua conta está aguardando aprovação pelo administrador. 
+              Por favor, aguarde ou entre em contato com o suporte.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {userStatus === 'rejected' && (
+          <Alert variant="destructive" className="mb-4 border-red-600 bg-red-900/20">
+            <AlertCircle className="h-4 w-4 text-red-400" />
+            <AlertDescription className="text-red-100">
+              Seu acesso foi negado pelo administrador. 
+              Entre em contato com o suporte para mais informações.
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {userStatus === 'approved' && (
+          <Alert className="mb-4 border-green-600 bg-green-900/20">
+            <CheckCircle className="h-4 w-4 text-green-400" />
+            <AlertDescription className="text-green-100">
+              Seu cadastro foi aprovado. Faça login para acessar o sistema.
+            </AlertDescription>
           </Alert>
         )}
         

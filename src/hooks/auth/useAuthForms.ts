@@ -49,6 +49,7 @@ export function useAuthForms() {
       handleSubmit: resetPasswordForm.handleSubmit,
     },
     error: showForgotPassword ? resetPasswordForm.error : loginForm.error,
+    userStatus: loginForm.userStatus,
     showForgotPassword,
     loading: loginForm.loading || resetPasswordForm.loading,
     handleLoginChange: loginForm.handleChange,

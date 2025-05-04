@@ -1,16 +1,18 @@
 
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { AuthError } from './types';
+import { AuthError, AuthUser } from './types';
 import { toast } from 'sonner';
+import { useProfileFetcher } from './useProfileFetcher';
 
 export function useAuthActions() {
   const [loading, setLoading] = useState<boolean>(false);
+  const { fetchUserProfile } = useProfileFetcher();
   
   const signIn = async (
     email: string, 
     password: string
-  ): Promise<{ error: AuthError | null }> => {
+  ): Promise<{ error: AuthError | null; user?: AuthUser }> => {
     try {
       setLoading(true);
       console.log('Attempting login with:', email);
@@ -34,8 +36,19 @@ export function useAuthActions() {
       }
 
       console.log('Login successful:', data);
-      toast.success('Login realizado com sucesso!');
-      return { error: null };
+      
+      // Fetch user profile
+      let profile = null;
+      if (data.user) {
+        profile = await fetchUserProfile(data.user.id);
+      }
+      
+      const userWithProfile: AuthUser = {
+        ...data.user,
+        profile: profile || undefined
+      };
+      
+      return { error: null, user: userWithProfile };
     } catch (error: any) {
       console.error('Login catch error:', error);
       return { error: { message: error.message } };

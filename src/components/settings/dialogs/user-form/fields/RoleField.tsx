@@ -38,11 +38,11 @@ export function RoleField({ control }: RoleFieldProps) {
                 <SelectValue placeholder="Selecione uma função" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="administrator">Administrador</SelectItem>
-                <SelectItem value="seller">Vendedor</SelectItem>
-                <SelectItem value="financial">Financeiro</SelectItem>
-                <SelectItem value="dispatcher">Despachante</SelectItem>
-                <SelectItem value="investor">Investidor</SelectItem>
+                <SelectItem value="administrator">Administrador - Acesso total</SelectItem>
+                <SelectItem value="seller">Vendedor - Gestão de vendas</SelectItem>
+                <SelectItem value="financial">Financeiro - Gestão financeira</SelectItem>
+                <SelectItem value="dispatcher">Despachante - Documentação</SelectItem>
+                <SelectItem value="investor">Investidor - Visualização de investimentos</SelectItem>
               </SelectContent>
             </Select>
           </FormControl>
