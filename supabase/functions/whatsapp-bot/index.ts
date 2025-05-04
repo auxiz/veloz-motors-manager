@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0"
 import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts"
@@ -545,27 +544,33 @@ serve(async (req) => {
     return new Response(null, {
       headers: corsHeaders,
       status: 204,
-    })
+    });
   }
 
   try {
     // Parse request data
-    const url = new URL(req.url)
-    const action = url.searchParams.get('action') || ''
-    let requestData = {}
+    const url = new URL(req.url);
+    const action = url.searchParams.get('action') || '';
+    let requestData = {};
     
     if (req.method === 'POST') {
       try {
-        requestData = await req.json()
+        const contentType = req.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const bodyText = await req.text();
+          if (bodyText && bodyText.trim()) {
+            requestData = JSON.parse(bodyText);
+          }
+        }
       } catch (e) {
-        console.error("Error parsing request JSON:", e)
+        console.error("Error parsing request JSON:", e);
         // Continue with empty request data if parse fails
       }
     }
     
     // Merge query params and body
-    const data = { ...requestData, ...Object.fromEntries(url.searchParams) }
-    console.log("Edge function received action:", action)
+    const data = { ...requestData, ...Object.fromEntries(url.searchParams) };
+    console.log("Edge function received action:", action, "with data:", JSON.stringify(data));
     
     // Route to appropriate handler based on action
     switch (action) {
@@ -639,13 +644,14 @@ serve(async (req) => {
         })
     }
   } catch (error) {
-    console.error("Error in edge function:", error)
+    console.error("Error in edge function:", error);
     return new Response(JSON.stringify({ 
       success: false, 
-      message: error.message 
+      message: error.message,
+      stack: error.stack 
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
-    })
+    });
   }
-})
+});

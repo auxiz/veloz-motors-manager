@@ -9,13 +9,18 @@ export const useLeads = (userId: string | undefined) => {
   const [loading, setLoading] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const [autoRefreshEnabled, setAutoRefreshEnabled] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const fetchLeads = async () => {
     // Don't fetch if not logged in (no userId)
-    if (!userId) return;
+    if (!userId) {
+      console.log('No userId provided, skipping lead fetch');
+      return;
+    }
 
     try {
       setLoading(true);
+      setError(null);
       
       // Use RPC function instead of direct table access
       const { data, error } = await supabase
@@ -26,8 +31,9 @@ export const useLeads = (userId: string | undefined) => {
       }
       
       setLeads(data as Lead[]);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching leads:', error);
+      setError(error.message || 'Failed to load leads');
       toast.error('Falha ao carregar leads');
     } finally {
       setLoading(false);
@@ -65,6 +71,7 @@ export const useLeads = (userId: string | undefined) => {
     
     timerRef.current = setTimeout(() => {
       if (autoRefreshEnabled && userId) {
+        console.log('Auto-refreshing leads');
         fetchLeads();
       }
       // After fetching, schedule next refresh
@@ -75,6 +82,11 @@ export const useLeads = (userId: string | undefined) => {
   // Toggle auto-refresh functionality
   const toggleAutoRefresh = () => {
     setAutoRefreshEnabled(prev => !prev);
+    toast.info(
+      autoRefreshEnabled 
+        ? 'Auto-refresh desativado' 
+        : 'Auto-refresh ativado'
+    );
   };
 
   // Set up initial fetch and interval when component mounts or userId changes
@@ -83,6 +95,8 @@ export const useLeads = (userId: string | undefined) => {
     if (userId) {
       fetchLeads();
       scheduleNextRefresh();
+    } else {
+      console.log('User not logged in, skipping lead fetch setup');
     }
     
     // Cleanup on unmount
@@ -93,9 +107,15 @@ export const useLeads = (userId: string | undefined) => {
     };
   }, [userId]);
 
+  // Effect to log status changes
+  useEffect(() => {
+    console.log('Auto-refresh status:', autoRefreshEnabled ? 'enabled' : 'disabled');
+  }, [autoRefreshEnabled]);
+
   return {
     leads,
     loading,
+    error,
     fetchLeads,
     updateLead,
     setLeads,

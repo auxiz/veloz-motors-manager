@@ -1,56 +1,41 @@
+import { ConnectionStatus, ConnectionMetrics } from '../types';
+
+export interface ConnectionState {
+  connectionStatus: ConnectionStatus;
+  qrCode: string | null;
+  isLoading: boolean;
+  connectionError: string | null;
+  metrics: ConnectionMetrics;
+}
+
+export interface ConnectionStateSetters {
+  setConnectionStatus: (status: ConnectionStatus) => void;
+  setQrCode: (qrCode: string | null) => void;
+  setIsLoading: (isLoading: boolean) => void;
+  setConnectionError: (error: string | null) => void;
+  setMetrics: (metrics: ConnectionMetrics) => void;
+}
+
+export type UseConnectionStateReturn = ConnectionState & ConnectionStateSetters;
 
 export interface Lead {
   id: string;
+  created_at: string;
   name: string | null;
   phone_number: string;
-  status: string;
   first_message: string | null;
+  status: string;
   assigned_to: string | null;
-  created_at: string;
-  vehicle_interest: any | null;
-  lead_source: string | null;
 }
 
 export interface Message {
   id: string;
+  created_at: string;
   lead_id: string;
   message_text: string;
   direction: 'incoming' | 'outgoing';
   sent_by: string | null;
-  sent_at: string;
   is_read: boolean;
-  media_url: string | null;
-}
-
-export interface Category {
-  id: string;
-  name: string;
-  description: string | null;
-}
-
-export interface SalespersonCategory {
-  id: string;
-  user_id: string;
-  category_id: string;
-  assigned_at: string;
-}
-
-export type ConnectionStatus = 'connected' | 'disconnected' | 'connecting' | 'unknown';
-
-export interface ConnectionMetrics {
-  lastActivity: number | null;
-  reconnectAttempts: number;
-  messageQueueSize: number;
-}
-
-export interface ErrorLog {
-  id: string;
-  error_type: string;
-  error_message: string;
-  occurred_at: string;
-  resolved: boolean;
-  resolution_notes?: string | null;
-  resolved_at?: string | null;
 }
 
 export interface WhatsAppContextType {
@@ -60,15 +45,16 @@ export interface WhatsAppContextType {
   connectionStatus: ConnectionStatus;
   qrCode: string | null;
   isLoading: boolean;
-  connectionError?: string | null;
-  metrics?: ConnectionMetrics;
+  connectionError: string | null;
+  metrics: ConnectionMetrics;
+  error: string | null;
   selectLead: (lead: Lead | null) => void;
-  fetchLeads: () => void;
-  fetchMessages: (leadId: string) => void;
+  fetchLeads: () => Promise<void>;
+  fetchMessages: (leadId: string) => Promise<void>;
   sendMessage: (phoneNumber: string, message: string, leadId: string) => Promise<boolean>;
   connectWhatsApp: () => Promise<boolean>;
-  disconnectWhatsApp: () => Promise<boolean>;
-  reconnectWhatsApp: () => Promise<boolean>;
+  disconnectWhatsApp: () => Promise<void>;
+  reconnectWhatsApp: () => Promise<void>;
   checkConnectionStatus: () => Promise<void>;
   refreshQRCode: () => Promise<void>;
   updateLead: (leadId: string, updates: Partial<Lead>) => Promise<void>;

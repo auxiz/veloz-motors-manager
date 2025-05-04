@@ -1,90 +1,79 @@
 
-import { useCallback } from 'react';
+import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
-import { ConnectionStatus } from '../../types';
+import { ConnectionStatus, ConnectionMetrics } from '../../types';
 
 export const useCheckConnectionStatus = (
   setConnectionStatus: (status: ConnectionStatus) => void,
   setQrCode: (qrCode: string | null) => void,
   setIsLoading: (isLoading: boolean) => void,
   setConnectionError: (error: string | null) => void,
-  setMetrics: (metrics: any) => void
+  setMetrics: (metrics: ConnectionMetrics) => void
 ) => {
-  const checkConnectionStatus = useCallback(async (): Promise<void> => {
+  const checkConnectionStatus = async (): Promise<void> => {
     try {
-      setIsLoading(true);
-      console.log('Checking WhatsApp connection status...');
-      
-      // First check the database for faster response
-      const { data: connectionData, error: connectionError } = await supabase
+      // First try to fetch connection data from the database
+      const { data: dbData, error: dbError } = await supabase
         .from('whatsapp_connection')
-        .select('is_connected, qr_code, last_connected_at, updated_at, reconnect_attempts, last_error, last_error_at')
-        .maybeSingle();
+        .select('*')
+        .limit(1)
+        .single();
       
-      if (connectionError) {
-        console.error('Error fetching connection data from DB:', connectionError);
-        // Continue to check with edge function
-      } else if (connectionData) {
-        console.log('Connection data from DB:', connectionData);
-        
-        // Update local state with DB data
-        setConnectionStatus(connectionData.is_connected ? 'connected' : 'disconnected');
-        
-        if (connectionData.qr_code && !connectionData.is_connected) {
-          console.log('QR code found in database');
-          setQrCode(connectionData.qr_code);
+      if (dbError) {
+        console.error('Error fetching connection data from DB:', dbError);
+        // Don't throw error here, try the edge function instead
+      } else {
+        // If we have DB data, use it
+        if (dbData) {
+          setConnectionStatus(dbData.is_connected ? 'connected' : 'disconnected');
+          setQrCode(dbData.qr_code);
+          setConnectionError(null);
+          console.log('Connection status from DB:', dbData.is_connected ? 'connected' : 'disconnected');
+          return;
         }
-        
-        // Update metrics with DB data
-        setMetrics(prev => ({
-          ...prev,
-          reconnectAttempts: connectionData.reconnect_attempts || 0,
-          lastError: connectionData.last_error,
-          lastErrorAt: connectionData.last_error_at
-        }));
       }
       
-      // Then check directly with the edge function for real-time status
-      const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: { action: 'status' },
-        headers: {
-          'Content-Type': 'application/json'
-        }
+      // If DB data is not available, try the edge function
+      const { data: edgeData, error: edgeError } = await supabase.functions.invoke('whatsapp-bot', {
+        body: { action: 'status' }
       });
       
-      if (error) {
-        console.error('Error checking status via function:', error);
-        setConnectionError(error.message);
+      if (edgeError) {
+        console.error('Error checking connection status:', edgeError);
+        setConnectionError(`Error checking status: ${edgeError.message}`);
+        // Don't change connection status here
         return;
       }
       
-      console.log('Status response from function:', data);
-      
-      // Update state based on response
-      setConnectionStatus(data.isConnected ? 'connected' : 'disconnected');
-      
-      // Update QR code if available
-      if (data.qrCode && !data.isConnected) {
-        setQrCode(data.qrCode);
-      } else if (data.isConnected) {
-        // Clear QR code if connected
-        setQrCode(null);
+      if (edgeData) {
+        setConnectionStatus(edgeData.isConnected ? 'connected' : 'disconnected');
+        
+        if (edgeData.qrCode) {
+          setQrCode(edgeData.qrCode);
+        }
+        
+        if (edgeData.lastActivity || edgeData.reconnectAttempts !== undefined || edgeData.messageQueueSize !== undefined) {
+          setMetrics({
+            lastActivity: edgeData.lastActivity,
+            reconnectAttempts: edgeData.reconnectAttempts || 0,
+            messageQueueSize: edgeData.messageQueueSize || 0
+          });
+        }
+        
+        setConnectionError(null);
+      } else {
+        // No data returned, assume disconnected
+        setConnectionStatus('disconnected');
+        setConnectionError('Could not determine connection status');
       }
-      
-      // Update metrics
-      setMetrics({
-        lastActivity: data.lastActivity,
-        reconnectAttempts: data.reconnectAttempts,
-        messageQueueSize: data.messageQueueSize
-      });
-      
     } catch (error: any) {
       console.error('Error checking connection status:', error);
-      setConnectionError(error.message || 'Erro ao verificar status');
+      setConnectionError(`Error checking status: ${error.message}`);
+      // Don't change connection status here
     } finally {
       setIsLoading(false);
     }
-  }, [setConnectionStatus, setQrCode, setIsLoading, setConnectionError, setMetrics]);
+  };
 
   return { checkConnectionStatus };
 };

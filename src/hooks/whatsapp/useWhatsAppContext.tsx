@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,7 +24,8 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     updateLead,
     setLeads,
     autoRefreshEnabled,
-    toggleAutoRefresh 
+    toggleAutoRefresh,
+    error: leadsError 
   } = useLeads(user?.id);
   
   const { 
@@ -50,7 +52,12 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
 
   // Set up real-time subscriptions
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      console.log('User not logged in, skipping subscriptions setup');
+      return;
+    }
+
+    console.log('Setting up subscriptions for user:', user.id);
 
     // Subscribe to leads table
     const leadsSubscription = supabase
@@ -108,18 +115,22 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       )
       .subscribe();
 
-    // Check connection status on mount
-    checkConnectionStatus();
+    // Only check connection status if user is logged in
+    if (user) {
+      console.log('Checking initial connection status');
+      checkConnectionStatus();
+    }
 
     // Cleanup subscriptions
     return () => {
+      console.log('Cleaning up subscriptions');
       leadsSubscription.unsubscribe();
       if (messagesSubscription) {
         messagesSubscription.unsubscribe();
       }
       connectionSubscription.unsubscribe();
     };
-  }, [user, selectedLead?.id]);
+  }, [user?.id, selectedLead?.id]);
 
   const selectLead = (lead: Lead | null) => {
     setSelectedLead(lead);
@@ -168,7 +179,8 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     updateLead,
     markMessagesAsRead,
     autoRefreshEnabled,
-    toggleAutoRefresh
+    toggleAutoRefresh,
+    error: leadsError
   };
 
   return (
