@@ -1,4 +1,3 @@
-
 import React, { useState, useRef, useEffect } from 'react';
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -84,6 +83,11 @@ const MessagesPanel: React.FC = () => {
     }
     
     return phone;
+  };
+  
+  const formatSourceName = (source: string | null) => {
+    if (!source) return 'WhatsApp';
+    return source.charAt(0).toUpperCase() + source.slice(1);
   };
   
   if (!selectedLead) return null;

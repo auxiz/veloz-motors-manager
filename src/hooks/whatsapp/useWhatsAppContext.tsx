@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +12,7 @@ export interface Lead {
   assigned_to: string | null;
   created_at: string;
   vehicle_interest: any | null;
+  lead_source: string | null; // Added missing property
 }
 
 export interface Message {
@@ -134,17 +134,9 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     try {
       setLoading(true);
       
-      let query = supabase
-        .from('leads')
-        .select('*')
-        .order('created_at', { ascending: false });
-      
-      // If user is not admin, only show leads assigned to them
-      if (user?.profile?.role !== 'administrator' && user?.id) {
-        query = query.eq('assigned_to', user.id);
-      }
-      
-      const { data, error } = await query;
+      // Use RPC function instead of direct table access
+      const { data, error } = await supabase
+        .rpc('get_leads', { current_user_id: user?.id || null });
       
       if (error) {
         throw error;
@@ -154,7 +146,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       
       // Update selected lead if it exists in the new data
       if (selectedLead) {
-        const updatedLead = data.find(lead => lead.id === selectedLead.id);
+        const updatedLead = data.find((lead: Lead) => lead.id === selectedLead.id);
         if (updatedLead) {
           setSelectedLead(updatedLead as Lead);
         }
@@ -170,11 +162,9 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
   const fetchMessages = async (leadId: string) => {
     try {
       setLoading(true);
+      // Use RPC function
       const { data, error } = await supabase
-        .from('messages')
-        .select('*')
-        .eq('lead_id', leadId)
-        .order('sent_at', { ascending: true });
+        .rpc('get_lead_messages', { p_lead_id: leadId });
         
       if (error) {
         throw error;

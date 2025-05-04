@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { UserProfile } from '@/types/auth';
@@ -44,16 +43,14 @@ const SalespeopleSettings: React.FC = () => {
         
         // Fetch categories
         const { data: categoriesData, error: categoriesError } = await supabase
-          .from('vehicle_categories')
-          .select('*');
+          .rpc('get_vehicle_categories'); // Using an RPC function instead of direct table access
           
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData as Category[]);
         
         // Fetch salesperson categories
         const { data: spCategoriesData, error: spCategoriesError } = await supabase
-          .from('salesperson_categories')
-          .select('*');
+          .rpc('get_salesperson_categories'); // Using an RPC function instead of direct table access
           
         if (spCategoriesError) throw spCategoriesError;
         setSalespeopleCategories(spCategoriesData as SalespersonCategory[]);
@@ -90,8 +87,10 @@ const SalespeopleSettings: React.FC = () => {
       if (isSelected) {
         // Add category
         const { error } = await supabase
-          .from('salesperson_categories')
-          .insert({ user_id: userId, category_id: categoryId });
+          .rpc('assign_salesperson_category', {
+            p_user_id: userId,
+            p_category_id: categoryId
+          });
           
         if (error) throw error;
         
@@ -104,10 +103,10 @@ const SalespeopleSettings: React.FC = () => {
       } else {
         // Remove category
         const { error } = await supabase
-          .from('salesperson_categories')
-          .delete()
-          .eq('user_id', userId)
-          .eq('category_id', categoryId);
+          .rpc('remove_salesperson_category', {
+            p_user_id: userId,
+            p_category_id: categoryId
+          });
           
         if (error) throw error;
         
