@@ -23,8 +23,8 @@ const ProfileSettings = () => {
       </CardHeader>
       <CardContent>
         <div className="flex flex-col md:flex-row gap-8 items-start">
-          <ProfileAvatar user={user} />
-          <ProfileTabs user={user} />
+          <ProfileAvatar user={user as AuthUser | null} />
+          <ProfileTabs user={user as AuthUser | null} />
         </div>
       </CardContent>
     </Card>

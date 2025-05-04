@@ -4,7 +4,7 @@ import { useUserData } from './useUserData';
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { UserProfile } from '@/types/auth';
+import { UserProfile, AuthUser } from '@/types/auth';
 
 export type { UserData } from './useUserData';
 // Re-export UserData as User for backward compatibility
@@ -38,16 +38,21 @@ export function useUsers() {
       return {
         id: '00000000-0000-0000-0000-000000000001',
         email: 'admin@example.com',
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: new Date().toISOString(),
         profile: {
           id: '00000000-0000-0000-0000-000000000001',
           first_name: 'Administrador',
           last_name: 'Sistema',
           role: 'administrator' as const,
+          status: 'approved' as const,
           avatar_url: null,
           updated_at: new Date().toISOString(),
           created_at: new Date().toISOString()
         } as UserProfile
-      };
+      } as AuthUser;
     }
     return auth.user;
   };
@@ -65,9 +70,10 @@ export function useUsers() {
         ...user,
         profile: {
           ...(user.profile || {}),
-          role: 'administrator' as const
+          role: 'administrator' as const,
+          status: 'approved' as const
         }
-      };
+      } as AuthUser;
     }
     return user;
   };
