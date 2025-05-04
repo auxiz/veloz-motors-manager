@@ -47,7 +47,7 @@ const ConsultaPlaca = () => {
 
   return (
     <AuthGuard>
-      <div className="space-y-8">
+      <div className="space-y-8 max-w-full">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Consulta por Placa</h1>
         </div>
@@ -58,12 +58,14 @@ const ConsultaPlaca = () => {
           </div>
         </Card>
         
-        {result && (
-          <ResultDisplay 
-            result={result}
-            onRegisterVehicle={handleRegisterVehicle}
-          />
-        )}
+        <div className="overflow-hidden">
+          {result && (
+            <ResultDisplay 
+              result={result}
+              onRegisterVehicle={handleRegisterVehicle}
+            />
+          )}
+        </div>
 
         <NewVehicleDialog 
           open={newVehicleDialogOpen}

@@ -34,7 +34,7 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
   };
 
   return (
-    <Card className="overflow-hidden bg-veloz-gray border-veloz-gray card-hover">
+    <Card className="overflow-hidden bg-veloz-gray border-veloz-gray card-hover h-full flex flex-col">
       <div className="h-48 overflow-hidden relative">
         {vehicle.photos && vehicle.photos.length > 0 ? (
           <img 
@@ -51,15 +51,15 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
           {getStatusBadge(vehicle.status)}
         </div>
       </div>
-      <CardContent className="p-4">
+      <CardContent className="p-4 flex flex-col flex-grow">
         <div className="flex justify-between items-start mb-2">
-          <div>
-            <h3 className="font-bold text-lg">
+          <div className="max-w-[70%]">
+            <h3 className="font-bold text-lg truncate">
               {vehicle.brand} {vehicle.model}
             </h3>
-            <p className="text-sm text-muted-foreground">{vehicle.version} • {vehicle.year}</p>
+            <p className="text-sm text-muted-foreground truncate">{vehicle.version} • {vehicle.year}</p>
           </div>
-          <p className="text-lg font-semibold text-veloz-yellow">
+          <p className="text-lg font-semibold text-veloz-yellow whitespace-nowrap">
             {formatCurrency(vehicle.sale_price)}
           </p>
         </div>
@@ -67,7 +67,7 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
         <div className="grid grid-cols-2 gap-2 text-sm mt-4">
           <div className="flex items-center">
             <span className="text-muted-foreground mr-1">Placa:</span>
-            <span>{vehicle.plate}</span>
+            <span className="truncate">{vehicle.plate}</span>
           </div>
           <div className="flex items-center">
             <span className="text-muted-foreground mr-1">Km:</span>
@@ -75,15 +75,15 @@ export const VehicleCard = ({ vehicle, onEditVehicle, onDeleteVehicle }: Vehicle
           </div>
           <div className="flex items-center">
             <span className="text-muted-foreground mr-1">Câmbio:</span>
-            <span>{vehicle.transmission}</span>
+            <span className="truncate">{vehicle.transmission}</span>
           </div>
           <div className="flex items-center">
             <span className="text-muted-foreground mr-1">Combustível:</span>
-            <span>{vehicle.fuel}</span>
+            <span className="truncate">{vehicle.fuel}</span>
           </div>
         </div>
         
-        <div className="border-t border-veloz-black mt-4 pt-4 flex justify-between">
+        <div className="border-t border-veloz-black mt-4 pt-4 flex justify-between mt-auto">
           <Button 
             variant="outline" 
             size="sm" 

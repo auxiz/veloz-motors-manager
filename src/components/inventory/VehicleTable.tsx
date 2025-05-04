@@ -53,75 +53,77 @@ export const VehicleTable = ({
   };
 
   return (
-    <Table>
-      <TableHeader>
-        <TableRow>
-          <TableHead 
-            className="cursor-pointer" 
-            onClick={() => onSort('brand')}
-          >
-            <div className="flex items-center">
-              Marca/Modelo {getSortIcon('brand')}
-            </div>
-          </TableHead>
-          <TableHead>Ano</TableHead>
-          <TableHead>Placa</TableHead>
-          <TableHead>Km</TableHead>
-          <TableHead 
-            className="cursor-pointer"
-            onClick={() => onSort('sale_price')}
-          >
-            <div className="flex items-center">
-              Valor {getSortIcon('sale_price')}
-            </div>
-          </TableHead>
-          <TableHead 
-            className="cursor-pointer"
-            onClick={() => onSort('status')}
-          >
-            <div className="flex items-center">
-              Status {getSortIcon('status')}
-            </div>
-          </TableHead>
-          <TableHead>Ações</TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {vehicles.map((vehicle) => (
-          <TableRow key={vehicle.id} className="hover:bg-veloz-black">
-            <TableCell className="font-medium">
-              {vehicle.brand} {vehicle.model} {vehicle.version}
-            </TableCell>
-            <TableCell>{vehicle.year}</TableCell>
-            <TableCell>{vehicle.plate}</TableCell>
-            <TableCell>{vehicle.mileage.toLocaleString()}</TableCell>
-            <TableCell>{formatCurrency(vehicle.sale_price)}</TableCell>
-            <TableCell>
-              {getStatusBadge(vehicle.status)}
-            </TableCell>
-            <TableCell>
-              <div className="flex space-x-2">
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 border-veloz-gray"
-                  onClick={() => onEditVehicle(vehicle)}
-                >
-                  <Edit size={16} />
-                </Button>
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  className="h-8 w-8 p-0 border-veloz-gray"
-                  onClick={() => onDeleteVehicle(vehicle)}
-                >
-                  <Trash size={16} />
-                </Button>
+    <div className="overflow-x-auto">
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead 
+              className="cursor-pointer w-[30%]" 
+              onClick={() => onSort('brand')}
+            >
+              <div className="flex items-center">
+                Marca/Modelo {getSortIcon('brand')}
               </div>
-            </TableCell>
+            </TableHead>
+            <TableHead className="w-[10%]">Ano</TableHead>
+            <TableHead className="w-[10%]">Placa</TableHead>
+            <TableHead className="w-[10%]">Km</TableHead>
+            <TableHead 
+              className="cursor-pointer w-[15%]"
+              onClick={() => onSort('sale_price')}
+            >
+              <div className="flex items-center">
+                Valor {getSortIcon('sale_price')}
+              </div>
+            </TableHead>
+            <TableHead 
+              className="cursor-pointer w-[15%]"
+              onClick={() => onSort('status')}
+            >
+              <div className="flex items-center">
+                Status {getSortIcon('status')}
+              </div>
+            </TableHead>
+            <TableHead className="w-[10%] text-right">Ações</TableHead>
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {vehicles.map((vehicle) => (
+            <TableRow key={vehicle.id} className="hover:bg-veloz-black">
+              <TableCell className="font-medium truncate max-w-[250px]">
+                <span className="block truncate">{vehicle.brand} {vehicle.model} {vehicle.version}</span>
+              </TableCell>
+              <TableCell>{vehicle.year}</TableCell>
+              <TableCell>{vehicle.plate}</TableCell>
+              <TableCell>{vehicle.mileage.toLocaleString()}</TableCell>
+              <TableCell>{formatCurrency(vehicle.sale_price)}</TableCell>
+              <TableCell>
+                {getStatusBadge(vehicle.status)}
+              </TableCell>
+              <TableCell>
+                <div className="flex justify-end space-x-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 border-veloz-gray"
+                    onClick={() => onEditVehicle(vehicle)}
+                  >
+                    <Edit size={16} />
+                  </Button>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 border-veloz-gray"
+                    onClick={() => onDeleteVehicle(vehicle)}
+                  >
+                    <Trash size={16} />
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
   );
 };

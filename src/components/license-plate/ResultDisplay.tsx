@@ -28,11 +28,11 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, onRegister
   const { veiculo } = result.result;
   
   return (
-    <Card className="bg-veloz-gray border-veloz-gray mt-4">
+    <Card className="bg-veloz-gray border-veloz-gray mt-4 overflow-hidden">
       <CardHeader>
-        <CardTitle className="text-xl flex justify-between items-center">
-          {veiculo.marca} {veiculo.modelo}
-          <Badge className="bg-veloz-yellow text-veloz-black">
+        <CardTitle className="text-xl flex flex-wrap justify-between items-center gap-2">
+          <span className="break-words">{veiculo.marca} {veiculo.modelo}</span>
+          <Badge className="bg-veloz-yellow text-veloz-black shrink-0">
             {veiculo.ano_fabricacao}/{veiculo.ano_modelo}
           </Badge>
         </CardTitle>
@@ -44,11 +44,11 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, onRegister
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <h3 className="text-sm text-muted-foreground">Chassis</h3>
-            <p className="text-lg">{veiculo.chassi || 'Não disponível'}</p>
+            <p className="text-lg break-all">{veiculo.chassi || 'Não disponível'}</p>
           </div>
           <div>
             <h3 className="text-sm text-muted-foreground">RENAVAM</h3>
-            <p className="text-lg">{veiculo.renavam || 'Não disponível'}</p>
+            <p className="text-lg break-all">{veiculo.renavam || 'Não disponível'}</p>
           </div>
           <div>
             <h3 className="text-sm text-muted-foreground">UF</h3>
@@ -56,7 +56,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, onRegister
           </div>
           <div>
             <h3 className="text-sm text-muted-foreground">Município</h3>
-            <p className="text-lg">{veiculo.municipio || 'Não disponível'}</p>
+            <p className="text-lg break-words">{veiculo.municipio || 'Não disponível'}</p>
           </div>
         </div>
         
@@ -77,7 +77,7 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, onRegister
           <div className="mt-6 border-t border-gray-700 pt-4">
             <div className="text-center">
               <p className="text-lg font-medium mb-3">Deseja cadastrar este veículo agora?</p>
-              <div className="flex justify-center gap-4">
+              <div className="flex flex-wrap justify-center gap-4">
                 <Button 
                   onClick={onRegisterVehicle}
                   className="bg-veloz-yellow hover:bg-yellow-500 text-veloz-black flex items-center gap-2"

@@ -58,7 +58,7 @@ export const PlateSearchDialog: React.FC<PlateSearchDialogProps> = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-veloz-gray border-veloz-gray">
+      <DialogContent className="bg-veloz-gray border-veloz-gray max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <DialogTitle>Consulta por Placa</DialogTitle>
           <DialogDescription>
@@ -66,7 +66,7 @@ export const PlateSearchDialog: React.FC<PlateSearchDialogProps> = ({
           </DialogDescription>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="space-y-4 overflow-y-auto p-1 flex-1">
           <LookupForm onResultFound={handleResultFound} />
           
           {result && (

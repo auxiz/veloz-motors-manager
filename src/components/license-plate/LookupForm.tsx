@@ -45,7 +45,7 @@ export const LookupForm: React.FC<LookupFormProps> = ({ onResultFound }) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4 w-full">
         <FormField
           control={form.control}
           name="plate"
@@ -58,7 +58,7 @@ export const LookupForm: React.FC<LookupFormProps> = ({ onResultFound }) => {
                   {...field} 
                   autoFocus
                   autoCapitalize="characters"
-                  className="uppercase"
+                  className="uppercase w-full"
                   maxLength={8}
                 />
               </FormControl>

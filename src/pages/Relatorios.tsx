@@ -23,48 +23,56 @@ const Relatorios = () => {
 
   return (
     <AuthGuard allowedRoles={['administrator', 'financial']}>
-      <div className="space-y-6 md:space-y-8">
+      <div className="space-y-6 md:space-y-8 max-w-full">
         <Card className="bg-veloz-gray border-veloz-gray">
           <CardHeader className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
               <CardTitle className="text-xl md:text-2xl font-bold mb-1">Relatórios</CardTitle>
               <p className="text-muted-foreground">Analise o desempenho do seu negócio com dados detalhados</p>
             </div>
-            <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            <div className="shrink-0">
+              <DateRangePicker dateRange={dateRange} onDateRangeChange={setDateRange} />
+            </div>
           </CardHeader>
         </Card>
 
-        <ScheduledReportsManager />
+        <div className="overflow-hidden">
+          <ScheduledReportsManager />
+        </div>
 
         <Card className="bg-veloz-gray border-veloz-gray">
           <CardHeader className="pb-2">
             <CardTitle className="text-xl">Relatórios Disponíveis</CardTitle>
           </CardHeader>
           <Separator className="bg-veloz-gray/50" />
-          <CardContent className="pt-6">
+          <CardContent className="pt-6 overflow-hidden">
             <Tabs defaultValue="sales" className="w-full">
-              <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full max-w-3xl mb-6">
-                <TabsTrigger value="sales">Vendas</TabsTrigger>
-                <TabsTrigger value="inventory">Estoque</TabsTrigger>
-                <TabsTrigger value="financial">Financeiro</TabsTrigger>
-                <TabsTrigger value="performance">Desempenho</TabsTrigger>
-              </TabsList>
+              <div className="overflow-x-auto mb-6">
+                <TabsList className="grid grid-cols-2 md:grid-cols-4 w-full max-w-3xl">
+                  <TabsTrigger value="sales">Vendas</TabsTrigger>
+                  <TabsTrigger value="inventory">Estoque</TabsTrigger>
+                  <TabsTrigger value="financial">Financeiro</TabsTrigger>
+                  <TabsTrigger value="performance">Desempenho</TabsTrigger>
+                </TabsList>
+              </div>
               
-              <TabsContent value="sales">
-                <SalesReports dateRange={dateRange} />
-              </TabsContent>
-              
-              <TabsContent value="inventory">
-                <InventoryReports dateRange={dateRange} />
-              </TabsContent>
-              
-              <TabsContent value="financial">
-                <FinancialReports dateRange={dateRange} />
-              </TabsContent>
-              
-              <TabsContent value="performance">
-                <SalesPerformanceReports dateRange={dateRange} />
-              </TabsContent>
+              <div className="overflow-hidden">
+                <TabsContent value="sales">
+                  <SalesReports dateRange={dateRange} />
+                </TabsContent>
+                
+                <TabsContent value="inventory">
+                  <InventoryReports dateRange={dateRange} />
+                </TabsContent>
+                
+                <TabsContent value="financial">
+                  <FinancialReports dateRange={dateRange} />
+                </TabsContent>
+                
+                <TabsContent value="performance">
+                  <SalesPerformanceReports dateRange={dateRange} />
+                </TabsContent>
+              </div>
             </Tabs>
           </CardContent>
         </Card>

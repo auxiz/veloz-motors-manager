@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -11,6 +12,7 @@ import { NewTransactionDialog } from '@/components/financial/NewTransactionDialo
 import { CashFlowChart } from '@/components/financial/CashFlowChart';
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import { Separator } from '@/components/ui/separator';
+
 const Financeiro = () => {
   const [newTransactionDialogOpen, setNewTransactionDialogOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('all');
@@ -21,10 +23,8 @@ const Financeiro = () => {
     status: '',
     search: ''
   });
-  const {
-    transactions,
-    isLoading
-  } = useTransactions();
+  
+  const { transactions, isLoading } = useTransactions();
 
   // Calculate summary statistics
   const summary = transactions.reduce((acc, transaction) => {
@@ -57,8 +57,10 @@ const Financeiro = () => {
     if (activeTab === 'expense') return 'expense';
     return undefined;
   };
-  return <AuthGuard allowedRoles={['administrator', 'financial']}>
-      <div className="space-y-6 md:space-y-8">
+  
+  return (
+    <AuthGuard allowedRoles={['administrator', 'financial']}>
+      <div className="space-y-6 md:space-y-8 max-w-full">
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
             <h1 className="text-2xl md:text-3xl font-bold mb-1 md:mb-2">Gestão Financeira</h1>
@@ -78,8 +80,8 @@ const Financeiro = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-veloz-yellow mr-2" />
-                <span className="text-2xl font-bold">{formatCurrency(summary.totalReceived)}</span>
+                <DollarSign className="h-5 w-5 text-veloz-yellow mr-2 shrink-0" />
+                <span className="text-2xl font-bold truncate">{formatCurrency(summary.totalReceived)}</span>
               </div>
             </CardContent>
           </Card>
@@ -90,8 +92,8 @@ const Financeiro = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <ArrowDown className="h-5 w-5 text-green-500 mr-2" />
-                <span className="text-2xl font-bold">{formatCurrency(summary.totalToReceive)}</span>
+                <ArrowDown className="h-5 w-5 text-green-500 mr-2 shrink-0" />
+                <span className="text-2xl font-bold truncate">{formatCurrency(summary.totalToReceive)}</span>
               </div>
             </CardContent>
           </Card>
@@ -102,8 +104,8 @@ const Financeiro = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <ArrowUp className="h-5 w-5 text-red-500 mr-2" />
-                <span className="text-2xl font-bold">{formatCurrency(summary.totalPaid)}</span>
+                <ArrowUp className="h-5 w-5 text-red-500 mr-2 shrink-0" />
+                <span className="text-2xl font-bold truncate">{formatCurrency(summary.totalPaid)}</span>
               </div>
             </CardContent>
           </Card>
@@ -114,8 +116,8 @@ const Financeiro = () => {
             </CardHeader>
             <CardContent>
               <div className="flex items-center">
-                <DollarSign className="h-5 w-5 text-red-500 mr-2" />
-                <span className="text-2xl font-bold">{formatCurrency(summary.totalPending)}</span>
+                <DollarSign className="h-5 w-5 text-red-500 mr-2 shrink-0" />
+                <span className="text-2xl font-bold truncate">{formatCurrency(summary.totalPending)}</span>
               </div>
             </CardContent>
           </Card>
@@ -124,26 +126,30 @@ const Financeiro = () => {
         {/* Cash Balance and Chart */}
         <div className="flex flex-col gap-6 md:gap-8">
           <Card className="bg-veloz-gray border-veloz-gray">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
               <CardTitle className="text-xl">Saldo de Caixa</CardTitle>
               <div className={`text-xl font-bold ${netBalance >= 0 ? 'text-green-500' : 'text-red-500'}`}>
                 {formatCurrency(netBalance)}
               </div>
             </CardHeader>
             <Separator className="bg-veloz-gray/50" />
-            <CardContent className="pt-6 pb-4 relative py-[150px]">
-              <CashFlowChart transactions={transactions} />
+            <CardContent className="p-0 sm:p-2 overflow-hidden">
+              <div className="w-full h-[300px] relative">
+                <CashFlowChart transactions={transactions} />
+              </div>
             </CardContent>
           </Card>
 
           {/* Transactions Section */}
           <Tabs defaultValue="all" value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="grid grid-cols-2 sm:grid-cols-4 max-w-md">
-              <TabsTrigger value="all">Todas</TabsTrigger>
-              <TabsTrigger value="income">Receitas</TabsTrigger>
-              <TabsTrigger value="expense">Despesas</TabsTrigger>
-              <TabsTrigger value="pending">Pendentes</TabsTrigger>
-            </TabsList>
+            <div className="overflow-x-auto">
+              <TabsList className="grid grid-cols-2 sm:grid-cols-4 max-w-md mb-6">
+                <TabsTrigger value="all">Todas</TabsTrigger>
+                <TabsTrigger value="income">Receitas</TabsTrigger>
+                <TabsTrigger value="expense">Despesas</TabsTrigger>
+                <TabsTrigger value="pending">Pendentes</TabsTrigger>
+              </TabsList>
+            </div>
             
             <Card className="bg-veloz-gray border-veloz-gray mt-6">
               <CardHeader>
@@ -159,8 +165,12 @@ const Financeiro = () => {
                   <div className="relative">
                     <TransactionsFilter onFilterChange={setFilters} />
                   </div>
-                  <div className="relative">
-                    <TransactionsList transactionType={getTransactionType()} status={activeTab === 'pending' ? 'pending' : undefined} filters={filters} />
+                  <div className="relative overflow-hidden">
+                    <TransactionsList 
+                      transactionType={getTransactionType()} 
+                      status={activeTab === 'pending' ? 'pending' : undefined} 
+                      filters={filters} 
+                    />
                   </div>
                 </div>
               </CardContent>
@@ -170,6 +180,8 @@ const Financeiro = () => {
         
         <NewTransactionDialog open={newTransactionDialogOpen} onOpenChange={setNewTransactionDialogOpen} />
       </div>
-    </AuthGuard>;
+    </AuthGuard>
+  );
 };
+
 export default Financeiro;

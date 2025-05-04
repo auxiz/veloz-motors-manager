@@ -92,82 +92,96 @@ export const TransactionsList: React.FC<TransactionsListProps> = ({ transactionT
   return (
     <TooltipProvider>
       <div className="overflow-x-auto relative z-10">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-1/4">Descrição</TableHead>
-              <TableHead className="w-1/6">Categoria</TableHead>
-              <TableHead className="w-1/6">Data</TableHead>
-              <TableHead className="text-right w-1/6">Valor</TableHead>
-              <TableHead className="w-1/6">Status</TableHead>
-              <TableHead className="text-right w-28">Ações</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filteredTransactions.map((transaction) => (
-              <TableRow key={transaction.id} className="group">
-                <TableCell className="font-medium truncate max-w-[200px]">{transaction.description}</TableCell>
-                <TableCell className="truncate max-w-[120px]">{transaction.category}</TableCell>
-                <TableCell>
-                  <span className={isPast(new Date(transaction.due_date)) && transaction.status === 'pending' ? 'text-red-500' : ''}>
-                    {format(new Date(transaction.due_date), 'dd/MM/yyyy', { locale: ptBR })}
-                  </span>
-                </TableCell>
-                <TableCell className={`text-right font-mono ${transaction.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
-                  {formatCurrency(transaction.amount)}
-                </TableCell>
-                <TableCell>
-                  <Badge variant="outline" className={`${
-                    transaction.status === 'paid' ? 'bg-green-700 hover:bg-green-800' : 'bg-amber-700 hover:bg-amber-800'
-                  }`}>
-                    {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right p-2">
-                  <div className="flex justify-end gap-1">
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-70 hover:opacity-100"
-                          onClick={() => setEditingTransaction(transaction.id)}
-                        >
-                          <Edit className="h-4 w-4" />
-                          <span className="sr-only">Editar</span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Editar</TooltipContent>
-                    </Tooltip>
-                    
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-8 w-8 opacity-70 hover:opacity-100"
-                          onClick={() => handleStatusToggle(transaction.id, transaction.status)}
-                        >
-                          {transaction.status === 'paid' ? (
-                            <XCircle className="h-4 w-4 text-amber-500" />
-                          ) : (
-                            <CheckCircle className="h-4 w-4 text-green-500" />
-                          )}
-                          <span className="sr-only">
-                            {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
-                          </span>
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
-                      </TooltipContent>
-                    </Tooltip>
-                  </div>
-                </TableCell>
+        <div className="w-full min-w-max">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[25%]">
+                  <div className="truncate">Descrição</div>
+                </TableHead>
+                <TableHead className="w-[15%]">
+                  <div className="truncate">Categoria</div>
+                </TableHead>
+                <TableHead className="w-[15%]">Data</TableHead>
+                <TableHead className="text-right w-[15%]">Valor</TableHead>
+                <TableHead className="w-[15%]">Status</TableHead>
+                <TableHead className="text-right w-[15%]">Ações</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {filteredTransactions.map((transaction) => (
+                <TableRow key={transaction.id} className="group">
+                  <TableCell>
+                    <div className="truncate max-w-[200px]" title={transaction.description}>
+                      {transaction.description}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <div className="truncate max-w-[120px]" title={transaction.category}>
+                      {transaction.category}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <span className={isPast(new Date(transaction.due_date)) && transaction.status === 'pending' ? 'text-red-500' : ''}>
+                      {format(new Date(transaction.due_date), 'dd/MM/yyyy', { locale: ptBR })}
+                    </span>
+                  </TableCell>
+                  <TableCell className={`text-right font-mono ${transaction.type === 'income' ? 'text-green-500' : 'text-red-500'}`}>
+                    {formatCurrency(transaction.amount)}
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant="outline" className={`${
+                      transaction.status === 'paid' ? 'bg-green-700 hover:bg-green-800' : 'bg-amber-700 hover:bg-amber-800'
+                    }`}>
+                      {transaction.status === 'paid' ? 'Pago' : 'Pendente'}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right p-2">
+                    <div className="flex justify-end gap-1">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-70 hover:opacity-100"
+                            onClick={() => setEditingTransaction(transaction.id)}
+                          >
+                            <Edit className="h-4 w-4" />
+                            <span className="sr-only">Editar</span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>Editar</TooltipContent>
+                      </Tooltip>
+                      
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 opacity-70 hover:opacity-100"
+                            onClick={() => handleStatusToggle(transaction.id, transaction.status)}
+                          >
+                            {transaction.status === 'paid' ? (
+                              <XCircle className="h-4 w-4 text-amber-500" />
+                            ) : (
+                              <CheckCircle className="h-4 w-4 text-green-500" />
+                            )}
+                            <span className="sr-only">
+                              {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
+                            </span>
+                          </Button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          {transaction.status === 'paid' ? 'Marcar como pendente' : 'Marcar como pago'}
+                        </TooltipContent>
+                      </Tooltip>
+                    </div>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </div>
       
       {editingTransaction && (
