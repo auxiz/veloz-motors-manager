@@ -39,9 +39,14 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
   const { 
     connectionStatus, 
     qrCode, 
+    isLoading: connectionLoading,
+    error: connectionError,
+    metrics,
     connectWhatsApp, 
-    disconnectWhatsApp, 
-    checkConnectionStatus 
+    disconnectWhatsApp,
+    reconnectWhatsApp,
+    checkConnectionStatus,
+    refreshQRCode
   } = useConnection();
 
   // Set up real-time subscriptions
@@ -88,11 +93,17 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
         (payload: any) => {
           console.log('Connection change received:', payload);
           const newData = payload.new;
-          if (newData?.is_connected !== undefined) {
-            const newStatus = newData.is_connected ? 'connected' : 'disconnected';
-            if (newStatus !== connectionStatus) {
-              checkConnectionStatus();
-            }
+          
+          // Check if the connection status has changed
+          if (newData && newData.is_connected !== undefined) {
+            console.log('Connection status changed in database:', newData.is_connected);
+            checkConnectionStatus();
+          }
+          
+          // Check if QR code has changed
+          if (newData && newData.qr_code !== undefined && newData.qr_code !== null) {
+            console.log('QR code updated in database');
+            checkConnectionStatus();
           }
         }
       )
@@ -135,7 +146,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   }, [leads]);
 
-  const loading = leadsLoading || messagesLoading;
+  const loading = leadsLoading || messagesLoading || connectionLoading;
 
   const value: WhatsAppContextType = {
     leads,
@@ -143,14 +154,18 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     selectedLead,
     connectionStatus,
     qrCode,
-    loading,
+    isLoading: loading,
+    connectionError,
+    metrics,
     selectLead,
     fetchLeads,
     fetchMessages,
     sendMessage,
     connectWhatsApp,
     disconnectWhatsApp,
+    reconnectWhatsApp,
     checkConnectionStatus,
+    refreshQRCode,
     updateLead,
     markMessagesAsRead,
     autoRefreshEnabled,

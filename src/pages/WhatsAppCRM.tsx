@@ -3,6 +3,7 @@ import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import WhatsAppConnection from '@/components/whatsapp/WhatsAppConnection';
+import WhatsAppMetrics from '@/components/whatsapp/WhatsAppMetrics';
 import LeadsList from '@/components/whatsapp/LeadsList';
 import MessagesPanel from '@/components/whatsapp/MessagesPanel';
 import SalespeopleSettings from '@/components/whatsapp/SalespeopleSettings';
@@ -29,6 +30,9 @@ const WhatsAppCRM = () => {
             <TabsTrigger value="connection" className="text-white">
               Conexão WhatsApp
             </TabsTrigger>
+            <TabsTrigger value="metrics" className="text-white">
+              Diagnósticos
+            </TabsTrigger>
             <TabsTrigger value="salespeople" className="text-white">
               Vendedores
             </TabsTrigger>
@@ -53,6 +57,10 @@ const WhatsAppCRM = () => {
           
           <TabsContent value="connection" className="p-4 mt-4 bg-veloz-black border border-veloz-gray rounded-md">
             <WhatsAppConnection />
+          </TabsContent>
+          
+          <TabsContent value="metrics" className="p-4 mt-4 bg-veloz-black border border-veloz-gray rounded-md">
+            <WhatsAppMetrics />
           </TabsContent>
           
           <TabsContent value="salespeople" className="p-4 mt-4 bg-veloz-black border border-veloz-gray rounded-md">

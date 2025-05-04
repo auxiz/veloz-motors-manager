@@ -37,20 +37,30 @@ export interface SalespersonCategory {
 
 export type ConnectionStatus = 'connected' | 'disconnected' | 'connecting' | 'unknown';
 
+export interface ConnectionMetrics {
+  lastActivity: number | null;
+  reconnectAttempts: number;
+  messageQueueSize: number;
+}
+
 export interface WhatsAppContextType {
   leads: Lead[];
   messages: Message[];
   selectedLead: Lead | null;
   connectionStatus: ConnectionStatus;
   qrCode: string | null;
-  loading: boolean;
+  isLoading: boolean;
+  connectionError?: string | null;
+  metrics?: ConnectionMetrics;
   selectLead: (lead: Lead | null) => void;
   fetchLeads: () => void;
   fetchMessages: (leadId: string) => void;
   sendMessage: (phoneNumber: string, message: string, leadId: string) => Promise<boolean>;
   connectWhatsApp: () => Promise<boolean>;
   disconnectWhatsApp: () => Promise<boolean>;
+  reconnectWhatsApp: () => Promise<boolean>;
   checkConnectionStatus: () => Promise<void>;
+  refreshQRCode: () => Promise<void>;
   updateLead: (leadId: string, updates: Partial<Lead>) => Promise<void>;
   markMessagesAsRead: (leadId: string) => Promise<void>;
   autoRefreshEnabled: boolean;

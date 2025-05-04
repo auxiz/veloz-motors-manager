@@ -30,8 +30,13 @@ export const useMessages = () => {
 
   const sendMessage = async (phoneNumber: string, message: string, leadId: string, userId: string | undefined): Promise<boolean> => {
     try {
+      setLoading(true);
+      
+      console.log(`Sending message to ${phoneNumber}: ${message}`);
+      
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: { phoneNumber, message, leadId },
+        body: { message, leadId },
+        params: { action: 'send_message', phoneNumber },
         headers: { 
           'Content-Type': 'application/json',
           'x-user-id': userId || ''
@@ -39,14 +44,30 @@ export const useMessages = () => {
       });
       
       if (error) {
-        throw error;
+        console.error('Error sending message:', error);
+        toast.error(`Falha ao enviar mensagem: ${error.message}`);
+        return false;
       }
       
-      return data.success;
-    } catch (error) {
+      if (!data.success) {
+        console.error('Failed to send message:', data.message);
+        toast.error(`Falha ao enviar mensagem: ${data.message}`);
+        return false;
+      }
+      
+      console.log('Message sent successfully');
+      toast.success('Mensagem enviada com sucesso');
+      
+      // Fetch the messages again to update the UI
+      await fetchMessages(leadId);
+      
+      return true;
+    } catch (error: any) {
       console.error('Error sending message:', error);
-      toast.error('Falha ao enviar mensagem');
+      toast.error(`Falha ao enviar mensagem: ${error.message || error}`);
       return false;
+    } finally {
+      setLoading(false);
     }
   };
 
