@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import UserManagement from '@/components/settings/UserManagement';
-import ProfileSettings from '@/components/settings/ProfileSettings';
+import ProfileSettings from '@/components/settings/profile';
 import SystemPreferences from '@/components/settings/SystemPreferences';
 import { useUsers } from '@/hooks/useUsers';
 import { Card, CardContent } from '@/components/ui/card';

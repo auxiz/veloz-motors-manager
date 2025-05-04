@@ -10,7 +10,7 @@ export function useProfiles() {
   
   // Custom handler for fetching profiles after actions
   const handleProfilesRefresh = useCallback(async () => {
-    return await profilesList.fetchAllProfiles();
+    await profilesList.fetchAllProfiles();
   }, []);
   
   // Individual hooks
