@@ -1,3 +1,4 @@
+
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { supabase } from '@/integrations/supabase/client';
@@ -12,7 +13,7 @@ export interface Lead {
   assigned_to: string | null;
   created_at: string;
   vehicle_interest: any | null;
-  lead_source: string | null; // Added missing property
+  lead_source: string | null;
 }
 
 export interface Message {
@@ -24,6 +25,19 @@ export interface Message {
   sent_at: string;
   is_read: boolean;
   media_url: string | null;
+}
+
+interface Category {
+  id: string;
+  name: string;
+  description: string | null;
+}
+
+interface SalespersonCategory {
+  id: string;
+  user_id: string;
+  category_id: string;
+  assigned_at: string;
 }
 
 interface WhatsAppContextType {
@@ -146,14 +160,14 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       
       // Update selected lead if it exists in the new data
       if (selectedLead) {
-        const updatedLead = data.find((lead: Lead) => lead.id === selectedLead.id);
+        const updatedLead = (data as Lead[]).find((lead: Lead) => lead.id === selectedLead.id);
         if (updatedLead) {
-          setSelectedLead(updatedLead as Lead);
+          setSelectedLead(updatedLead);
         }
       }
     } catch (error) {
       console.error('Error fetching leads:', error);
-      toast.error('Failed to load leads');
+      toast.error('Falha ao carregar leads');
     } finally {
       setLoading(false);
     }
@@ -173,7 +187,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       setMessages(data as Message[]);
     } catch (error) {
       console.error('Error fetching messages:', error);
-      toast.error('Failed to load messages');
+      toast.error('Falha ao carregar mensagens');
     } finally {
       setLoading(false);
     }
@@ -182,13 +196,11 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
   const sendMessage = async (phoneNumber: string, message: string, leadId: string): Promise<boolean> => {
     try {
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        method: 'POST',
         body: { phoneNumber, message, leadId },
         headers: { 
           'Content-Type': 'application/json',
           'x-user-id': user?.id || ''
-        },
-        path: '/send'
+        }
       });
       
       if (error) {
@@ -198,7 +210,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       return data.success;
     } catch (error) {
       console.error('Error sending message:', error);
-      toast.error('Failed to send message');
+      toast.error('Falha ao enviar mensagem');
       return false;
     }
   };
@@ -208,9 +220,10 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       setConnectionStatus('connecting');
       
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        method: 'POST',
-        body: {},
-        path: '/connect'
+        body: { action: 'connect' },
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
       if (error) {
@@ -224,7 +237,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       return true;
     } catch (error) {
       console.error('Error connecting to WhatsApp:', error);
-      toast.error('Failed to connect to WhatsApp');
+      toast.error('Falha ao conectar ao WhatsApp');
       setConnectionStatus('disconnected');
       return false;
     }
@@ -233,9 +246,10 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
   const disconnectWhatsApp = async (): Promise<boolean> => {
     try {
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        method: 'POST',
-        body: {},
-        path: '/disconnect'
+        body: { action: 'disconnect' },
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
       if (error) {
@@ -248,7 +262,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       return true;
     } catch (error) {
       console.error('Error disconnecting from WhatsApp:', error);
-      toast.error('Failed to disconnect from WhatsApp');
+      toast.error('Falha ao desconectar do WhatsApp');
       return false;
     }
   };
@@ -274,8 +288,10 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
       
       // Then check the edge function
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        method: 'GET',
-        path: '/status'
+        body: { action: 'status' },
+        headers: {
+          'Content-Type': 'application/json'
+        }
       });
       
       if (error) {
@@ -300,11 +316,11 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
         throw error;
       }
       
-      toast.success('Lead updated successfully');
+      toast.success('Lead atualizado com sucesso');
       fetchLeads();
     } catch (error) {
       console.error('Error updating lead:', error);
-      toast.error('Failed to update lead');
+      toast.error('Falha ao atualizar lead');
     }
   };
 

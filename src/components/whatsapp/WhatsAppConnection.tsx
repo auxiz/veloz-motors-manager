@@ -35,13 +35,13 @@ const WhatsAppConnection: React.FC = () => {
             ) : (
               <WifiOff className="text-red-500" />
             )}
-            WhatsApp Connection Status
+            Status da Conexão WhatsApp
           </CardTitle>
           <CardDescription className="text-gray-400">
-            {connectionStatus === 'connected' && 'WhatsApp is connected and ready to receive messages.'}
-            {connectionStatus === 'disconnected' && 'WhatsApp is not connected. Connect to start receiving messages.'}
-            {connectionStatus === 'connecting' && 'Connecting to WhatsApp...'}
-            {connectionStatus === 'unknown' && 'Checking connection status...'}
+            {connectionStatus === 'connected' && 'WhatsApp está conectado e pronto para receber mensagens.'}
+            {connectionStatus === 'disconnected' && 'WhatsApp não está conectado. Conecte para começar a receber mensagens.'}
+            {connectionStatus === 'connecting' && 'Conectando ao WhatsApp...'}
+            {connectionStatus === 'unknown' && 'Verificando status da conexão...'}
           </CardDescription>
         </CardHeader>
         
@@ -54,24 +54,24 @@ const WhatsAppConnection: React.FC = () => {
                 'bg-red-500'
               }`}></span>
               <span>
-                {connectionStatus === 'connected' ? 'Connected' : 
-                 connectionStatus === 'connecting' ? 'Connecting...' :
-                 'Disconnected'}
+                {connectionStatus === 'connected' ? 'Conectado' : 
+                 connectionStatus === 'connecting' ? 'Conectando...' :
+                 'Desconectado'}
               </span>
             </div>
             
             {connectionStatus === 'connecting' && qrCode && (
               <div className="my-4">
-                <p className="text-center mb-2">Scan this QR code with WhatsApp on your phone</p>
+                <p className="text-center mb-2">Escaneie este QR code com WhatsApp no seu celular</p>
                 <img src={qrCode} alt="WhatsApp QR Code" className="mx-auto max-w-xs" />
               </div>
             )}
             
             {!isAdmin && (
               <Alert className="bg-yellow-900 border-yellow-800 text-white mb-4">
-                <AlertTitle>Administrator Access Required</AlertTitle>
+                <AlertTitle>Acesso de Administrador Necessário</AlertTitle>
                 <AlertDescription>
-                  Only administrators can connect or disconnect WhatsApp. Contact your administrator for assistance.
+                  Apenas administradores podem conectar ou desconectar o WhatsApp. Contate seu administrador para assistência.
                 </AlertDescription>
               </Alert>
             )}
@@ -89,10 +89,10 @@ const WhatsAppConnection: React.FC = () => {
               {connectionStatus === 'connecting' ? (
                 <>
                   <Loader className="mr-2 h-4 w-4 animate-spin" />
-                  Connecting...
+                  Conectando...
                 </>
               ) : (
-                'Connect WhatsApp'
+                'Conectar WhatsApp'
               )}
             </Button>
           )}
@@ -102,7 +102,7 @@ const WhatsAppConnection: React.FC = () => {
               variant="destructive" 
               onClick={handleDisconnect}
             >
-              Disconnect WhatsApp
+              Desconectar WhatsApp
             </Button>
           )}
           
@@ -112,33 +112,33 @@ const WhatsAppConnection: React.FC = () => {
             onClick={handleRefresh}
           >
             <RefreshCw className="mr-2 h-4 w-4" />
-            Refresh Status
+            Atualizar Status
           </Button>
         </CardFooter>
       </Card>
       
       <div className="text-white space-y-4">
-        <h2 className="text-xl font-semibold">How to Connect WhatsApp</h2>
+        <h2 className="text-xl font-semibold">Como Conectar o WhatsApp</h2>
         
         <div className="space-y-2">
-          <p>1. Click the "Connect WhatsApp" button above.</p>
-          <p>2. Wait for the QR code to appear.</p>
-          <p>3. Open WhatsApp on your phone and scan the QR code:</p>
+          <p>1. Clique no botão "Conectar WhatsApp" acima.</p>
+          <p>2. Aguarde o QR code aparecer.</p>
+          <p>3. Abra o WhatsApp no seu celular e escaneie o QR code:</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>Android: Settings &gt; Linked Devices &gt; Link a Device</li>
-            <li>iPhone: Settings &gt; Linked Devices &gt; Link a Device</li>
+            <li>Android: Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho</li>
+            <li>iPhone: Configurações &gt; Aparelhos conectados &gt; Conectar um aparelho</li>
           </ul>
-          <p>4. Once connected, you will start receiving WhatsApp messages in the CRM.</p>
-          <p>5. The WhatsApp connection will remain active as long as the server is running.</p>
+          <p>4. Uma vez conectado, você começará a receber mensagens do WhatsApp no CRM.</p>
+          <p>5. A conexão do WhatsApp permanecerá ativa enquanto o servidor estiver em execução.</p>
         </div>
         
         <div className="bg-amber-900 border border-amber-800 p-4 rounded-md">
-          <h3 className="font-semibold text-amber-300">Important Notes:</h3>
+          <h3 className="font-semibold text-amber-300">Notas Importantes:</h3>
           <ul className="list-disc pl-6 mt-2 space-y-1 text-white">
-            <li>This is an unofficial WhatsApp integration using browser automation.</li>
-            <li>WhatsApp does not officially support this type of integration.</li>
-            <li>The connection may need to be refreshed occasionally.</li>
-            <li>For production use, consider official WhatsApp Business API.</li>
+            <li>Esta é uma integração não oficial do WhatsApp usando automação de navegador.</li>
+            <li>O WhatsApp não oferece suporte oficial a este tipo de integração.</li>
+            <li>A conexão pode precisar ser atualizada ocasionalmente.</li>
+            <li>Para uso em produção, considere a API oficial do WhatsApp Business.</li>
           </ul>
         </div>
       </div>

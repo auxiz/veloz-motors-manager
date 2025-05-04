@@ -15,13 +15,13 @@ const LeadsList: React.FC = () => {
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'new': return 'bg-blue-500';
-      case 'contacted': return 'bg-yellow-500';
-      case 'interested': return 'bg-green-500';
+      case 'novo': return 'bg-blue-500';
+      case 'contatado': return 'bg-yellow-500';
+      case 'interessado': return 'bg-green-500';
       case 'test_drive': return 'bg-purple-500';
-      case 'negotiating': return 'bg-orange-500';
-      case 'converted': return 'bg-emerald-500';
-      case 'lost': return 'bg-red-500';
+      case 'negociando': return 'bg-orange-500';
+      case 'convertido': return 'bg-emerald-500';
+      case 'perdido': return 'bg-red-500';
       default: return 'bg-gray-500';
     }
   };
@@ -62,6 +62,20 @@ const LeadsList: React.FC = () => {
     selectLead(lead);
   };
   
+  // Translate status for UI display
+  const translateStatus = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'novo': 'Novo',
+      'contatado': 'Contatado',
+      'interessado': 'Interessado',
+      'test_drive': 'Test Drive',
+      'negociando': 'Negociando',
+      'convertido': 'Convertido',
+      'perdido': 'Perdido'
+    };
+    return statusMap[status] || status.charAt(0).toUpperCase() + status.slice(1);
+  };
+  
   return (
     <Card className="h-full bg-veloz-gray border-veloz-gray text-white">
       <CardHeader className="pb-2">
@@ -74,7 +88,7 @@ const LeadsList: React.FC = () => {
           <div className="relative">
             <Search className="absolute left-2 top-2.5 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Search leads..."
+              placeholder="Buscar leads..."
               className="pl-8 bg-veloz-black border-veloz-black text-white"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
@@ -83,17 +97,17 @@ const LeadsList: React.FC = () => {
           
           <Select value={statusFilter} onValueChange={setStatusFilter}>
             <SelectTrigger className="bg-veloz-black border-veloz-black text-white">
-              <SelectValue placeholder="Filter by status" />
+              <SelectValue placeholder="Filtrar por status" />
             </SelectTrigger>
             <SelectContent className="bg-veloz-black text-white">
-              <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="new">New</SelectItem>
-              <SelectItem value="contacted">Contacted</SelectItem>
-              <SelectItem value="interested">Interested</SelectItem>
+              <SelectItem value="all">Todos os Status</SelectItem>
+              <SelectItem value="novo">Novo</SelectItem>
+              <SelectItem value="contatado">Contatado</SelectItem>
+              <SelectItem value="interessado">Interessado</SelectItem>
               <SelectItem value="test_drive">Test Drive</SelectItem>
-              <SelectItem value="negotiating">Negotiating</SelectItem>
-              <SelectItem value="converted">Converted</SelectItem>
-              <SelectItem value="lost">Lost</SelectItem>
+              <SelectItem value="negociando">Negociando</SelectItem>
+              <SelectItem value="convertido">Convertido</SelectItem>
+              <SelectItem value="perdido">Perdido</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -107,8 +121,8 @@ const LeadsList: React.FC = () => {
         ) : filteredLeads.length === 0 ? (
           <div className="text-center py-8 text-gray-400">
             {searchTerm || statusFilter !== 'all' ? 
-              'No leads match your search' : 
-              'No leads available'}
+              'Nenhum lead corresponde à sua busca' : 
+              'Nenhum lead disponível'}
           </div>
         ) : (
           <div className="space-y-2">
@@ -129,16 +143,16 @@ const LeadsList: React.FC = () => {
                       {lead.name || formatPhone(lead.phone_number)}
                     </div>
                     <Badge className={`${getStatusColor(lead.status)} text-xs`}>
-                      {lead.status.charAt(0).toUpperCase() + lead.status.slice(1)}
+                      {translateStatus(lead.status)}
                     </Badge>
                   </div>
                   
                   <div className="text-sm text-gray-400 truncate">
-                    {lead.name ? formatPhone(lead.phone_number) : lead.first_message?.substring(0, 30) || 'No message'}
+                    {lead.name ? formatPhone(lead.phone_number) : lead.first_message?.substring(0, 30) || 'Sem mensagem'}
                   </div>
                   
                   <div className="text-xs text-gray-500 mt-1">
-                    {new Date(lead.created_at).toLocaleDateString()}
+                    {new Date(lead.created_at).toLocaleDateString('pt-BR')}
                   </div>
                 </div>
               </Button>

@@ -10,12 +10,14 @@ import { useUsers } from '@/hooks/useUsers';
 interface Category {
   id: string;
   name: string;
-  description: string;
+  description: string | null;
 }
 
 interface SalespersonCategory {
+  id: string;
   user_id: string;
   category_id: string;
+  assigned_at: string;
 }
 
 const SalespeopleSettings: React.FC = () => {
@@ -41,23 +43,25 @@ const SalespeopleSettings: React.FC = () => {
         if (profilesError) throw profilesError;
         setSalespeople(profilesData as UserProfile[]);
         
-        // Fetch categories
+        // Fetch categories using the RPC function
         const { data: categoriesData, error: categoriesError } = await supabase
-          .rpc('get_vehicle_categories'); // Using an RPC function instead of direct table access
+          .from('vehicle_categories')
+          .select('*');
           
         if (categoriesError) throw categoriesError;
         setCategories(categoriesData as Category[]);
         
-        // Fetch salesperson categories
+        // Fetch salesperson categories using the RPC function
         const { data: spCategoriesData, error: spCategoriesError } = await supabase
-          .rpc('get_salesperson_categories'); // Using an RPC function instead of direct table access
+          .from('salesperson_categories')
+          .select('*');
           
         if (spCategoriesError) throw spCategoriesError;
         setSalespeopleCategories(spCategoriesData as SalespersonCategory[]);
         
       } catch (error) {
         console.error('Error fetching data:', error);
-        toast.error('Failed to load data');
+        toast.error('Falha ao carregar dados');
       } finally {
         setLoading(false);
       }
@@ -68,7 +72,7 @@ const SalespeopleSettings: React.FC = () => {
   
   const getCategoryName = (categoryId: string): string => {
     const category = categories.find(c => c.id === categoryId);
-    return category?.description || '';
+    return category?.description || category?.name || '';
   };
   
   const getSalespersonCategories = (userId: string): string[] => {
@@ -79,14 +83,14 @@ const SalespeopleSettings: React.FC = () => {
   
   const handleCategoryChange = async (userId: string, categoryId: string, isSelected: boolean) => {
     if (!isAdmin) {
-      toast.error('Only administrators can change salesperson categories');
+      toast.error('Apenas administradores podem alterar categorias de vendedores');
       return;
     }
     
     try {
       if (isSelected) {
-        // Add category
-        const { error } = await supabase
+        // Add category using RPC function
+        const { data, error } = await supabase
           .rpc('assign_salesperson_category', {
             p_user_id: userId,
             p_category_id: categoryId
@@ -94,14 +98,20 @@ const SalespeopleSettings: React.FC = () => {
           
         if (error) throw error;
         
+        // Update local state
         setSalespeopleCategories([
           ...salespeopleCategories,
-          { user_id: userId, category_id: categoryId }
+          { 
+            id: data || "", 
+            user_id: userId, 
+            category_id: categoryId,
+            assigned_at: new Date().toISOString()
+          }
         ]);
         
-        toast.success('Category assigned successfully');
+        toast.success('Categoria atribuída com sucesso');
       } else {
-        // Remove category
+        // Remove category using RPC function
         const { error } = await supabase
           .rpc('remove_salesperson_category', {
             p_user_id: userId,
@@ -110,32 +120,33 @@ const SalespeopleSettings: React.FC = () => {
           
         if (error) throw error;
         
+        // Update local state
         setSalespeopleCategories(
           salespeopleCategories.filter(
             sc => !(sc.user_id === userId && sc.category_id === categoryId)
           )
         );
         
-        toast.success('Category removed successfully');
+        toast.success('Categoria removida com sucesso');
       }
     } catch (error) {
       console.error('Error updating salesperson category:', error);
-      toast.error('Failed to update category');
+      toast.error('Falha ao atualizar categoria');
     }
   };
   
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-veloz-white">Salespeople Settings</h2>
+        <h2 className="text-2xl font-bold text-veloz-white">Configurações de Vendedores</h2>
       </div>
       
       {!isAdmin && (
         <Card className="bg-yellow-900 border-yellow-800 text-white">
           <CardHeader className="pb-2">
-            <CardTitle>Administrator Access Required</CardTitle>
+            <CardTitle>Acesso de Administrador Necessário</CardTitle>
             <CardDescription className="text-gray-300">
-              Only administrators can manage salesperson settings.
+              Apenas administradores podem gerenciar configurações de vendedores.
             </CardDescription>
           </CardHeader>
         </Card>
@@ -143,9 +154,9 @@ const SalespeopleSettings: React.FC = () => {
       
       <Card className="bg-veloz-gray border-veloz-gray text-white">
         <CardHeader>
-          <CardTitle>Category Assignments</CardTitle>
+          <CardTitle>Atribuições de Categorias</CardTitle>
           <CardDescription className="text-gray-300">
-            Assign salespeople to vehicle categories to manage lead distribution.
+            Atribua vendedores às categorias de veículos para gerenciar a distribuição de leads.
           </CardDescription>
         </CardHeader>
         
@@ -156,7 +167,7 @@ const SalespeopleSettings: React.FC = () => {
             </div>
           ) : salespeople.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
-              No salespeople available
+              Nenhum vendedor disponível
             </div>
           ) : (
             <div className="space-y-6">
@@ -180,7 +191,7 @@ const SalespeopleSettings: React.FC = () => {
                       ))}
                       
                       {getSalespersonCategories(salesperson.id).length === 0 && (
-                        <div className="text-sm text-gray-400">No categories assigned</div>
+                        <div className="text-sm text-gray-400">Nenhuma categoria atribuída</div>
                       )}
                     </div>
                   </div>
@@ -204,7 +215,7 @@ const SalespeopleSettings: React.FC = () => {
                           onClick={() => handleCategoryChange(salesperson.id, category.id, !isSelected)}
                           disabled={!isAdmin}
                         >
-                          {isSelected ? '✓ ' : ''}{category.description}
+                          {isSelected ? '✓ ' : ''}{category.description || category.name}
                         </Button>
                       );
                     })}

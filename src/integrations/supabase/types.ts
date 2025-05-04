@@ -143,6 +143,118 @@ export type Database = {
         }
         Relationships: []
       }
+      lead_assignments: {
+        Row: {
+          assigned_at: string | null
+          assigned_by: string | null
+          assigned_to: string | null
+          id: string
+          lead_id: string | null
+          notes: string | null
+        }
+        Insert: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_to?: string | null
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+        }
+        Update: {
+          assigned_at?: string | null
+          assigned_by?: string | null
+          assigned_to?: string | null
+          id?: string
+          lead_id?: string | null
+          notes?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "lead_assignments_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      leads: {
+        Row: {
+          assigned_to: string | null
+          created_at: string | null
+          first_message: string | null
+          id: string
+          lead_source: string | null
+          name: string | null
+          phone_number: string
+          status: string
+          vehicle_interest: Json | null
+        }
+        Insert: {
+          assigned_to?: string | null
+          created_at?: string | null
+          first_message?: string | null
+          id?: string
+          lead_source?: string | null
+          name?: string | null
+          phone_number: string
+          status?: string
+          vehicle_interest?: Json | null
+        }
+        Update: {
+          assigned_to?: string | null
+          created_at?: string | null
+          first_message?: string | null
+          id?: string
+          lead_source?: string | null
+          name?: string | null
+          phone_number?: string
+          status?: string
+          vehicle_interest?: Json | null
+        }
+        Relationships: []
+      }
+      messages: {
+        Row: {
+          direction: string
+          id: string
+          is_read: boolean | null
+          lead_id: string | null
+          media_url: string | null
+          message_text: string
+          sent_at: string | null
+          sent_by: string | null
+        }
+        Insert: {
+          direction: string
+          id?: string
+          is_read?: boolean | null
+          lead_id?: string | null
+          media_url?: string | null
+          message_text: string
+          sent_at?: string | null
+          sent_by?: string | null
+        }
+        Update: {
+          direction?: string
+          id?: string
+          is_read?: boolean | null
+          lead_id?: string | null
+          media_url?: string | null
+          message_text?: string
+          sent_at?: string | null
+          sent_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_lead_id_fkey"
+            columns: ["lead_id"]
+            isOneToOne: false
+            referencedRelation: "leads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       notification_settings: {
         Row: {
           created_at: string | null
@@ -265,6 +377,35 @@ export type Database = {
           },
         ]
       }
+      salesperson_categories: {
+        Row: {
+          assigned_at: string | null
+          category_id: string | null
+          id: string
+          user_id: string
+        }
+        Insert: {
+          assigned_at?: string | null
+          category_id?: string | null
+          id?: string
+          user_id: string
+        }
+        Update: {
+          assigned_at?: string | null
+          category_id?: string | null
+          id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "salesperson_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "vehicle_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       scheduled_reports: {
         Row: {
           created_at: string | null
@@ -348,6 +489,24 @@ export type Database = {
           id?: string
           role?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      vehicle_categories: {
+        Row: {
+          description: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          description?: string | null
+          id?: string
+          name: string
+        }
+        Update: {
+          description?: string | null
+          id?: string
+          name?: string
         }
         Relationships: []
       }
@@ -449,11 +608,42 @@ export type Database = {
         }
         Relationships: []
       }
+      whatsapp_connection: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_connected: boolean | null
+          last_connected_at: string | null
+          qr_code: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_connected_at?: string | null
+          qr_code?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          last_connected_at?: string | null
+          qr_code?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      assign_salesperson_category: {
+        Args: { p_user_id: string; p_category_id: string }
+        Returns: string
+      }
       generate_dummy_customer: {
         Args: Record<PropertyKey, never>
         Returns: string
@@ -470,8 +660,56 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      get_lead_messages: {
+        Args: { p_lead_id: string }
+        Returns: {
+          direction: string
+          id: string
+          is_read: boolean | null
+          lead_id: string | null
+          media_url: string | null
+          message_text: string
+          sent_at: string | null
+          sent_by: string | null
+        }[]
+      }
+      get_leads: {
+        Args: { current_user_id: string }
+        Returns: {
+          assigned_to: string | null
+          created_at: string | null
+          first_message: string | null
+          id: string
+          lead_source: string | null
+          name: string | null
+          phone_number: string
+          status: string
+          vehicle_interest: Json | null
+        }[]
+      }
+      get_salesperson_categories: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          assigned_at: string | null
+          category_id: string | null
+          id: string
+          user_id: string
+        }[]
+      }
+      get_vehicle_categories: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          description: string | null
+          id: string
+          name: string
+        }[]
+      }
       investor_has_vehicle_access: {
         Args: { user_id: string; vehicle_id: string }
+        Returns: boolean
+      }
+      remove_salesperson_category: {
+        Args: { p_user_id: string; p_category_id: string }
         Returns: boolean
       }
     }

@@ -49,3 +49,5 @@ verify_jwt = true
 verify_jwt = true
 [functions.get_lead_messages]
 verify_jwt = true
+[functions.whatsapp-bot]
+verify_jwt = true

@@ -1,10 +1,10 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Send, User, Phone, Tag, Calendar, MoreHorizontal } from 'lucide-react';
-import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { toast } from 'sonner';
@@ -38,9 +38,9 @@ const MessagesPanel: React.FC = () => {
     if (success) {
       setNewMessage('');
       
-      // If this is the first outgoing message to a 'new' lead, update status to 'contacted'
-      if (selectedLead.status === 'new') {
-        await updateLead(selectedLead.id, { status: 'contacted' });
+      // If this is the first outgoing message to a 'novo' lead, update status to 'contatado'
+      if (selectedLead.status === 'novo') {
+        await updateLead(selectedLead.id, { status: 'contatado' });
       }
     }
     
@@ -52,7 +52,7 @@ const MessagesPanel: React.FC = () => {
     
     try {
       await updateLead(selectedLead.id, { status });
-      toast.success(`Lead status updated to ${status}`);
+      toast.success(`Status do lead atualizado para ${translateStatus(status)}`);
     } catch (error) {
       console.error('Error updating lead status:', error);
     }
@@ -66,7 +66,7 @@ const MessagesPanel: React.FC = () => {
   };
   
   const formatTime = (dateString: string) => {
-    return new Date(dateString).toLocaleTimeString([], { 
+    return new Date(dateString).toLocaleTimeString('pt-BR', { 
       hour: '2-digit', 
       minute: '2-digit'
     });
@@ -75,7 +75,7 @@ const MessagesPanel: React.FC = () => {
   const formatPhone = (phone: string) => {
     if (!phone) return '';
     
-    // Try to format as Brazilian phone: (XX) XXXXX-XXXX
+    // Format as Brazilian phone: (XX) XXXXX-XXXX
     const digits = phone.replace(/\D/g, '');
     const match = digits.match(/^(\d{2})(\d{4,5})(\d{4})$/);
     if (match) {
@@ -87,7 +87,31 @@ const MessagesPanel: React.FC = () => {
   
   const formatSourceName = (source: string | null) => {
     if (!source) return 'WhatsApp';
-    return source.charAt(0).toUpperCase() + source.slice(1);
+    
+    const sourceMappings: Record<string, string> = {
+      'whatsapp': 'WhatsApp',
+      'website': 'Site',
+      'facebook': 'Facebook',
+      'instagram': 'Instagram',
+      'referral': 'Indicação',
+      'walkIn': 'Visita presencial',
+      'phone': 'Telefone'
+    };
+    
+    return sourceMappings[source] || source.charAt(0).toUpperCase() + source.slice(1);
+  };
+  
+  const translateStatus = (status: string) => {
+    const statusMap: Record<string, string> = {
+      'novo': 'Novo',
+      'contatado': 'Contatado',
+      'interessado': 'Interessado',
+      'test_drive': 'Test Drive',
+      'negociando': 'Negociando',
+      'convertido': 'Convertido',
+      'perdido': 'Perdido'
+    };
+    return statusMap[status] || status.charAt(0).toUpperCase() + status.slice(1);
   };
   
   if (!selectedLead) return null;
@@ -103,7 +127,7 @@ const MessagesPanel: React.FC = () => {
             
             <div>
               <div className="font-medium">
-                {selectedLead.name || 'Unknown Contact'}
+                {selectedLead.name || 'Contato Desconhecido'}
               </div>
               <div className="text-sm text-gray-400 flex items-center">
                 <Phone className="h-3 w-3 mr-1" />
@@ -121,13 +145,13 @@ const MessagesPanel: React.FC = () => {
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
               <SelectContent className="bg-veloz-black text-white">
-                <SelectItem value="new">New</SelectItem>
-                <SelectItem value="contacted">Contacted</SelectItem>
-                <SelectItem value="interested">Interested</SelectItem>
+                <SelectItem value="novo">Novo</SelectItem>
+                <SelectItem value="contatado">Contatado</SelectItem>
+                <SelectItem value="interessado">Interessado</SelectItem>
                 <SelectItem value="test_drive">Test Drive</SelectItem>
-                <SelectItem value="negotiating">Negotiating</SelectItem>
-                <SelectItem value="converted">Converted</SelectItem>
-                <SelectItem value="lost">Lost</SelectItem>
+                <SelectItem value="negociando">Negociando</SelectItem>
+                <SelectItem value="convertido">Convertido</SelectItem>
+                <SelectItem value="perdido">Perdido</SelectItem>
               </SelectContent>
             </Select>
             
@@ -140,21 +164,21 @@ const MessagesPanel: React.FC = () => {
               <PopoverContent className="w-80 bg-veloz-black text-white">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <h4 className="font-medium">Lead Info</h4>
+                    <h4 className="font-medium">Informações do Lead</h4>
                     <div className="grid gap-2">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-400">Created: </span>
+                        <span className="text-sm text-gray-400">Criado em: </span>
                         <span className="text-sm">
-                          {new Date(selectedLead.created_at).toLocaleDateString()}
+                          {new Date(selectedLead.created_at).toLocaleDateString('pt-BR')}
                         </span>
                       </div>
                       
                       <div className="flex items-center gap-2">
                         <Tag className="h-4 w-4 text-gray-400" />
-                        <span className="text-sm text-gray-400">Source: </span>
+                        <span className="text-sm text-gray-400">Fonte: </span>
                         <span className="text-sm">
-                          {selectedLead.lead_source || 'WhatsApp'}
+                          {formatSourceName(selectedLead.lead_source)}
                         </span>
                       </div>
                     </div>
@@ -174,7 +198,7 @@ const MessagesPanel: React.FC = () => {
             </div>
           ) : messages.length === 0 ? (
             <div className="text-center py-8 text-gray-400">
-              No messages yet
+              Nenhuma mensagem ainda
             </div>
           ) : (
             messages.map((message) => (
@@ -211,7 +235,7 @@ const MessagesPanel: React.FC = () => {
         >
           <Input
             className="flex-grow bg-veloz-black border-veloz-black text-white"
-            placeholder="Type your message..."
+            placeholder="Digite sua mensagem..."
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
             onKeyDown={handleKeyDown}

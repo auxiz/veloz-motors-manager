@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import WhatsAppConnection from '@/components/whatsapp/WhatsAppConnection';
@@ -27,10 +27,10 @@ const WhatsAppCRM = () => {
               Leads
             </TabsTrigger>
             <TabsTrigger value="connection" className="text-white">
-              WhatsApp Connection
+              Conexão WhatsApp
             </TabsTrigger>
             <TabsTrigger value="salespeople" className="text-white">
-              Salespeople
+              Vendedores
             </TabsTrigger>
           </TabsList>
           
@@ -44,7 +44,7 @@ const WhatsAppCRM = () => {
                   <MessagesPanel />
                 ) : (
                   <div className="flex items-center justify-center h-96 bg-veloz-black rounded-md border border-veloz-gray">
-                    <p className="text-gray-400">Select a lead to view conversation</p>
+                    <p className="text-gray-400">Selecione um lead para visualizar a conversa</p>
                   </div>
                 )}
               </div>

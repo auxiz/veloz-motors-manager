@@ -1,6 +1,6 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
+import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0"
 import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts"
 
 // Initialize Supabase client
@@ -20,9 +20,14 @@ let page: any = null
 let isConnected = false
 let qrCode: string | null = null
 
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
 async function initBrowser() {
   try {
-    console.log("Initializing browser...")
+    console.log("Inicializando navegador...")
     
     browser = await puppeteer.launch({
       headless: true,
@@ -38,7 +43,7 @@ async function initBrowser() {
     page = await browser.newPage()
     await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36')
     
-    console.log("Navigating to WhatsApp Web...")
+    console.log("Navegando para o WhatsApp Web...")
     await page.goto('https://web.whatsapp.com/', { waitUntil: 'networkidle2' })
     
     // Wait for QR code to appear
@@ -50,18 +55,18 @@ async function initBrowser() {
       return canvas?.toDataURL() || null
     })
     
-    console.log("QR code generated")
+    console.log("QR code gerado")
     
     // Update QR code in database
     await updateWhatsAppConnection(false, qrCode)
     
     // Wait for WhatsApp to be ready
     await page.waitForSelector('div[data-testid="chat-list"]', { timeout: 0 }).then(() => {
-      console.log("WhatsApp Web logged in successfully!")
+      console.log("WhatsApp Web conectado com sucesso!")
       isConnected = true
       updateWhatsAppConnection(true)
     }).catch(err => {
-      console.error("Error while waiting for WhatsApp to load:", err)
+      console.error("Erro ao aguardar carregamento do WhatsApp:", err)
       isConnected = false
     })
     
@@ -71,17 +76,17 @@ async function initBrowser() {
     }
     
   } catch (error) {
-    console.error("Error initializing browser:", error)
+    console.error("Erro ao inicializar navegador:", error)
     await closeBrowser()
   }
 }
 
 async function setupMessageListeners() {
-  console.log("Setting up message listeners...")
+  console.log("Configurando ouvintes de mensagem...")
   
   // Monitor for new messages
   await page.exposeFunction('onNewMessage', async (phoneNumber: string, message: string) => {
-    console.log(`New message from ${phoneNumber}: ${message}`)
+    console.log(`Nova mensagem de ${phoneNumber}: ${message}`)
     await processIncomingMessage(phoneNumber, message)
   })
   
@@ -154,7 +159,7 @@ async function processIncomingMessage(phoneNumber: string, message: string) {
         .insert({
           phone_number: cleanPhone,
           first_message: message,
-          status: 'new'
+          status: 'novo'
         })
         .select()
         .single()
@@ -173,7 +178,7 @@ async function processIncomingMessage(phoneNumber: string, message: string) {
       }
     }
   } catch (error) {
-    console.error("Error processing incoming message:", error)
+    console.error("Erro ao processar mensagem recebida:", error)
   }
 }
 
@@ -203,11 +208,11 @@ async function assignLeadToSalesperson(leadId: string) {
         .insert({
           lead_id: leadId,
           assigned_to: assignedTo,
-          notes: 'Auto-assigned by system'
+          notes: 'Atribuído automaticamente pelo sistema'
         })
     }
   } catch (error) {
-    console.error("Error assigning lead to salesperson:", error)
+    console.error("Erro ao atribuir lead ao vendedor:", error)
   }
 }
 
@@ -225,23 +230,46 @@ async function updateWhatsAppConnection(isConnected: boolean, qrCode: string | n
       updateData.qr_code = qrCode
     }
     
-    await supabase
+    // First, get the existing record id
+    const { data: existingRecord, error: queryError } = await supabase
       .from('whatsapp_connection')
-      .update(updateData)
-      .eq('id', (await supabase.from('whatsapp_connection').select('id').single()).data?.id)
+      .select('id')
+      .limit(1)
+      .single()
+    
+    if (queryError) {
+      console.error("Erro ao buscar registro de conexão:", queryError)
+      return
+    }
+    
+    if (existingRecord) {
+      await supabase
+        .from('whatsapp_connection')
+        .update(updateData)
+        .eq('id', existingRecord.id)
+    } else {
+      // Create new record if none exists
+      await supabase
+        .from('whatsapp_connection')
+        .insert({ ...updateData })
+    }
     
   } catch (error) {
-    console.error("Error updating WhatsApp connection:", error)
+    console.error("Erro ao atualizar conexão do WhatsApp:", error)
   }
 }
 
 async function sendWhatsAppMessage(phoneNumber: string, message: string): Promise<boolean> {
   if (!isConnected || !page) {
-    console.error("WhatsApp is not connected")
+    console.error("WhatsApp não está conectado")
     return false
   }
   
   try {
+    // Add random delay to simulate human behavior (between 1-3 seconds)
+    const randomDelay = Math.floor(Math.random() * 2000) + 1000
+    await new Promise(resolve => setTimeout(resolve, randomDelay))
+    
     // Clean phone number
     const cleanPhone = phoneNumber.replace(/\D/g, '')
     
@@ -251,17 +279,29 @@ async function sendWhatsAppMessage(phoneNumber: string, message: string): Promis
     // Wait for chat to load
     await page.waitForSelector('#main', { timeout: 10000 })
     
-    // Type and send message
+    // Type message with random delays between keystrokes to simulate human typing
     const messageInput = await page.waitForSelector('div[contenteditable="true"][data-testid="conversation-compose-box-input"]')
-    await messageInput.type(message)
+    
+    // Type with random delays
+    for (const char of message) {
+      await messageInput.type(char, { delay: Math.floor(Math.random() * 100) + 30 })
+      
+      // Occasionally pause for longer (10% chance)
+      if (Math.random() < 0.1) {
+        await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 500) + 200))
+      }
+    }
+    
+    // Random delay before sending
+    await new Promise(resolve => setTimeout(resolve, Math.floor(Math.random() * 1000) + 500))
     
     // Press Enter to send
     await messageInput.press('Enter')
     
-    console.log(`Message sent to ${phoneNumber}`)
+    console.log(`Mensagem enviada para ${phoneNumber}`)
     return true
   } catch (error) {
-    console.error("Error sending message:", error)
+    console.error("Erro ao enviar mensagem:", error)
     return false
   }
 }
@@ -274,66 +314,52 @@ async function closeBrowser() {
       page = null
       isConnected = false
       await updateWhatsAppConnection(false)
-      console.log("Browser closed")
+      console.log("Navegador fechado")
     } catch (error) {
-      console.error("Error closing browser:", error)
+      console.error("Erro ao fechar navegador:", error)
     }
   }
 }
 
 serve(async (req) => {
-  const url = new URL(req.url)
-  const path = url.pathname
-  
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, {
-      headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, GET, OPTIONS',
-        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-      },
+      headers: corsHeaders,
       status: 204,
     })
   }
 
   try {
-    if (path === '/connect' && req.method === 'POST') {
+    const { action, phoneNumber, message, leadId } = await req.json()
+    
+    if (action === 'connect') {
       if (!browser) {
         await initBrowser()
         return new Response(JSON.stringify({ success: true, qrCode }), {
-          headers: { 'Content-Type': 'application/json' },
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       } else {
-        return new Response(JSON.stringify({ success: true, message: 'Already initialized', isConnected }), {
-          headers: { 'Content-Type': 'application/json' },
+        return new Response(JSON.stringify({ success: true, message: 'Já inicializado', isConnected }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
     } 
-    else if (path === '/status' && req.method === 'GET') {
+    else if (action === 'status') {
       return new Response(JSON.stringify({ isConnected }), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    else if (path === '/disconnect' && req.method === 'POST') {
+    else if (action === 'disconnect') {
       await closeBrowser()
       return new Response(JSON.stringify({ success: true }), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
-    else if (path === '/send' && req.method === 'POST') {
+    else if (phoneNumber && message) {
       if (!isConnected) {
-        return new Response(JSON.stringify({ success: false, message: 'WhatsApp is not connected' }), {
-          headers: { 'Content-Type': 'application/json' },
-          status: 400
-        })
-      }
-      
-      const { phoneNumber, message, leadId } = await req.json()
-      
-      if (!phoneNumber || !message) {
-        return new Response(JSON.stringify({ success: false, message: 'Phone number and message are required' }), {
-          headers: { 'Content-Type': 'application/json' },
+        return new Response(JSON.stringify({ success: false, message: 'WhatsApp não está conectado' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
           status: 400
         })
       }
@@ -352,18 +378,18 @@ serve(async (req) => {
       }
       
       return new Response(JSON.stringify({ success }), {
-        headers: { 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }
     
-    return new Response(JSON.stringify({ error: 'Not found' }), {
-      headers: { 'Content-Type': 'application/json' },
-      status: 404,
+    return new Response(JSON.stringify({ error: 'Ação não reconhecida' }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      status: 400,
     })
   } catch (error) {
-    console.error("Error in edge function:", error)
+    console.error("Erro na função edge:", error)
     return new Response(JSON.stringify({ error: error.message }), {
-      headers: { 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 500,
     })
   }
