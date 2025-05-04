@@ -178,9 +178,15 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     sendMessage,
     connectWhatsApp,
     disconnectWhatsApp,
-    reconnectWhatsApp,
-    checkConnectionStatus,
-    refreshQRCode,
+    reconnectWhatsApp: async () => {
+      await reconnectWhatsApp();
+    },
+    checkConnectionStatus: async () => {
+      await checkConnectionStatus();
+    },
+    refreshQRCode: async () => {
+      await refreshQRCode();
+    },
     updateLead,
     markMessagesAsRead,
     autoRefreshEnabled,

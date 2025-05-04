@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import WhatsAppConnection from '@/components/whatsapp/WhatsAppConnection';
 import WhatsAppMetrics from '@/components/whatsapp/WhatsAppMetrics';
-import LeadsList from '@/components/whatsapp/LeadsList';
+import { LeadsList } from '@/components/whatsapp/leads';
 import MessagesPanel from '@/components/whatsapp/MessagesPanel';
 import SalespeopleSettings from '@/components/whatsapp/SalespeopleSettings';
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
