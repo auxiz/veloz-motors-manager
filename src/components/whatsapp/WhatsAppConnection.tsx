@@ -1,4 +1,3 @@
-
 import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -83,9 +82,9 @@ const WhatsAppConnection: React.FC = () => {
       connectionStatus, 
       qrCodeAvailable: !!qrCode,
       isLoading,
-      error
+      connectionError // Changed from 'error' to 'connectionError' to match the context type
     });
-  }, [connectionStatus, qrCode, isLoading, error]);
+  }, [connectionStatus, qrCode, isLoading, connectionError]);
   
   const getStatusColor = () => {
     switch (connectionStatus) {
@@ -205,7 +204,7 @@ const WhatsAppConnection: React.FC = () => {
             )}
             
             {/* Error Display */}
-            {connectionError && (
+            {connectionError && ( // Changed from 'error' to 'connectionError'
               <Alert className="bg-red-900 border-red-800 text-white mb-4">
                 <AlertTitle className="text-red-200">Erro</AlertTitle>
                 <AlertDescription>{connectionError}</AlertDescription>
