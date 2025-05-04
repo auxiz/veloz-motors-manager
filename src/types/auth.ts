@@ -8,7 +8,7 @@ export interface UserProfile {
   avatar_url?: string;
   updated_at?: string;
   created_at?: string;
-  role?: string;
+  role?: 'administrator' | 'seller' | 'dispatcher' | 'financial' | 'investor';
   status?: 'pending' | 'approved' | 'rejected';
 }
 

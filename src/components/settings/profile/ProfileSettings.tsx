@@ -5,6 +5,7 @@ import { User } from 'lucide-react';
 import ProfileAvatar from './ProfileAvatar';
 import ProfileTabs from './ProfileTabs';
 import { useUsers } from '@/hooks/useUsers';
+import { AuthUser } from '@/types/auth';
 
 const ProfileSettings = () => {
   const { user } = useUsers();
