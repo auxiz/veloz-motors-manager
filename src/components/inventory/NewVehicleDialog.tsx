@@ -14,9 +14,14 @@ import { VehicleForm, VehicleFormData } from './vehicle-form/VehicleForm';
 interface NewVehicleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialData?: Partial<VehicleFormData>; // Add initialData prop
 }
 
-export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) => {
+export const NewVehicleDialog = ({ 
+  open, 
+  onOpenChange, 
+  initialData 
+}: NewVehicleDialogProps) => {
   const { addVehicle } = useVehicles();
 
   const handleSubmit = async (data: VehicleFormData) => {
@@ -59,6 +64,7 @@ export const NewVehicleDialog = ({ open, onOpenChange }: NewVehicleDialogProps) 
         <VehicleForm 
           onSubmit={handleSubmit} 
           isLoading={addVehicle.isPending}
+          initialData={initialData}
         />
       </DialogContent>
     </Dialog>

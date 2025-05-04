@@ -47,6 +47,11 @@ serve(async (req) => {
     
     const data = await response.json();
     
+    // Add the plate to the vehicle data if response is successful
+    if (data.success && data.result && data.result.veiculo) {
+      data.result.veiculo.placa = plate;
+    }
+    
     return new Response(
       JSON.stringify(data),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }

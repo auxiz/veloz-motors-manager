@@ -16,6 +16,8 @@ export interface PlateSearchResult {
       renavam: string;
       uf: string;
       municipio: string;
+      combustivel?: string;
+      tipo_veiculo?: string;
       restricoes: string[];
     }
   };
@@ -63,7 +65,7 @@ export const useLicensePlateLookup = () => {
     }
   };
 
-  // Map API result to Vehicle schema
+  // Enhanced mapping function to include more vehicle details
   const mapResultToVehicle = (result: PlateSearchResult): Partial<Vehicle> => {
     if (!result?.success || !result.result) return {};
 
@@ -76,6 +78,13 @@ export const useLicensePlateLookup = () => {
       color: veiculo.cor,
       chassis: veiculo.chassi,
       renavam: veiculo.renavam,
+      plate: veiculo.placa || "",
+      fuel: veiculo.combustivel || "Flex", // Default to Flex if not available
+      mileage: 0, // This needs to be filled by user as it's not in the API
+      transmission: "Manual", // Default value, not available in API
+      purchase_price: 0, // Needs to be filled by user
+      sale_price: 0, // Needs to be filled by user
+      internal_notes: `Veículo consultado por placa. UF: ${veiculo.uf}, Município: ${veiculo.municipio}`,
       // Other fields to be filled by user
     };
   };

@@ -54,18 +54,10 @@ export const PlateSearchDialog: React.FC<PlateSearchDialogProps> = ({
           
           {result && (
             <>
-              <ResultDisplay result={result} />
-              
-              {result.success && onDataSelected && (
-                <div className="flex justify-end mt-4">
-                  <Button 
-                    onClick={handleUseData} 
-                    className="bg-veloz-yellow text-veloz-black hover:bg-opacity-90"
-                  >
-                    Usar estes dados
-                  </Button>
-                </div>
-              )}
+              <ResultDisplay 
+                result={result} 
+                onRegisterVehicle={onDataSelected ? handleUseData : undefined}
+              />
             </>
           )}
         </div>

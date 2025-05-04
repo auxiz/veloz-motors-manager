@@ -5,12 +5,26 @@ import { AuthGuard } from '@/components/auth/AuthGuard';
 import { LookupForm } from '@/components/license-plate/LookupForm';
 import { ResultDisplay } from '@/components/license-plate/ResultDisplay';
 import { PlateSearchResult } from '@/hooks/useLicensePlateLookup';
+import { NewVehicleDialog } from '@/components/inventory/NewVehicleDialog';
+import { useLicensePlateLookup } from '@/hooks/useLicensePlateLookup';
+import { Vehicle } from '@/hooks/useVehicles';
 
 const ConsultaPlaca = () => {
   const [result, setResult] = useState<PlateSearchResult | null>(null);
+  const [newVehicleDialogOpen, setNewVehicleDialogOpen] = useState(false);
+  const [vehicleData, setVehicleData] = useState<Partial<Vehicle> | null>(null);
+  const { mapResultToVehicle } = useLicensePlateLookup();
   
   const handleResultFound = (data: PlateSearchResult) => {
     setResult(data);
+  };
+
+  const handleRegisterVehicle = () => {
+    if (result) {
+      const mappedData = mapResultToVehicle(result);
+      setVehicleData(mappedData);
+      setNewVehicleDialogOpen(true);
+    }
   };
 
   return (
@@ -27,8 +41,17 @@ const ConsultaPlaca = () => {
         </Card>
         
         {result && (
-          <ResultDisplay result={result} />
+          <ResultDisplay 
+            result={result}
+            onRegisterVehicle={handleRegisterVehicle}
+          />
         )}
+
+        <NewVehicleDialog 
+          open={newVehicleDialogOpen}
+          onOpenChange={setNewVehicleDialogOpen}
+          initialData={vehicleData}
+        />
       </div>
     </AuthGuard>
   );

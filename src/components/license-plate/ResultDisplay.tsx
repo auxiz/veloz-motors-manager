@@ -3,12 +3,15 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PlateSearchResult } from '@/hooks/useLicensePlateLookup';
+import { Button } from '@/components/ui/button';
+import { Check, X } from 'lucide-react';
 
 interface ResultDisplayProps {
   result: PlateSearchResult;
+  onRegisterVehicle?: () => void;
 }
 
-export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
+export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result, onRegisterVehicle }) => {
   if (!result?.success || !result.result) {
     return (
       <Card className="bg-veloz-gray border-veloz-gray mt-4">
@@ -66,6 +69,30 @@ export const ResultDisplay: React.FC<ResultDisplayProps> = ({ result }) => {
                   {restricao}
                 </Badge>
               ))}
+            </div>
+          </div>
+        )}
+
+        {onRegisterVehicle && (
+          <div className="mt-6 border-t border-gray-700 pt-4">
+            <div className="text-center">
+              <p className="text-lg font-medium mb-3">Deseja cadastrar este veículo agora?</p>
+              <div className="flex justify-center gap-4">
+                <Button 
+                  onClick={onRegisterVehicle}
+                  className="bg-veloz-yellow hover:bg-yellow-500 text-veloz-black flex items-center gap-2"
+                >
+                  <Check size={18} />
+                  Sim, cadastrar
+                </Button>
+                <Button 
+                  variant="outline"
+                  className="border-veloz-gray text-veloz-white hover:bg-veloz-gray/50 flex items-center gap-2"
+                >
+                  <X size={18} />
+                  Não
+                </Button>
+              </div>
             </div>
           </div>
         )}
