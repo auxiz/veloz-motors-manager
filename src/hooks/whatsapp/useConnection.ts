@@ -1,6 +1,6 @@
 
 import { useConnectionState } from './connection/useConnectionState';
-import { useConnectionActions } from './connection/useConnectionActions';
+import { useConnectionActions } from './connection/actions';
 
 export const useConnection = () => {
   const {
@@ -16,19 +16,20 @@ export const useConnection = () => {
     setMetrics
   } = useConnectionState();
 
+  // Pass all state setters as an object to the actions hook
   const {
     connectWhatsApp,
     disconnectWhatsApp,
     reconnectWhatsApp,
     checkConnectionStatus,
     refreshQRCode
-  } = useConnectionActions(
+  } = useConnectionActions({
     setConnectionStatus,
     setQrCode,
     setIsLoading,
     setConnectionError,
     setMetrics
-  );
+  });
 
   return {
     // Connection state
