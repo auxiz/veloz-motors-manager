@@ -8,11 +8,12 @@ import { PlateSearchResult } from '@/hooks/useLicensePlateLookup';
 import { NewVehicleDialog } from '@/components/inventory/NewVehicleDialog';
 import { useLicensePlateLookup } from '@/hooks/useLicensePlateLookup';
 import { Vehicle } from '@/hooks/useVehicles';
+import { VehicleFormData } from '@/components/inventory/vehicle-form/VehicleFormSchema';
 
 const ConsultaPlaca = () => {
   const [result, setResult] = useState<PlateSearchResult | null>(null);
   const [newVehicleDialogOpen, setNewVehicleDialogOpen] = useState(false);
-  const [vehicleData, setVehicleData] = useState<Partial<Vehicle> | null>(null);
+  const [vehicleData, setVehicleData] = useState<Partial<VehicleFormData> | null>(null);
   const { mapResultToVehicle } = useLicensePlateLookup();
   
   const handleResultFound = (data: PlateSearchResult) => {
@@ -22,7 +23,25 @@ const ConsultaPlaca = () => {
   const handleRegisterVehicle = () => {
     if (result) {
       const mappedData = mapResultToVehicle(result);
-      setVehicleData(mappedData);
+      // Convert Vehicle to VehicleFormData
+      const formData: Partial<VehicleFormData> = {
+        brand: mappedData.brand,
+        model: mappedData.model,
+        year: mappedData.year,
+        color: mappedData.color,
+        chassis: mappedData.chassis,
+        renavam: mappedData.renavam,
+        plate: mappedData.plate,
+        fuel: mappedData.fuel,
+        mileage: mappedData.mileage,
+        transmission: mappedData.transmission,
+        purchase_price: mappedData.purchase_price,
+        sale_price: mappedData.sale_price,
+        internal_notes: mappedData.internal_notes,
+        status: mappedData.status as "in_stock" | "reserved" | "sold",
+        photos: mappedData.photos,
+      };
+      setVehicleData(formData);
       setNewVehicleDialogOpen(true);
     }
   };

@@ -19,6 +19,7 @@ export interface PlateSearchResult {
       combustivel?: string;
       tipo_veiculo?: string;
       restricoes: string[];
+      placa?: string; // Add the placa property which comes from our edge function
     }
   };
   message?: string;
@@ -85,6 +86,7 @@ export const useLicensePlateLookup = () => {
       purchase_price: 0, // Needs to be filled by user
       sale_price: 0, // Needs to be filled by user
       internal_notes: `Veículo consultado por placa. UF: ${veiculo.uf}, Município: ${veiculo.municipio}`,
+      status: "in_stock" as "in_stock" | "reserved" | "sold", // Using type assertion to ensure compatibility
       // Other fields to be filled by user
     };
   };
