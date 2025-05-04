@@ -62,7 +62,20 @@ export function useUsers() {
     const user = mockUserIfNeeded();
     
     // Log for debugging
-    console.log("Auth user details:", auth.user?.email, "Role:", auth.user?.profile?.role);
+    console.log("Auth user details:", user?.email, "Role:", user?.profile?.role, "Status:", user?.profile?.status);
+    
+    // Special handling for auxizpro@gmail.com - ensure they are always an administrator
+    if (user?.email === 'auxizpro@gmail.com') {
+      console.log("Ensuring admin privileges for auxizpro@gmail.com");
+      return {
+        ...user,
+        profile: {
+          ...(user?.profile || {}),
+          role: 'administrator' as const,
+          status: 'approved' as const
+        }
+      } as AuthUser;
+    }
     
     // If user exists but profile doesn't have a role, set as administrator
     if (user && (!user.profile || !user.profile.role)) {

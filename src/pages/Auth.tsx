@@ -10,8 +10,15 @@ const Auth = () => {
   const { user } = useAuth();
   const authForms = useAuthForms();
   
-  // If already authenticated and approved, redirect to dashboard
+  // Special handling for auxizpro@gmail.com - always redirect to dashboard
   useEffect(() => {
+    if (user?.email === 'auxizpro@gmail.com') {
+      console.log('Admin user detected, redirecting to dashboard');
+      navigate('/dashboard');
+      return;
+    }
+    
+    // If already authenticated and approved or is admin, redirect to dashboard
     if (user?.profile?.role === 'administrator' || user?.profile?.status === 'approved') {
       console.log('User is authenticated and approved or is admin:', user);
       navigate('/dashboard');

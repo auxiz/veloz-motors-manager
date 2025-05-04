@@ -19,6 +19,12 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) 
       return; // Still checking authentication status
     }
 
+    // Special handling for auxizpro@gmail.com - ensure admin access
+    if (user?.email === 'auxizpro@gmail.com') {
+      console.log('Admin user verified: auxizpro@gmail.com');
+      return; // Allow immediate access
+    }
+
     if (!user) {
       toast.error('Acesso negado. Faça login para continuar.');
       navigate('/auth');
@@ -27,6 +33,7 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) 
 
     // Administrators always have access regardless of status
     if (user.profile?.role === 'administrator') {
+      console.log('Administrator access granted');
       return;
     }
 
@@ -51,6 +58,11 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) 
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
+  }
+
+  // Special handling for auxizpro@gmail.com - guarantee access
+  if (user?.email === 'auxizpro@gmail.com') {
+    return <>{children}</>;
   }
 
   // Administrators always get access
