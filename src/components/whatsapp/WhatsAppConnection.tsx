@@ -125,8 +125,8 @@ const WhatsAppConnection: React.FC = () => {
           <p>2. Wait for the QR code to appear.</p>
           <p>3. Open WhatsApp on your phone and scan the QR code:</p>
           <ul className="list-disc pl-6 space-y-1">
-            <li>Android: Settings > Linked Devices > Link a Device</li>
-            <li>iPhone: Settings > Linked Devices > Link a Device</li>
+            <li>Android: Settings &gt; Linked Devices &gt; Link a Device</li>
+            <li>iPhone: Settings &gt; Linked Devices &gt; Link a Device</li>
           </ul>
           <p>4. Once connected, you will start receiving WhatsApp messages in the CRM.</p>
           <p>5. The WhatsApp connection will remain active as long as the server is running.</p>
