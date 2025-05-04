@@ -12,6 +12,7 @@ export const useConnection = () => {
     try {
       setConnectionStatus('connecting');
       
+      console.log('Initiating WhatsApp connection...');
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
         body: { action: 'connect' },
         headers: {
@@ -20,14 +21,25 @@ export const useConnection = () => {
       });
       
       if (error) {
+        console.error('Error from Supabase function:', error);
         throw error;
       }
       
+      console.log('Connection response:', data);
+      
       if (data && data.qrCode) {
-        console.log('QR Code received successfully');
-        setQrCode(data.qrCode);
-        toast.success('QR Code gerado com sucesso. Escaneie com seu celular.');
-        return true;
+        console.log('QR Code received successfully, length:', data.qrCode.length);
+        // Validate that we have a proper data URL
+        if (typeof data.qrCode === 'string' && data.qrCode.startsWith('data:image')) {
+          setQrCode(data.qrCode);
+          toast.success('QR Code gerado com sucesso. Escaneie com seu celular.');
+          return true;
+        } else {
+          console.error('Invalid QR Code format received:', typeof data.qrCode);
+          toast.error('Formato de QR Code inválido. Tente novamente.');
+          setConnectionStatus('disconnected');
+          return false;
+        }
       } else {
         console.error('QR Code missing from response:', data);
         toast.error('QR Code não foi recebido. Tente novamente.');
@@ -68,6 +80,7 @@ export const useConnection = () => {
 
   const checkConnectionStatus = async (): Promise<void> => {
     try {
+      console.log('Checking WhatsApp connection status...');
       // First check the database
       const { data: connectionData, error: connectionError } = await supabase
         .from('whatsapp_connection')
@@ -75,14 +88,20 @@ export const useConnection = () => {
         .maybeSingle();
       
       if (connectionError) {
+        console.error('Error fetching connection data:', connectionError);
         throw connectionError;
       }
+      
+      console.log('Connection data from DB:', connectionData);
       
       if (connectionData) {
         setConnectionStatus(connectionData.is_connected ? 'connected' : 'disconnected');
         if (connectionData.qr_code) {
+          console.log('QR code found in database, length:', connectionData.qr_code.length);
           setQrCode(connectionData.qr_code);
         }
+      } else {
+        console.log('No connection data found in database');
       }
       
       // Then check the edge function
@@ -94,8 +113,11 @@ export const useConnection = () => {
       });
       
       if (error) {
+        console.error('Error checking status via function:', error);
         throw error;
       }
+      
+      console.log('Status response from function:', data);
       
       setConnectionStatus(data.isConnected ? 'connected' : 'disconnected');
     } catch (error) {

@@ -1,4 +1,3 @@
-
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts"
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.21.0"
 import puppeteer from "https://deno.land/x/puppeteer@16.2.0/mod.ts"
@@ -47,15 +46,30 @@ async function initBrowser() {
     await page.goto('https://web.whatsapp.com/', { waitUntil: 'networkidle2' })
     
     // Wait for QR code to appear
+    console.log("Esperando o QR code aparecer...")
     await page.waitForSelector('canvas[aria-label="Scan me!"]', { timeout: 20000 })
     
     // Get QR code data
+    console.log("Extraindo dados do QR code...")
     qrCode = await page.evaluate(() => {
       const canvas = document.querySelector('canvas[aria-label="Scan me!"]')
-      return canvas?.toDataURL() || null
+      if (!canvas) {
+        console.error("Canvas for QR code not found")
+        return null
+      }
+      try {
+        return canvas.toDataURL() || null
+      } catch (e) {
+        console.error("Error converting canvas to data URL:", e)
+        return null
+      }
     })
     
-    console.log("QR code gerado")
+    if (qrCode) {
+      console.log("QR code gerado com sucesso, tamanho:", qrCode.length)
+    } else {
+      console.error("Falha ao gerar o QR code")
+    }
     
     // Update QR code in database
     await updateWhatsAppConnection(false, qrCode)
@@ -218,6 +232,8 @@ async function assignLeadToSalesperson(leadId: string) {
 
 async function updateWhatsAppConnection(isConnected: boolean, qrCode: string | null = null) {
   try {
+    console.log("Atualizando status da conexão: conectado =", isConnected, ", QR code =", qrCode ? "disponível" : "não disponível")
+    
     const updateData: any = { 
       is_connected: isConnected
     }
@@ -228,6 +244,7 @@ async function updateWhatsAppConnection(isConnected: boolean, qrCode: string | n
     
     if (qrCode) {
       updateData.qr_code = qrCode
+      console.log("QR code enviado para o banco de dados, tamanho:", qrCode.length)
     }
     
     // First, get the existing record id
@@ -243,17 +260,20 @@ async function updateWhatsAppConnection(isConnected: boolean, qrCode: string | n
     }
     
     if (existingRecord) {
+      console.log("Atualizando registro existente:", existingRecord.id)
       await supabase
         .from('whatsapp_connection')
         .update(updateData)
         .eq('id', existingRecord.id)
     } else {
       // Create new record if none exists
+      console.log("Criando novo registro de conexão")
       await supabase
         .from('whatsapp_connection')
         .insert({ ...updateData })
     }
     
+    console.log("Status da conexão atualizado com sucesso")
   } catch (error) {
     console.error("Erro ao atualizar conexão do WhatsApp:", error)
   }
@@ -332,21 +352,26 @@ serve(async (req) => {
 
   try {
     const { action, phoneNumber, message, leadId } = await req.json()
+    console.log("Edge function received action:", action)
     
     if (action === 'connect') {
       if (!browser) {
+        console.log("Iniciando conexão com WhatsApp...")
         await initBrowser()
+        console.log("Retornando QR code, disponível:", !!qrCode)
         return new Response(JSON.stringify({ success: true, qrCode }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       } else {
-        return new Response(JSON.stringify({ success: true, message: 'Já inicializado', isConnected }), {
+        console.log("Browser já inicializado, estado da conexão:", isConnected)
+        return new Response(JSON.stringify({ success: true, message: 'Já inicializado', isConnected, qrCode }), {
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         })
       }
     } 
     else if (action === 'status') {
-      return new Response(JSON.stringify({ isConnected }), {
+      console.log("Verificando status, conectado:", isConnected)
+      return new Response(JSON.stringify({ isConnected, qrCode }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       })
     }

@@ -14,7 +14,9 @@ const WhatsAppConnection: React.FC = () => {
   const isAdmin = user?.profile?.role === 'administrator';
   
   const handleConnect = async () => {
-    await connectWhatsApp();
+    console.log('Connect button clicked');
+    const result = await connectWhatsApp();
+    console.log('Connect result:', result, 'QR Code available:', !!qrCode);
   };
   
   const handleDisconnect = async () => {
@@ -27,8 +29,14 @@ const WhatsAppConnection: React.FC = () => {
 
   // Check connection status on initial load
   useEffect(() => {
+    console.log('WhatsAppConnection component mounted');
     checkConnectionStatus();
   }, []);
+
+  // Debug rendering
+  useEffect(() => {
+    console.log('Render state:', { connectionStatus, qrCodeAvailable: !!qrCode });
+  }, [connectionStatus, qrCode]);
   
   return (
     <div className="space-y-6">
