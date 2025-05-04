@@ -4,14 +4,14 @@ import { useDisconnectWhatsApp } from './useDisconnectWhatsApp';
 import { useReconnectWhatsApp } from './useReconnectWhatsApp';
 import { useCheckConnectionStatus } from './useCheckConnectionStatus';
 import { useRefreshQRCode } from './useRefreshQRCode';
-import { ConnectionStatus } from '../../types';
+import { ConnectionStatus, ConnectionMetrics } from '../../types';
 
 export type ConnectionStateSetters = {
   setConnectionStatus: (status: ConnectionStatus) => void;
   setQrCode: (qrCode: string | null) => void;
   setIsLoading: (isLoading: boolean) => void;
   setConnectionError: (error: string | null) => void;
-  setMetrics: (metrics: any) => void;
+  setMetrics: (metrics: ConnectionMetrics) => void;
 };
 
 export const useConnectionActions = ({

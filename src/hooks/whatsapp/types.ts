@@ -1,4 +1,13 @@
-import { ConnectionStatus, ConnectionMetrics } from '../types';
+
+// Define and export the ConnectionStatus type
+export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected' | 'unknown';
+
+// Define and export ConnectionMetrics
+export interface ConnectionMetrics {
+  lastActivity: string | null;
+  reconnectAttempts: number;
+  messageQueueSize: number;
+}
 
 export interface ConnectionState {
   connectionStatus: ConnectionStatus;
@@ -36,6 +45,18 @@ export interface Message {
   direction: 'incoming' | 'outgoing';
   sent_by: string | null;
   is_read: boolean;
+  sent_at: string; // Added this field to fix the error
+  media_url?: string;  // Optional field from the DB
+}
+
+export interface ErrorLog {
+  id: string;
+  occurred_at: string;
+  error_type: string;
+  error_message: string;
+  resolved: boolean;
+  resolved_at?: string | null;
+  resolution_notes?: string | null;
 }
 
 export interface WhatsAppContextType {
@@ -52,8 +73,8 @@ export interface WhatsAppContextType {
   fetchLeads: () => Promise<void>;
   fetchMessages: (leadId: string) => Promise<void>;
   sendMessage: (phoneNumber: string, message: string, leadId: string) => Promise<boolean>;
-  connectWhatsApp: () => Promise<boolean>;
-  disconnectWhatsApp: () => Promise<void>;
+  connectWhatsApp: () => Promise<void>; // Changed return type to Promise<void>
+  disconnectWhatsApp: () => Promise<void>; // Changed return type to Promise<void>
   reconnectWhatsApp: () => Promise<void>;
   checkConnectionStatus: () => Promise<void>;
   refreshQRCode: () => Promise<void>;

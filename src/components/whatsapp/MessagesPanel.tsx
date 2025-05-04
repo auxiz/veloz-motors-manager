@@ -1,3 +1,4 @@
+
 import React, { useState, useRef, useEffect } from 'react';
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -73,7 +74,7 @@ const MessagesPanel: React.FC = () => {
   
   // Group messages by date
   const groupedMessages = messages.reduce((groups: any, message) => {
-    const date = formatMessageDate(message.sent_at);
+    const date = formatMessageDate(message.sent_at || message.created_at);
     if (!groups[date]) {
       groups[date] = [];
     }

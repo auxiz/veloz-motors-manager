@@ -43,12 +43,21 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     isLoading: connectionLoading,
     connectionError,
     metrics,
-    connectWhatsApp, 
-    disconnectWhatsApp,
+    connectWhatsApp: originalConnectWhatsApp, 
+    disconnectWhatsApp: originalDisconnectWhatsApp,
     reconnectWhatsApp,
     checkConnectionStatus,
     refreshQRCode
   } = useConnection();
+
+  // Wrap the connection functions to adapt the return type
+  const connectWhatsApp = async (): Promise<void> => {
+    await originalConnectWhatsApp();
+  };
+  
+  const disconnectWhatsApp = async (): Promise<void> => {
+    await originalDisconnectWhatsApp();
+  };
 
   // Set up real-time subscriptions
   useEffect(() => {

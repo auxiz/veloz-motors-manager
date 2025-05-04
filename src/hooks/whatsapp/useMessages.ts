@@ -19,7 +19,20 @@ export const useMessages = () => {
         throw error;
       }
       
-      setMessages(data as Message[]);
+      // Properly map database response to Message interface
+      const formattedMessages: Message[] = (data as any[]).map(item => ({
+        id: item.id,
+        created_at: item.created_at,
+        lead_id: item.lead_id,
+        message_text: item.message_text,
+        direction: item.direction as 'incoming' | 'outgoing',
+        sent_by: item.sent_by,
+        is_read: item.is_read,
+        sent_at: item.sent_at || item.created_at, // Use sent_at if available or fallback to created_at
+        media_url: item.media_url
+      }));
+      
+      setMessages(formattedMessages);
     } catch (error) {
       console.error('Error fetching messages:', error);
       toast.error('Falha ao carregar mensagens');
