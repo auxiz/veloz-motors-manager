@@ -5,20 +5,24 @@ import { AuthUser, UserProfile } from './types';
 export function useProfileFetcher() {
   const fetchUserProfile = async (userId: string): Promise<UserProfile | null> => {
     try {
-      // Use a type cast to handle the TypeScript issue with custom RPC functions
-      const { data, error } = await (supabase.rpc as any)('get_profile', { user_id: userId });
+      console.log('Fetching profile for user:', userId);
+      
+      // Direct query to the profiles table
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', userId)
+        .single();
 
       if (error) {
         console.error('Error fetching user profile:', error);
         return null;
       }
 
+      console.log('Profile data retrieved:', data);
+      
       if (data) {
-        return {
-          ...data,
-          // Mock role for testing - this would come from the database in a real app
-          role: userId === '1' ? 'administrator' : 'seller'
-        } as UserProfile;
+        return data as UserProfile;
       }
       
       return null;

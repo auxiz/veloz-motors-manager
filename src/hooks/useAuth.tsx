@@ -47,10 +47,12 @@ export function useAuth() {
 
   const updateUserWithProfile = async (userId: string) => {
     const profile = await fetchUserProfile(userId);
+    console.log('Fetched user profile:', profile);
     
     if (profile) {
       setUser((prevUser) => {
         if (!prevUser) return null;
+        console.log('Updating user with profile. Role:', profile.role, 'Status:', profile.status);
         return {
           ...prevUser,
           profile

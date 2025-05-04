@@ -12,8 +12,11 @@ const Auth = () => {
   
   // If already authenticated and approved, redirect to dashboard
   useEffect(() => {
-    if (user?.profile?.status === 'approved' || user?.profile?.role === 'administrator') {
+    if (user?.profile?.role === 'administrator' || user?.profile?.status === 'approved') {
+      console.log('User is authenticated and approved or is admin:', user);
       navigate('/dashboard');
+    } else if (user) {
+      console.log('User is authenticated but not approved:', user);
     }
   }, [user, navigate]);
 

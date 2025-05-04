@@ -25,8 +25,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) 
       return;
     }
 
-    // Check if user is approved (unless they're an administrator, who is always approved)
-    if (user.profile?.status !== 'approved' && user.profile?.role !== 'administrator') {
+    // Administrators always have access regardless of status
+    if (user.profile?.role === 'administrator') {
+      return;
+    }
+
+    // Check if user is approved
+    if (user.profile?.status !== 'approved') {
       toast.error('Sua conta está aguardando aprovação pelo administrador.');
       navigate('/auth');
       return;
@@ -48,8 +53,13 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children, allowedRoles }) 
     );
   }
 
+  // Administrators always get access
+  if (user?.profile?.role === 'administrator') {
+    return <>{children}</>;
+  }
+
   // If not authenticated or not approved, return null (redirect will happen from useEffect)
-  if (!user || (user.profile?.status !== 'approved' && user.profile?.role !== 'administrator')) {
+  if (!user || (user.profile?.status !== 'approved')) {
     return null;
   }
 

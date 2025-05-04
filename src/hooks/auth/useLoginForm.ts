@@ -53,8 +53,17 @@ export function useLoginForm() {
         return;
       }
 
-      // Check user status
+      // Check user status - administrators are always allowed in
       if (user?.profile) {
+        console.log("User profile:", user.profile);
+        
+        if (user.profile.role === 'administrator') {
+          setUserStatus('approved');
+          toast.success('Login bem-sucedido');
+          navigate('/dashboard');
+          return;
+        }
+        
         if (user.profile.status === 'pending') {
           setUserStatus('pending');
           setError('Sua conta está aguardando aprovação pelo administrador.');
@@ -63,7 +72,7 @@ export function useLoginForm() {
           setUserStatus('rejected');
           setError('Seu acesso foi negado pelo administrador.');
           return;
-        } else if (user.profile.role === 'administrator' || user.profile.status === 'approved') {
+        } else if (user.profile.status === 'approved') {
           setUserStatus('approved');
           toast.success('Login bem-sucedido');
           navigate('/dashboard');
