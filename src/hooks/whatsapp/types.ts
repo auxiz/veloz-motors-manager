@@ -53,4 +53,6 @@ export interface WhatsAppContextType {
   checkConnectionStatus: () => Promise<void>;
   updateLead: (leadId: string, updates: Partial<Lead>) => Promise<void>;
   markMessagesAsRead: (leadId: string) => Promise<void>;
+  autoRefreshEnabled: boolean;
+  toggleAutoRefresh: () => void;
 }

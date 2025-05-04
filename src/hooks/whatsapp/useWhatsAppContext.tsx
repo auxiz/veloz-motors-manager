@@ -22,7 +22,9 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     loading: leadsLoading, 
     fetchLeads, 
     updateLead,
-    setLeads 
+    setLeads,
+    autoRefreshEnabled,
+    toggleAutoRefresh 
   } = useLeads(user?.id);
   
   const { 
@@ -122,13 +124,6 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
   const sendMessage = async (phoneNumber: string, message: string, leadId: string): Promise<boolean> => {
     return sendMessageToLead(phoneNumber, message, leadId, user?.id);
   };
-  
-  useEffect(() => {
-    if (user) {
-      fetchLeads();
-      checkConnectionStatus();
-    }
-  }, [user]);
 
   // Update selected lead if it exists in the new data after fetching leads
   useEffect(() => {
@@ -157,7 +152,9 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     disconnectWhatsApp,
     checkConnectionStatus,
     updateLead,
-    markMessagesAsRead
+    markMessagesAsRead,
+    autoRefreshEnabled,
+    toggleAutoRefresh
   };
 
   return (

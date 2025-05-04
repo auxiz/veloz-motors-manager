@@ -5,11 +5,21 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Search } from 'lucide-react';
+import { Search, RefreshCw, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const LeadsList: React.FC = () => {
-  const { leads, loading, selectLead, selectedLead } = useWhatsAppContext();
+  const { 
+    leads, 
+    loading, 
+    selectLead, 
+    selectedLead, 
+    fetchLeads, 
+    autoRefreshEnabled, 
+    toggleAutoRefresh 
+  } = useWhatsAppContext();
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   
@@ -79,10 +89,58 @@ const LeadsList: React.FC = () => {
   return (
     <Card className="h-full bg-veloz-gray border-veloz-gray text-white">
       <CardHeader className="pb-2">
-        <CardTitle className="text-xl">
-          Leads
-          <Badge className="ml-2 bg-veloz-yellow text-black">{leads.length}</Badge>
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-xl flex items-center">
+            Leads
+            <Badge className="ml-2 bg-veloz-yellow text-black">{leads.length}</Badge>
+          </CardTitle>
+          
+          <div className="flex space-x-2">
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 bg-veloz-black border-veloz-black"
+                    onClick={toggleAutoRefresh}
+                  >
+                    {autoRefreshEnabled ? (
+                      <Pause size={16} className="text-veloz-yellow" />
+                    ) : (
+                      <RefreshCw size={16} className="text-veloz-yellow" />
+                    )}
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {autoRefreshEnabled ? 'Pausar atualização automática' : 'Ativar atualização automática'}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+            
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    className="h-8 w-8 p-0 bg-veloz-black border-veloz-black"
+                    onClick={() => fetchLeads()}
+                    disabled={loading}
+                  >
+                    <RefreshCw 
+                      size={16} 
+                      className={`text-white ${loading ? 'animate-spin' : ''}`} 
+                    />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  Atualizar agora
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+        </div>
         
         <div className="flex flex-col space-y-2 mt-2">
           <div className="relative">
