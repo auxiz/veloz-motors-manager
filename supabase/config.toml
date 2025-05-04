@@ -7,4 +7,3 @@ verify_jwt = false
 
 [functions.license-plate-lookup]
 verify_jwt = false
-

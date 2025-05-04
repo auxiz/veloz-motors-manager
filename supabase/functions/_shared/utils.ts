@@ -7,3 +7,8 @@ export function formatCurrency(value: number | null | undefined): string {
     currency: 'BRL',
   }).format(value);
 }
+
+export const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};

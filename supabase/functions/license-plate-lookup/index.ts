@@ -2,7 +2,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { corsHeaders } from "../_shared/utils.ts";
 
-const INFOSIMPLES_API_TOKEN = Deno.env.get("INFOSIMPLES_API_TOKEN") || "";
+const INFOSIMPLES_API_TOKEN = Deno.env.get("INFOSIMPLES_API_TOKEN") || "rvSsjZr1wKYGNi9-qi0MEDsS25W5y-RxbB15KUPi";
 const API_URL = "https://api.infosimples.com/api/v2/consultas/veiculo-placa";
 
 interface LicensePlateRequest {
@@ -20,17 +20,12 @@ serve(async (req) => {
     
     if (!plate) {
       return new Response(
-        JSON.stringify({ error: "Placa é obrigatória" }),
+        JSON.stringify({ success: false, message: "Placa é obrigatória" }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
       );
     }
     
-    if (!INFOSIMPLES_API_TOKEN) {
-      return new Response(
-        JSON.stringify({ error: "API token não configurado" }),
-        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
-      );
-    }
+    console.log(`Requesting plate information for: ${plate}`);
     
     // Call the Infosimples API
     const response = await fetch(API_URL, {
@@ -46,6 +41,7 @@ serve(async (req) => {
     });
     
     const data = await response.json();
+    console.log("API response received:", JSON.stringify(data).substring(0, 200) + "...");
     
     // Add the plate to the vehicle data if response is successful
     if (data.success && data.result && data.result.veiculo) {
@@ -57,8 +53,9 @@ serve(async (req) => {
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
+    console.error("Error in license-plate-lookup function:", error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ success: false, message: `Erro ao processar requisição: ${error.message}` }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }

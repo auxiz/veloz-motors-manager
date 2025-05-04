@@ -40,16 +40,19 @@ export const useLicensePlateLookup = () => {
     setResult(null);
 
     try {
+      console.log(`Calling license-plate-lookup with plate: ${plate}`);
       const { data, error } = await supabase.functions.invoke('license-plate-lookup', {
         body: { plate }
       });
 
       if (error) {
+        console.error('Error from edge function:', error);
         toast.error(`Erro ao consultar placa: ${error.message}`);
         setIsLoading(false);
         return null;
       }
 
+      console.log('Data received from API:', data);
       setResult(data as PlateSearchResult);
       setIsLoading(false);
       
