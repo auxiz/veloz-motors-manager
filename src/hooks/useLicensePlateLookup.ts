@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Vehicle } from '@/hooks/useVehicles';
@@ -85,7 +86,7 @@ export const useLicensePlateLookup = () => {
       transmission: "Manual", // Default value, not available in API
       purchase_price: 0, // Needs to be filled by user
       sale_price: 0, // Needs to be filled by user
-      internal_notes: `Veículo consultado por placa. UF: ${veiculo.uf}, Município: ${veiculo.municipio}`,
+      internal_notes: `Veículo consultado por placa. UF: ${veiculo.uf}, Município: ${veiculo.municipio}${veiculo.tipo_veiculo ? `, Tipo: ${veiculo.tipo_veiculo}` : ''}`,
       status: "in_stock" as "in_stock" | "reserved" | "sold", // Using type assertion to ensure compatibility
       // Other fields to be filled by user
     };

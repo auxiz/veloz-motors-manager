@@ -7,7 +7,6 @@ import { ResultDisplay } from '@/components/license-plate/ResultDisplay';
 import { PlateSearchResult } from '@/hooks/useLicensePlateLookup';
 import { NewVehicleDialog } from '@/components/inventory/NewVehicleDialog';
 import { useLicensePlateLookup } from '@/hooks/useLicensePlateLookup';
-import { Vehicle } from '@/hooks/useVehicles';
 import { VehicleFormData } from '@/components/inventory/vehicle-form/VehicleFormSchema';
 
 const ConsultaPlaca = () => {
