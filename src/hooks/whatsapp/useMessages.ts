@@ -35,8 +35,12 @@ export const useMessages = () => {
       console.log(`Sending message to ${phoneNumber}: ${message}`);
       
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: { message, leadId },
-        params: { action: 'send_message', phoneNumber },
+        body: { 
+          action: 'send_message', 
+          phoneNumber,
+          message,
+          leadId
+        },
         headers: { 
           'Content-Type': 'application/json',
           'x-user-id': userId || ''

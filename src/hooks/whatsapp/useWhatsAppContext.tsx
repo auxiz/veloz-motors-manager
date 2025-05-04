@@ -40,7 +40,7 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     connectionStatus, 
     qrCode, 
     isLoading: connectionLoading,
-    error: connectionError,
+    connectionError,
     metrics,
     connectWhatsApp, 
     disconnectWhatsApp,

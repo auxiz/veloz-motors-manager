@@ -6,14 +6,7 @@ import { RefreshCw, AlertCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-
-interface ErrorLog {
-  id: string;
-  error_type: string;
-  error_message: string;
-  occurred_at: string;
-  resolved: boolean;
-}
+import { ErrorLog } from '@/hooks/whatsapp/types';
 
 const WhatsAppMetrics: React.FC = () => {
   const { connectionStatus, metrics, checkConnectionStatus } = useWhatsAppContext();
@@ -23,7 +16,9 @@ const WhatsAppMetrics: React.FC = () => {
   const fetchErrors = async () => {
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      // Use a type assertion to allow supabase to query the whatsapp_errors table
+      // that was added in the migration but isn't in the types yet
+      const { data, error } = await (supabase as any)
         .from('whatsapp_errors')
         .select('*')
         .order('occurred_at', { ascending: false })
@@ -34,7 +29,9 @@ const WhatsAppMetrics: React.FC = () => {
         return;
       }
       
-      setErrors(data || []);
+      if (data) {
+        setErrors(data as ErrorLog[]);
+      }
     } catch (error) {
       console.error('Error fetching WhatsApp errors:', error);
     } finally {

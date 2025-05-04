@@ -614,7 +614,10 @@ export type Database = {
           id: string
           is_connected: boolean | null
           last_connected_at: string | null
+          last_error: string | null
+          last_error_at: string | null
           qr_code: string | null
+          reconnect_attempts: number | null
           updated_at: string | null
         }
         Insert: {
@@ -622,7 +625,10 @@ export type Database = {
           id?: string
           is_connected?: boolean | null
           last_connected_at?: string | null
+          last_error?: string | null
+          last_error_at?: string | null
           qr_code?: string | null
+          reconnect_attempts?: number | null
           updated_at?: string | null
         }
         Update: {
@@ -630,8 +636,41 @@ export type Database = {
           id?: string
           is_connected?: boolean | null
           last_connected_at?: string | null
+          last_error?: string | null
+          last_error_at?: string | null
           qr_code?: string | null
+          reconnect_attempts?: number | null
           updated_at?: string | null
+        }
+        Relationships: []
+      }
+      whatsapp_errors: {
+        Row: {
+          error_message: string
+          error_type: string
+          id: string
+          occurred_at: string
+          resolution_notes: string | null
+          resolved: boolean | null
+          resolved_at: string | null
+        }
+        Insert: {
+          error_message: string
+          error_type: string
+          id?: string
+          occurred_at?: string
+          resolution_notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
+        }
+        Update: {
+          error_message?: string
+          error_type?: string
+          id?: string
+          occurred_at?: string
+          resolution_notes?: string | null
+          resolved?: boolean | null
+          resolved_at?: string | null
         }
         Relationships: []
       }

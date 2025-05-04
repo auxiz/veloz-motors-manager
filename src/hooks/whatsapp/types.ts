@@ -43,6 +43,16 @@ export interface ConnectionMetrics {
   messageQueueSize: number;
 }
 
+export interface ErrorLog {
+  id: string;
+  error_type: string;
+  error_message: string;
+  occurred_at: string;
+  resolved: boolean;
+  resolution_notes?: string | null;
+  resolved_at?: string | null;
+}
+
 export interface WhatsAppContextType {
   leads: Lead[];
   messages: Message[];

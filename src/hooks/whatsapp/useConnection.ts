@@ -7,7 +7,7 @@ export const useConnection = () => {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>('unknown');
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+  const [connectionError, setConnectionError] = useState<string | null>(null);
   const [metrics, setMetrics] = useState<any>({
     lastActivity: null,
     reconnectAttempts: 0,
@@ -18,13 +18,12 @@ export const useConnection = () => {
   const connectWhatsApp = async (): Promise<boolean> => {
     try {
       setIsLoading(true);
-      setError(null);
+      setConnectionError(null);
       setConnectionStatus('connecting');
       
       console.log('Initiating WhatsApp connection...');
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: {},
-        params: { action: 'connect' },
+        body: { action: 'connect' },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -33,7 +32,7 @@ export const useConnection = () => {
       if (error) {
         console.error('Error from Supabase function:', error);
         toast.error('Erro ao conectar ao WhatsApp: ' + error.message);
-        setError(error.message);
+        setConnectionError(error.message);
         setConnectionStatus('disconnected');
         return false;
       }
@@ -43,7 +42,7 @@ export const useConnection = () => {
       if (!data.success) {
         console.error('Connection failed:', data.message);
         toast.error('Falha na conexão: ' + data.message);
-        setError(data.message || 'Erro desconhecido');
+        setConnectionError(data.message || 'Erro desconhecido');
         setConnectionStatus('disconnected');
         return false;
       }
@@ -65,21 +64,21 @@ export const useConnection = () => {
         } else {
           console.error('Invalid QR Code format:', typeof data.qrCode);
           toast.error('Formato de QR Code inválido.');
-          setError('Formato de QR Code inválido');
+          setConnectionError('Formato de QR Code inválido');
           setConnectionStatus('disconnected');
           return false;
         }
       } else {
         console.error('No QR Code or connection status in response');
         toast.error('Resposta inválida do servidor');
-        setError('Resposta inválida do servidor');
+        setConnectionError('Resposta inválida do servidor');
         setConnectionStatus('disconnected');
         return false;
       }
     } catch (error: any) {
       console.error('Error connecting to WhatsApp:', error);
       toast.error('Erro ao conectar ao WhatsApp: ' + (error.message || error));
-      setError(error.message || 'Erro desconhecido');
+      setConnectionError(error.message || 'Erro desconhecido');
       setConnectionStatus('disconnected');
       return false;
     } finally {
@@ -91,11 +90,10 @@ export const useConnection = () => {
   const disconnectWhatsApp = async (): Promise<boolean> => {
     try {
       setIsLoading(true);
-      setError(null);
+      setConnectionError(null);
       
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: {},
-        params: { action: 'disconnect' },
+        body: { action: 'disconnect' },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -104,14 +102,14 @@ export const useConnection = () => {
       if (error) {
         console.error('Error disconnecting from WhatsApp:', error);
         toast.error('Erro ao desconectar do WhatsApp: ' + error.message);
-        setError(error.message);
+        setConnectionError(error.message);
         return false;
       }
       
       if (!data.success) {
         console.error('Disconnection failed:', data.message);
         toast.error('Falha ao desconectar: ' + data.message);
-        setError(data.message || 'Erro desconhecido');
+        setConnectionError(data.message || 'Erro desconhecido');
         return false;
       }
       
@@ -123,7 +121,7 @@ export const useConnection = () => {
     } catch (error: any) {
       console.error('Error disconnecting from WhatsApp:', error);
       toast.error('Erro ao desconectar do WhatsApp: ' + (error.message || error));
-      setError(error.message || 'Erro desconhecido');
+      setConnectionError(error.message || 'Erro desconhecido');
       return false;
     } finally {
       setIsLoading(false);
@@ -134,12 +132,11 @@ export const useConnection = () => {
   const reconnectWhatsApp = async (): Promise<boolean> => {
     try {
       setIsLoading(true);
-      setError(null);
+      setConnectionError(null);
       setConnectionStatus('connecting');
       
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: {},
-        params: { action: 'reconnect' },
+        body: { action: 'reconnect' },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -148,7 +145,7 @@ export const useConnection = () => {
       if (error) {
         console.error('Error reconnecting WhatsApp:', error);
         toast.error('Erro ao reconectar o WhatsApp: ' + error.message);
-        setError(error.message);
+        setConnectionError(error.message);
         setConnectionStatus('disconnected');
         return false;
       }
@@ -156,7 +153,7 @@ export const useConnection = () => {
       if (!data.success) {
         console.error('Reconnection failed:', data.message);
         toast.error('Falha na reconexão: ' + data.message);
-        setError(data.message || 'Erro desconhecido');
+        setConnectionError(data.message || 'Erro desconhecido');
         setConnectionStatus('disconnected');
         return false;
       }
@@ -179,7 +176,7 @@ export const useConnection = () => {
     } catch (error: any) {
       console.error('Error reconnecting WhatsApp:', error);
       toast.error('Erro ao reconectar o WhatsApp: ' + (error.message || error));
-      setError(error.message || 'Erro desconhecido');
+      setConnectionError(error.message || 'Erro desconhecido');
       setConnectionStatus('disconnected');
       return false;
     } finally {
@@ -196,7 +193,7 @@ export const useConnection = () => {
       // First check the database for faster response
       const { data: connectionData, error: connectionError } = await supabase
         .from('whatsapp_connection')
-        .select('is_connected, qr_code, last_connected_at, updated_at')
+        .select('is_connected, qr_code, last_connected_at, updated_at, reconnect_attempts, last_error, last_error_at')
         .maybeSingle();
       
       if (connectionError) {
@@ -212,12 +209,19 @@ export const useConnection = () => {
           console.log('QR code found in database');
           setQrCode(connectionData.qr_code);
         }
+        
+        // Update metrics with DB data
+        setMetrics(prev => ({
+          ...prev,
+          reconnectAttempts: connectionData.reconnect_attempts || 0,
+          lastError: connectionData.last_error,
+          lastErrorAt: connectionData.last_error_at
+        }));
       }
       
       // Then check directly with the edge function for real-time status
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: {},
-        params: { action: 'status' },
+        body: { action: 'status' },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -225,7 +229,7 @@ export const useConnection = () => {
       
       if (error) {
         console.error('Error checking status via function:', error);
-        setError(error.message);
+        setConnectionError(error.message);
         // Keep existing status if available, otherwise set to unknown
         if (connectionStatus === 'unknown') {
           setConnectionStatus('unknown');
@@ -255,7 +259,7 @@ export const useConnection = () => {
       
     } catch (error: any) {
       console.error('Error checking connection status:', error);
-      setError(error.message || 'Erro ao verificar status');
+      setConnectionError(error.message || 'Erro ao verificar status');
     } finally {
       setIsLoading(false);
     }
@@ -267,8 +271,7 @@ export const useConnection = () => {
       setIsLoading(true);
       
       const { data, error } = await supabase.functions.invoke('whatsapp-bot', {
-        body: {},
-        params: { action: 'qrcode' },
+        body: { action: 'qrcode' },
         headers: {
           'Content-Type': 'application/json'
         }
@@ -298,7 +301,7 @@ export const useConnection = () => {
     connectionStatus,
     qrCode,
     isLoading,
-    error,
+    connectionError,
     metrics,
     connectWhatsApp,
     disconnectWhatsApp,

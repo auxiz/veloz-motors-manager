@@ -15,7 +15,7 @@ import {
   Bell,
   BellRing,
   LinkIcon,
-  Disconnect 
+  PowerOff // Replaced Disconnect with PowerOff
 } from 'lucide-react';
 import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
@@ -25,7 +25,7 @@ const WhatsAppConnection: React.FC = () => {
     connectionStatus, 
     qrCode, 
     isLoading,
-    error,
+    connectionError, // renamed from error to match context type
     metrics,
     connectWhatsApp, 
     disconnectWhatsApp,
@@ -205,10 +205,10 @@ const WhatsAppConnection: React.FC = () => {
             )}
             
             {/* Error Display */}
-            {error && (
+            {connectionError && (
               <Alert className="bg-red-900 border-red-800 text-white mb-4">
                 <AlertTitle className="text-red-200">Erro</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
+                <AlertDescription>{connectionError}</AlertDescription>
               </Alert>
             )}
             
@@ -254,7 +254,7 @@ const WhatsAppConnection: React.FC = () => {
                   onClick={handleDisconnect}
                   disabled={isLoading}
                 >
-                  <Disconnect className="mr-2 h-4 w-4" />
+                  <PowerOff className="mr-2 h-4 w-4" />
                   Desconectar WhatsApp
                 </Button>
               )}
