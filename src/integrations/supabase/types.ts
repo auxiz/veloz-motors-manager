@@ -744,7 +744,9 @@ export type Database = {
         }[]
       }
       investor_has_vehicle_access: {
-        Args: { user_id: string; vehicle_id: string }
+        Args:
+          | Record<PropertyKey, never>
+          | { user_id: string; vehicle_id: string }
         Returns: boolean
       }
       remove_salesperson_category: {

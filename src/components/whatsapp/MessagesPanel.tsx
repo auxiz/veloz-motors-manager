@@ -33,15 +33,15 @@ const MessagesPanel: React.FC = () => {
     if (!selectedLead || !inputMessage.trim()) return;
     
     try {
-      const success = await sendMessage(
+      // Send the message and handle the void return type
+      await sendMessage(
         selectedLead.phone_number,
         inputMessage.trim(),
         selectedLead.id
       );
       
-      if (success) {
-        setInputMessage('');
-      }
+      // Clear the input field after sending
+      setInputMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }

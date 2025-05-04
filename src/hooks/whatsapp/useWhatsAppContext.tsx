@@ -1,4 +1,3 @@
-
 import React, { createContext, useState, useContext, useEffect, ReactNode } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { supabase } from '@/integrations/supabase/client';
@@ -151,8 +150,9 @@ export const WhatsAppProvider: React.FC<{ children: ReactNode }> = ({ children }
     }
   };
 
-  const sendMessage = async (phoneNumber: string, message: string, leadId: string): Promise<boolean> => {
-    return sendMessageToLead(phoneNumber, message, leadId, user?.id);
+  // Updated to match the Promise<void> return type in WhatsAppContextType
+  const sendMessage = async (phoneNumber: string, message: string, leadId: string): Promise<void> => {
+    await sendMessageToLead(phoneNumber, message, leadId, user?.id);
   };
 
   // Update selected lead if it exists in the new data after fetching leads

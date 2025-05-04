@@ -72,9 +72,9 @@ export interface WhatsAppContextType {
   selectLead: (lead: Lead | null) => void;
   fetchLeads: () => Promise<void>;
   fetchMessages: (leadId: string) => Promise<void>;
-  sendMessage: (phoneNumber: string, message: string, leadId: string) => Promise<boolean>;
-  connectWhatsApp: () => Promise<void>; // Changed return type to Promise<void>
-  disconnectWhatsApp: () => Promise<void>; // Changed return type to Promise<void>
+  sendMessage: (phoneNumber: string, message: string, leadId: string) => Promise<void>; // Updated to return Promise<void>
+  connectWhatsApp: () => Promise<void>;
+  disconnectWhatsApp: () => Promise<void>;
   reconnectWhatsApp: () => Promise<void>;
   checkConnectionStatus: () => Promise<void>;
   refreshQRCode: () => Promise<void>;
