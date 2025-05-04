@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { QrCode, RefreshCw } from 'lucide-react';
 import { Button } from "@/components/ui/button";
 
@@ -15,13 +15,21 @@ export const QRCodeDisplay: React.FC<QRCodeDisplayProps> = ({
   isLoading
 }) => {
   // Log QR code info for debugging
-  React.useEffect(() => {
+  useEffect(() => {
     console.log("QR Code available:", !!qrCode, "length:", qrCode?.length || 0);
     
     if (!qrCode?.startsWith('data:image')) {
       console.error("Invalid QR code format:", qrCode?.substring(0, 20));
     }
-  }, [qrCode]);
+    
+    // Set up automatic refresh timer (QR codes typically expire after 20-30 seconds)
+    const refreshTimer = setTimeout(() => {
+      console.log("QR Code may be expired, refreshing...");
+      onRefreshQR();
+    }, 25000); // Refresh after 25 seconds
+    
+    return () => clearTimeout(refreshTimer);
+  }, [qrCode, onRefreshQR]);
 
   return (
     <div className="my-4 flex flex-col items-center p-4 bg-white rounded-lg w-full max-w-xs mx-auto">

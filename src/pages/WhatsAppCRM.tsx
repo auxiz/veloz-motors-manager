@@ -1,5 +1,5 @@
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { AuthGuard } from '@/components/auth/AuthGuard';
 import WhatsAppConnection from '@/components/whatsapp/WhatsAppConnection';
@@ -11,7 +11,19 @@ import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
 import { Separator } from '@/components/ui/separator';
 
 const WhatsAppCRM = () => {
-  const { selectedLead } = useWhatsAppContext();
+  const { selectedLead, connectionStatus, checkConnectionStatus } = useWhatsAppContext();
+  const [activeTab, setActiveTab] = useState("leads");
+  
+  // Auto-switch to connection tab if disconnected
+  useEffect(() => {
+    // Initialize connection check
+    checkConnectionStatus();
+    
+    // If connection is disconnected, switch to connection tab
+    if (connectionStatus === 'disconnected') {
+      setActiveTab('connection');
+    }
+  }, [connectionStatus]);
   
   return (
     <AuthGuard allowedRoles={['administrator', 'seller']}>
@@ -22,7 +34,7 @@ const WhatsAppCRM = () => {
         
         <Separator />
         
-        <Tabs defaultValue="leads" className="w-full">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
           <TabsList className="w-full justify-start bg-veloz-gray">
             <TabsTrigger value="leads" className="text-white">
               Leads

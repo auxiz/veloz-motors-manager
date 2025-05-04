@@ -12,6 +12,8 @@ export const useCheckConnectionStatus = (
 ) => {
   const checkConnectionStatus = async (): Promise<void> => {
     try {
+      setIsLoading(true);
+      
       // First try to fetch connection data from the database
       const { data: dbData, error: dbError } = await supabase
         .from('whatsapp_connection')
@@ -25,10 +27,17 @@ export const useCheckConnectionStatus = (
       } else {
         // If we have DB data, use it
         if (dbData) {
-          setConnectionStatus(dbData.is_connected ? 'connected' : 'disconnected');
-          setQrCode(dbData.qr_code);
+          const isConnected = dbData.is_connected;
+          setConnectionStatus(isConnected ? 'connected' : 'disconnected');
+          
+          // If there's a QR code in the DB and we're not connected, show it
+          if (!isConnected && dbData.qr_code) {
+            setQrCode(dbData.qr_code);
+          }
+          
           setConnectionError(null);
-          console.log('Connection status from DB:', dbData.is_connected ? 'connected' : 'disconnected');
+          console.log('Connection status from DB:', isConnected ? 'connected' : 'disconnected');
+          setIsLoading(false);
           return;
         }
       }
@@ -42,13 +51,16 @@ export const useCheckConnectionStatus = (
         console.error('Error checking connection status:', edgeError);
         setConnectionError(`Error checking status: ${edgeError.message}`);
         // Don't change connection status here
+        setIsLoading(false);
         return;
       }
       
       if (edgeData) {
-        setConnectionStatus(edgeData.isConnected ? 'connected' : 'disconnected');
+        const isConnected = edgeData.isConnected;
+        setConnectionStatus(isConnected ? 'connected' : 'disconnected');
         
-        if (edgeData.qrCode) {
+        // If we're not connected and there's a QR code, show it
+        if (!isConnected && edgeData.qrCode) {
           setQrCode(edgeData.qrCode);
         }
         

@@ -56,6 +56,14 @@ const WhatsAppConnection: React.FC = () => {
     await refreshQRCode();
   };
 
+  // Effect to automatically connect or get QR code when component mounts
+  useEffect(() => {
+    if (user && connectionStatus === 'disconnected') {
+      console.log('Auto-initiating connection flow on component mount');
+      connectWhatsApp();
+    }
+  }, [user, connectionStatus]);
+
   // Check connection status on initial load and set up polling with backoff
   useEffect(() => {
     console.log('WhatsAppConnection component mounted');
@@ -156,8 +164,8 @@ const WhatsAppConnection: React.FC = () => {
               metrics={metrics}
             />
             
-            {/* QR Code Display Section - Fixed visibility condition */}
-            {qrCode && connectionStatus !== 'connected' && (
+            {/* QR Code Display Section - Show QR code when disconnected or while connecting */}
+            {((connectionStatus === 'disconnected' || connectionStatus === 'connecting') && qrCode) && (
               <QRCodeDisplay 
                 qrCode={qrCode} 
                 onRefreshQR={handleRefreshQR} 
