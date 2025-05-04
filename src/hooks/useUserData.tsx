@@ -22,7 +22,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'administrator'
+        role: 'administrator',
+        status: 'approved'
       }
     },
     { 
@@ -36,7 +37,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'seller'
+        role: 'seller',
+        status: 'approved'
       }
     },
     { 
@@ -50,7 +52,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'financial'
+        role: 'financial',
+        status: 'approved'
       }
     },
     { 
@@ -64,7 +67,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'seller'
+        role: 'seller',
+        status: 'approved'
       }
     },
     { 
@@ -78,7 +82,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'seller'
+        role: 'seller',
+        status: 'approved'
       }
     },
     { 
@@ -92,7 +97,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'dispatcher'
+        role: 'dispatcher',
+        status: 'approved'
       }
     },
     { 
@@ -106,7 +112,8 @@ export function useUserData() {
         avatar_url: null,
         updated_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
-        role: 'dispatcher'
+        role: 'dispatcher',
+        status: 'approved'
       }
     }
   ]);

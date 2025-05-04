@@ -15,7 +15,7 @@ import { RoleField } from './fields/RoleField';
 const formSchema = z.object({
   email: z.string().email({ message: 'Email inválido' }),
   name: z.string().min(1, { message: 'Nome é obrigatório' }),
-  role: z.enum(['administrator', 'seller', 'financial', 'dispatcher']),
+  role: z.enum(['administrator', 'seller', 'financial', 'dispatcher', 'investor']),
 });
 
 export type UserFormValues = z.infer<typeof formSchema>;

@@ -18,6 +18,7 @@ import { PendingUsersList } from './user-management/PendingUsersList';
 import { SetUserRoleDialog } from './user-management/SetUserRoleDialog';
 import { AuthUser } from '@/types/auth';
 import { toast } from 'sonner';
+import { UserData } from '@/hooks/useUserData';
 
 const UserManagement = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -47,8 +48,25 @@ const UserManagement = () => {
     }
   };
 
-  const pendingUsers = users.filter(user => 
-    user.profile?.status === 'pending'
+  // Convert UserData[] to AuthUser[] for compatibility with PendingUsersList
+  const convertToAuthUsers = (users: UserData[]): AuthUser[] => {
+    return users.map(user => {
+      // Create a minimal AuthUser object with the required properties
+      return {
+        id: user.id,
+        email: user.email,
+        profile: user.profile,
+        // Add minimal required properties from SupabaseUser
+        app_metadata: {},
+        user_metadata: {},
+        aud: 'authenticated',
+        created_at: user.profile?.created_at || new Date().toISOString()
+      } as AuthUser;
+    });
+  };
+
+  const pendingUsers = convertToAuthUsers(
+    users.filter(user => user.profile?.status === 'pending')
   );
 
   const activeUsers = users.filter(user => 
