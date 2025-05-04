@@ -1,9 +1,9 @@
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
-import { Loader, RefreshCw, Smartphone, WifiOff } from 'lucide-react';
+import { Loader, RefreshCw, Smartphone, WifiOff, QrCode } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { useUsers } from '@/hooks/useUsers';
 
@@ -24,6 +24,11 @@ const WhatsAppConnection: React.FC = () => {
   const handleRefresh = async () => {
     await checkConnectionStatus();
   };
+
+  // Check connection status on initial load
+  useEffect(() => {
+    checkConnectionStatus();
+  }, []);
   
   return (
     <div className="space-y-6">
@@ -60,11 +65,25 @@ const WhatsAppConnection: React.FC = () => {
               </span>
             </div>
             
-            {/* QR Code Display - Now shows when connecting OR when QR code is available */}
+            {/* QR Code Display Section */}
             {qrCode && (
-              <div className="my-4">
-                <p className="text-center mb-2">Escaneie este QR code com WhatsApp no seu celular</p>
-                <img src={qrCode} alt="WhatsApp QR Code" className="mx-auto max-w-xs" />
+              <div className="my-4 flex flex-col items-center p-4 bg-white rounded-lg">
+                <div className="flex items-center mb-2 text-black">
+                  <QrCode className="mr-2 text-black" size={20} />
+                  <p className="font-medium">Escaneie este QR code com WhatsApp no seu celular</p>
+                </div>
+                <div className="p-3 bg-white rounded-lg shadow-md">
+                  <img 
+                    src={qrCode} 
+                    alt="WhatsApp QR Code" 
+                    className="mx-auto max-w-xs"
+                    onError={(e) => {
+                      console.error('Error loading QR code image');
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
+                </div>
+                <p className="mt-2 text-sm text-black">O QR Code expirará após alguns minutos</p>
               </div>
             )}
             

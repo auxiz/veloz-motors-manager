@@ -23,16 +23,17 @@ export const useConnection = () => {
         throw error;
       }
       
-      if (data.qrCode) {
-        console.log('QR Code recebido:', data.qrCode.substring(0, 50) + '...');
+      if (data && data.qrCode) {
+        console.log('QR Code received successfully');
         setQrCode(data.qrCode);
         toast.success('QR Code gerado com sucesso. Escaneie com seu celular.');
+        return true;
       } else {
-        console.log('QR Code não recebido na resposta:', data);
+        console.error('QR Code missing from response:', data);
         toast.error('QR Code não foi recebido. Tente novamente.');
+        setConnectionStatus('disconnected');
+        return false;
       }
-      
-      return true;
     } catch (error) {
       console.error('Error connecting to WhatsApp:', error);
       toast.error('Falha ao conectar ao WhatsApp');
