@@ -53,7 +53,7 @@ export function useProfiles() {
           role: role,
           status: 'pending',
           updated_at: new Date().toISOString(),
-        });
+        } as UserProfile);
 
       if (profileError) throw profileError;
 
@@ -149,7 +149,7 @@ export function useProfiles() {
       // Here we're just updating the profile status
       const { error } = await supabase
         .from('profiles')
-        .update({ status: 'rejected' })
+        .update({ status: 'rejected' } as Partial<UserProfile>)
         .eq('id', userId);
 
       if (error) throw error;
@@ -173,7 +173,7 @@ export function useProfiles() {
       
       const { error } = await supabase
         .from('profiles')
-        .update({ status })
+        .update({ status } as Partial<UserProfile>)
         .eq('id', userId);
 
       if (error) throw error;
@@ -194,7 +194,7 @@ export function useProfiles() {
       
       const { error } = await supabase
         .from('profiles')
-        .update({ role })
+        .update({ role } as Partial<UserProfile>)
         .eq('id', userId);
 
       if (error) throw error;
