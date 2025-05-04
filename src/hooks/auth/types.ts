@@ -8,7 +8,7 @@ export interface UserProfile {
   avatar_url: string | null;
   updated_at: string;
   created_at: string;
-  role: 'administrator' | 'seller' | 'dispatcher' | 'financial';
+  role: 'administrator' | 'seller' | 'dispatcher' | 'financial' | 'investor';
 }
 
 export interface AuthError {

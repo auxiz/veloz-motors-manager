@@ -348,6 +348,35 @@ export type Database = {
         }
         Relationships: []
       }
+      vehicle_investor_access: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+          vehicle_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+          vehicle_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+          vehicle_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "vehicle_investor_access_vehicle_id_fkey"
+            columns: ["vehicle_id"]
+            isOneToOne: false
+            referencedRelation: "vehicles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       vehicles: {
         Row: {
           brand: string
@@ -438,9 +467,18 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: string
       }
+      investor_has_vehicle_access: {
+        Args: { user_id: string; vehicle_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
-      [_ in never]: never
+      app_role:
+        | "administrator"
+        | "seller"
+        | "financial"
+        | "dispatcher"
+        | "investor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -555,6 +593,14 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_role: [
+        "administrator",
+        "seller",
+        "financial",
+        "dispatcher",
+        "investor",
+      ],
+    },
   },
 } as const

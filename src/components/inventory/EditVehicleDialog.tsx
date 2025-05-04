@@ -11,6 +11,7 @@ import {
 import { VehicleForm, VehicleFormData } from './vehicle-form/VehicleForm';
 import { toast } from 'sonner';
 import { DeleteSaleConfirmDialog } from './DeleteSaleConfirmDialog';
+import { useInvestors } from '@/hooks/useInvestors';
 
 interface EditVehicleDialogProps {
   open: boolean;
@@ -25,6 +26,7 @@ export const EditVehicleDialog = ({
 }: EditVehicleDialogProps) => {
   const { updateVehicle } = useVehicles();
   const { getSalesByVehicleId, deleteSale } = useSales();
+  const { updateVehicleAccess } = useInvestors();
   const [relatedSale, setRelatedSale] = useState<Sale | null>(null);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [pendingFormData, setPendingFormData] = useState<VehicleFormData | null>(null);
@@ -70,6 +72,7 @@ export const EditVehicleDialog = ({
     if (!vehicle) return;
     
     try {
+      // Update vehicle data
       await updateVehicle.mutateAsync({
         ...vehicle,
         brand: data.brand,
@@ -89,9 +92,20 @@ export const EditVehicleDialog = ({
         photos: data.photos || vehicle.photos,
         status: data.status
       });
+
+      // Update investor access if provided
+      if (data.investorAccess) {
+        await updateVehicleAccess.mutateAsync({
+          vehicleId: vehicle.id,
+          investorIds: data.investorAccess
+        });
+      }
+      
+      toast.success('Veículo atualizado com sucesso');
       onOpenChange(false);
     } catch (error) {
       console.error('Error updating vehicle:', error);
+      toast.error('Erro ao atualizar veículo');
     }
   };
 
@@ -144,6 +158,7 @@ export const EditVehicleDialog = ({
           <VehicleForm 
             onSubmit={handleSubmit} 
             isLoading={updateVehicle.isPending}
+            vehicleId={vehicle.id}
             initialData={{
               brand: vehicle.brand,
               model: vehicle.model,

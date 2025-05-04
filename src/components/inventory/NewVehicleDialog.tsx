@@ -10,11 +10,13 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { VehicleForm, VehicleFormData } from './vehicle-form/VehicleForm';
+import { useInvestors } from '@/hooks/useInvestors';
+import { toast } from 'sonner';
 
 interface NewVehicleDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  initialData?: Partial<VehicleFormData>; // Add initialData prop
+  initialData?: Partial<VehicleFormData>;
 }
 
 export const NewVehicleDialog = ({ 
@@ -23,10 +25,12 @@ export const NewVehicleDialog = ({
   initialData 
 }: NewVehicleDialogProps) => {
   const { addVehicle } = useVehicles();
+  const { updateVehicleAccess } = useInvestors();
 
   const handleSubmit = async (data: VehicleFormData) => {
     try {
-      await addVehicle.mutateAsync({
+      // First, add the vehicle to get its ID
+      const newVehicle = await addVehicle.mutateAsync({
         brand: data.brand,
         model: data.model,
         version: data.version || null,
@@ -45,9 +49,20 @@ export const NewVehicleDialog = ({
         photos: data.photos || null,
         internal_notes: data.internal_notes || '',
       });
+
+      // Then update investor access if provided
+      if (data.investorAccess && data.investorAccess.length > 0 && newVehicle.id) {
+        await updateVehicleAccess.mutateAsync({
+          vehicleId: newVehicle.id,
+          investorIds: data.investorAccess
+        });
+        toast.success('Acesso de investidores configurado com sucesso!');
+      }
+      
       onOpenChange(false);
     } catch (error) {
       console.error('Error adding vehicle:', error);
+      toast.error('Erro ao adicionar veículo');
     }
   };
 

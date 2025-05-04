@@ -62,7 +62,7 @@ const App = () => (
                 </AuthGuard>
               } />
               <Route path="/consulta-placa" element={
-                <AuthGuard>
+                <AuthGuard allowedRoles={['administrator', 'seller', 'financial', 'dispatcher']}>
                   <ConsultaPlaca />
                 </AuthGuard>
               } />
@@ -72,7 +72,7 @@ const App = () => (
                 </AuthGuard>
               } />
               <Route path="/clientes" element={
-                <AuthGuard>
+                <AuthGuard allowedRoles={['administrator', 'seller', 'financial', 'dispatcher']}>
                   <Clientes />
                 </AuthGuard>
               } />

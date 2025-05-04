@@ -42,6 +42,7 @@ export function RoleField({ control }: RoleFieldProps) {
                 <SelectItem value="seller">Vendedor</SelectItem>
                 <SelectItem value="financial">Financeiro</SelectItem>
                 <SelectItem value="dispatcher">Despachante</SelectItem>
+                <SelectItem value="investor">Investidor</SelectItem>
               </SelectContent>
             </Select>
           </FormControl>

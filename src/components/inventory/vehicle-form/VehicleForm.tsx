@@ -14,16 +14,22 @@ import { PlateSearchButton } from "./PlateSearchButton";
 import { usePlateSearch } from "./hooks/usePlateSearch";
 import { PhotosField } from "./fields/PhotosField";
 import { StatusField } from "./fields/StatusField";
+import { InvestorAccessField } from "./fields/InvestorAccessField";
+import { useUsers } from "@/hooks/useUsers";
 
 interface VehicleFormProps {
   onSubmit: (data: VehicleFormData) => void;
   isLoading?: boolean;
   initialData?: Partial<VehicleFormData>;
+  vehicleId?: string;
 }
 
 export type { VehicleFormData } from "./VehicleFormSchema";
 
-export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormProps) {
+export function VehicleForm({ onSubmit, isLoading, initialData, vehicleId }: VehicleFormProps) {
+  const { user } = useUsers();
+  const isAdmin = user?.profile?.role === 'administrator';
+  
   const form = useForm<VehicleFormData>({
     resolver: zodResolver(vehicleSchema),
     defaultValues: {
@@ -43,15 +49,20 @@ export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormPro
       internal_notes: initialData?.internal_notes || "",
       photos: initialData?.photos || [],
       status: initialData?.status || "in_stock",
+      investorAccess: initialData?.investorAccess || [],
     },
   });
 
   const { plateDialogOpen, setPlateDialogOpen, handleVehicleDataSelected } = usePlateSearch(form);
 
+  const handleFormSubmit = (data: VehicleFormData) => {
+    onSubmit(data);
+  };
+
   return (
     <>
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={form.handleSubmit(handleFormSubmit)} className="space-y-6">
           <div className="flex justify-end">
             <PlateSearchButton onClick={() => setPlateDialogOpen(true)} />
           </div>
@@ -69,6 +80,14 @@ export function VehicleForm({ onSubmit, isLoading, initialData }: VehicleFormPro
           </div>
 
           <NotesField form={form} />
+
+          {/* Show investor access field only to administrators */}
+          {isAdmin && (
+            <div className="border p-4 rounded-md bg-veloz-black/30">
+              <h3 className="text-base font-medium mb-3">Acesso para Investidores</h3>
+              <InvestorAccessField form={form} vehicleId={vehicleId} />
+            </div>
+          )}
 
           <div className="flex justify-end gap-3">
             <Button

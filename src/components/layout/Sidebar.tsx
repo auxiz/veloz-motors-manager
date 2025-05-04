@@ -15,18 +15,18 @@ export const Sidebar = ({ open, onClose }: SidebarProps) => {
   const isMobile = useIsMobile();
   const location = useLocation();
   
-  // Certifique-se de que o papel do usuário é 'administrator' para conta autenticada
+  // Make sure the user role is available
   const userRole = user?.profile?.role || 'administrator';
   
   console.log("Current user role:", userRole, "User:", user?.email);
   
-  // Definir visibilidade dos itens baseado no papel do usuário
+  // Define visibility of menu items based on user role
   const navItems = [
     { name: 'Dashboard', path: '/dashboard', icon: <BarChart size={20} />, visible: true },
     { name: 'Estoque', path: '/estoque', icon: <Car size={20} />, visible: true },
-    { name: 'Consulta por Placa', path: '/consulta-placa', icon: <Search size={20} />, visible: true },
+    { name: 'Consulta por Placa', path: '/consulta-placa', icon: <Search size={20} />, visible: userRole !== 'investor' },
     { name: 'Vendas', path: '/vendas', icon: <DollarSign size={20} />, visible: ['administrator', 'seller'].includes(userRole) },
-    { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: true },
+    { name: 'Clientes', path: '/clientes', icon: <User size={20} />, visible: userRole !== 'investor' },
     { name: 'Financeiro', path: '/financeiro', icon: <File size={20} />, visible: ['administrator', 'financial'].includes(userRole) },
     { name: 'Relatórios', path: '/relatorios', icon: <Package size={20} />, visible: ['administrator', 'seller', 'financial'].includes(userRole) },
     { name: 'Configurações', path: '/configuracoes', icon: <Settings size={20} />, visible: true },
