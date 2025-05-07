@@ -1,13 +1,9 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
 import { useWhatsAppContext } from '@/hooks/whatsapp/useWhatsAppContext';
 import { useUsers } from '@/hooks/useUsers';
-import { 
-  Loader, 
-  Smartphone, 
-  WifiOff
-} from 'lucide-react';
+import { Smartphone, WifiOff, Loader } from 'lucide-react';
 import { toast } from 'sonner';
 import { ConnectionHeader } from './connection/ConnectionHeader';
 import { ConnectionStatus } from './connection/ConnectionStatus';
@@ -16,6 +12,8 @@ import { ConnectionError } from './connection/ConnectionError';
 import { AdminWarning } from './connection/AdminWarning';
 import { ConnectionActions } from './connection/ConnectionActions';
 import { ConnectionInstructions } from './connection/ConnectionInstructions';
+import { ConnectionInitializer } from './connection/ConnectionInitializer';
+import { StatusPoller } from './connection/StatusPoller';
 
 const WhatsAppConnection: React.FC = () => {
   const { 
@@ -32,7 +30,6 @@ const WhatsAppConnection: React.FC = () => {
   } = useWhatsAppContext();
   
   const { user } = useUsers();
-  const [checkAttempts, setCheckAttempts] = useState(0);
   const [initializingConnection, setInitializingConnection] = useState(false);
   
   const isAdmin = user?.profile?.role === 'administrator';
@@ -74,192 +71,114 @@ const WhatsAppConnection: React.FC = () => {
     await refreshQRCode();
   };
 
-  // Effect to automatically connect or get QR code when component mounts
-  // or when disconnected status is detected
-  useEffect(() => {
-    const initializeConnection = async () => {
-      if (!user) return;
-      
-      // Only auto-connect if we're disconnected and not already loading or initializing
-      if (connectionStatus === 'disconnected' && !isLoading && !initializingConnection) {
-        try {
-          console.log('Auto-initiating connection flow');
-          setInitializingConnection(true);
-          await connectWhatsApp();
-        } catch (error) {
-          console.error('Error in auto-connection:', error);
-        } finally {
-          setInitializingConnection(false);
-        }
-      }
-    };
-
-    initializeConnection();
-  }, [user, connectionStatus]);
-
-  // Check connection status on initial load and set up polling with backoff
-  useEffect(() => {
-    console.log('WhatsAppConnection component mounted');
-    
-    if (!user) {
-      console.log('User not logged in, skipping connection checks');
-      return;
-    }
-    
-    // Check status immediately
-    checkConnectionStatus();
-    
-    // Set up polling for status updates with exponential backoff
-    // Start with 30 seconds, max out at 5 minutes
-    const minInterval = 30000; // 30 seconds
-    const maxInterval = 300000; // 5 minutes
-    const backoffFactor = 1.5;
-    
-    let currentInterval = minInterval;
-    
-    const scheduleNextCheck = () => {
-      const timeoutId = setTimeout(async () => {
-        console.log(`Checking connection status, interval: ${currentInterval / 1000}s`);
-        
-        try {
-          await checkConnectionStatus();
-          // Successful check, reset interval
-          currentInterval = minInterval;
-          setCheckAttempts(0);
-        } catch (error) {
-          // Failed check, increase backoff
-          setCheckAttempts(prev => prev + 1);
-          currentInterval = Math.min(currentInterval * backoffFactor, maxInterval);
-          console.log(`Check failed, new interval: ${currentInterval / 1000}s`);
-        }
-        
-        // Schedule next check
-        scheduleNextCheck();
-      }, currentInterval);
-      
-      return timeoutId;
-    };
-    
-    const timeoutId = scheduleNextCheck();
-    
-    // Clean up on unmount
-    return () => {
-      clearTimeout(timeoutId);
-    };
-  }, [user?.id]);
-
-  // Debug rendering
-  useEffect(() => {
-    console.log('Render state:', { 
-      connectionStatus, 
-      qrCodeAvailable: !!qrCode,
-      isLoading,
-      connectionError,
-      user: !!user
-    });
-  }, [connectionStatus, qrCode, isLoading, connectionError, user]);
-  
-  // Handle situations where we're disconnected without a QR code
-  useEffect(() => {
-    // If we're disconnected without a QR code and not loading/initializing, 
-    // we should try to get a QR code for the user
-    if (
-      (connectionStatus === 'disconnected' || connectionStatus === 'connecting') && 
-      !qrCode && 
-      !isLoading && 
-      !initializingConnection && 
-      user
-    ) {
-      console.log('Disconnected without QR code, attempting to refresh');
-      refreshQRCode().catch(error => console.error('Error refreshing QR code:', error));
-    }
-  }, [connectionStatus, qrCode, isLoading, initializingConnection, user]);
-  
-  const getStatusIcon = () => {
-    switch (connectionStatus) {
-      case 'connected': return <Smartphone className="text-green-500" />;
-      case 'connecting': return <Loader className="text-yellow-500 animate-spin" />;
-      case 'disconnected': return <WifiOff className="text-red-500" />;
-      default: return <Loader className="text-gray-500 animate-spin" />;
-    }
-  };
-
-  // Don't show the component if user is not logged in
-  if (!user) {
+  // Set up connection initialization and status polling
+  if (user) {
+    // These components handle side effects without rendering UI
     return (
-      <div className="p-8 text-center">
-        <h2 className="text-xl font-medium mb-4">Login Required</h2>
-        <p>Please log in to access WhatsApp connection features.</p>
-      </div>
+      <>
+        <ConnectionInitializer 
+          connectionStatus={connectionStatus}
+          isLoading={isLoading}
+          userId={user?.id}
+          connectWhatsApp={connectWhatsApp}
+          refreshQRCode={refreshQRCode}
+          qrCode={qrCode}
+        />
+        
+        <StatusPoller 
+          userId={user?.id}
+          checkConnectionStatus={checkConnectionStatus}
+        />
+        
+        <div className="space-y-6">
+          <Card className="bg-veloz-gray text-white border-veloz-gray">
+            <CardHeader>
+              <ConnectionHeader 
+                connectionStatus={connectionStatus}
+                isLoading={isLoading || initializingConnection}
+                getStatusIcon={() => getStatusIcon(connectionStatus)}
+              />
+            </CardHeader>
+            
+            <CardContent>
+              <div className="flex flex-col items-center">
+                <ConnectionStatus 
+                  connectionStatus={connectionStatus} 
+                  isLoading={isLoading || initializingConnection} 
+                  metrics={metrics}
+                />
+                
+                {/* QR Code Display Section - Show when disconnected/connecting */}
+                {shouldShowQRCode(connectionStatus, qrCode, initializingConnection) ? (
+                  qrCode ? (
+                    <QRCodeDisplay 
+                      qrCode={qrCode} 
+                      onRefreshQR={handleRefreshQR} 
+                      isLoading={isLoading || initializingConnection} 
+                    />
+                  ) : (
+                    <div className="my-4 p-8 bg-white rounded-lg w-full max-w-xs mx-auto text-center">
+                      <Loader className="mx-auto text-black animate-spin mb-2" />
+                      <p className="text-black">Carregando QR Code...</p>
+                    </div>
+                  )
+                ) : null}
+                
+                {/* Error Display */}
+                {connectionError && (
+                  <ConnectionError error={connectionError} />
+                )}
+                
+                {/* Admin Access Warning */}
+                {!isAdmin && <AdminWarning />}
+              </div>
+            </CardContent>
+            
+            <CardFooter>
+              <ConnectionActions
+                connectionStatus={connectionStatus}
+                isLoading={isLoading || initializingConnection}
+                isAdmin={isAdmin}
+                onConnect={handleConnect}
+                onDisconnect={handleDisconnect}
+                onReconnect={handleReconnect}
+                onRefresh={handleRefresh}
+              />
+            </CardFooter>
+          </Card>
+          
+          <ConnectionInstructions />
+        </div>
+      </>
     );
   }
-  
-  // Determine whether to show the QR code
-  const shouldShowQRCode = 
-    (connectionStatus === 'disconnected' || connectionStatus === 'connecting') && 
-    (qrCode || initializingConnection);
-  
+
+  // Don't show the component if user is not logged in
   return (
-    <div className="space-y-6">
-      <Card className="bg-veloz-gray text-white border-veloz-gray">
-        <CardHeader>
-          <ConnectionHeader 
-            connectionStatus={connectionStatus}
-            isLoading={isLoading || initializingConnection}
-            getStatusIcon={getStatusIcon}
-          />
-        </CardHeader>
-        
-        <CardContent>
-          <div className="flex flex-col items-center">
-            <ConnectionStatus 
-              connectionStatus={connectionStatus} 
-              isLoading={isLoading || initializingConnection} 
-              metrics={metrics}
-            />
-            
-            {/* QR Code Display Section - Always show QR code when disconnected or connecting */}
-            {shouldShowQRCode ? (
-              qrCode ? (
-                <QRCodeDisplay 
-                  qrCode={qrCode} 
-                  onRefreshQR={handleRefreshQR} 
-                  isLoading={isLoading || initializingConnection} 
-                />
-              ) : (
-                <div className="my-4 p-8 bg-white rounded-lg w-full max-w-xs mx-auto text-center">
-                  <Loader className="mx-auto text-black animate-spin mb-2" />
-                  <p className="text-black">Carregando QR Code...</p>
-                </div>
-              )
-            ) : null}
-            
-            {/* Error Display */}
-            {connectionError && (
-              <ConnectionError error={connectionError} />
-            )}
-            
-            {/* Admin Access Warning */}
-            {!isAdmin && <AdminWarning />}
-          </div>
-        </CardContent>
-        
-        <CardFooter>
-          <ConnectionActions
-            connectionStatus={connectionStatus}
-            isLoading={isLoading || initializingConnection}
-            isAdmin={isAdmin}
-            onConnect={handleConnect}
-            onDisconnect={handleDisconnect}
-            onReconnect={handleReconnect}
-            onRefresh={handleRefresh}
-          />
-        </CardFooter>
-      </Card>
-      
-      <ConnectionInstructions />
+    <div className="p-8 text-center">
+      <h2 className="text-xl font-medium mb-4">Login Required</h2>
+      <p>Please log in to access WhatsApp connection features.</p>
     </div>
   );
+};
+
+// Helper functions extracted to reduce component complexity
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'connected': return <Smartphone className="text-green-500" />;
+    case 'connecting': return <Loader className="text-yellow-500 animate-spin" />;
+    case 'disconnected': return <WifiOff className="text-red-500" />;
+    default: return <Loader className="text-gray-500 animate-spin" />;
+  }
+};
+
+const shouldShowQRCode = (
+  status: string, 
+  qrCode: string | null, 
+  initializing: boolean
+) => {
+  return (status === 'disconnected' || status === 'connecting') && 
+    (qrCode || initializing);
 };
 
 export default WhatsAppConnection;

@@ -4,9 +4,9 @@ import { useDisconnectWhatsApp } from './useDisconnectWhatsApp';
 import { useReconnectWhatsApp } from './useReconnectWhatsApp';
 import { useCheckConnectionStatus } from './useCheckConnectionStatus';
 import { useRefreshQRCode } from './useRefreshQRCode';
-import { ConnectionStateSetters, ConnectionActionsReturn } from './types';
+import type { ConnectionStateSetters, ConnectionActionsReturn } from './types';
 
-export { ConnectionStateSetters, ConnectionActionsReturn };
+export type { ConnectionStateSetters, ConnectionActionsReturn };
 
 export const useConnectionActions = (
   stateSetters: ConnectionStateSetters

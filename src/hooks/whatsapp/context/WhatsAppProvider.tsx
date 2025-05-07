@@ -8,6 +8,7 @@ import { useWhatsAppActions } from './useWhatsAppActions';
 import { useSubscriptions } from './useSubscriptions';
 import { useSelectedLead } from './useSelectedLead';
 import { WhatsAppContextType, WhatsAppProviderProps } from './types';
+import { Lead } from '../types';
 
 export const WhatsAppContext = createContext<WhatsAppContextType | undefined>(undefined);
 
