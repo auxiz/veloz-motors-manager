@@ -1,5 +1,5 @@
 
-import React, { createContext, ReactNode } from 'react';
+import React, { createContext } from 'react';
 import { useUsers } from '@/hooks/useUsers';
 import { useLeads } from '../useLeads';
 import { useMessages } from '../useMessages';
@@ -47,7 +47,7 @@ export const WhatsAppProvider: React.FC<WhatsAppProviderProps> = ({ children }) 
     refreshQRCode
   } = useConnection();
 
-  // Get wrapped actions
+  // Get wrapped actions with proper return types
   const {
     connectWhatsApp,
     disconnectWhatsApp,

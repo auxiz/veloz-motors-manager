@@ -1,5 +1,5 @@
 
-import { ConnectionStatus } from '../types';
+import { Lead } from '../types';
 
 type UseWhatsAppActionsProps = {
   originalConnectWhatsApp: () => Promise<boolean>;
