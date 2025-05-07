@@ -18,7 +18,7 @@ export const WhatsAppProvider: React.FC<WhatsAppProviderProps> = ({ children }) 
     leads, 
     loading: leadsLoading, 
     fetchLeads, 
-    updateLead,
+    updateLead: originalUpdateLead,
     setLeads,
     autoRefreshEnabled,
     toggleAutoRefresh,
@@ -58,6 +58,11 @@ export const WhatsAppProvider: React.FC<WhatsAppProviderProps> = ({ children }) 
     sendMessageToLead,
     userId: user?.id
   });
+
+  // Adapt updateLead to match the expected signature
+  const updateLead = async (lead: Lead): Promise<void> => {
+    await originalUpdateLead(lead.id, lead);
+  };
 
   // Handle selected lead
   const { selectedLead, selectLead } = useSelectedLead({

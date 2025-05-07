@@ -4,23 +4,21 @@ import { useDisconnectWhatsApp } from './useDisconnectWhatsApp';
 import { useReconnectWhatsApp } from './useReconnectWhatsApp';
 import { useCheckConnectionStatus } from './useCheckConnectionStatus';
 import { useRefreshQRCode } from './useRefreshQRCode';
-import { ConnectionStatus, ConnectionMetrics } from '../../types';
+import { ConnectionStateSetters, ConnectionActionsReturn } from './types';
 
-export type ConnectionStateSetters = {
-  setConnectionStatus: (status: ConnectionStatus) => void;
-  setQrCode: (qrCode: string | null) => void;
-  setIsLoading: (isLoading: boolean) => void;
-  setConnectionError: (error: string | null) => void;
-  setMetrics: (metrics: ConnectionMetrics) => void;
-};
+export { ConnectionStateSetters, ConnectionActionsReturn };
 
-export const useConnectionActions = ({
-  setConnectionStatus,
-  setQrCode,
-  setIsLoading,
-  setConnectionError,
-  setMetrics
-}: ConnectionStateSetters) => {
+export const useConnectionActions = (
+  stateSetters: ConnectionStateSetters
+): ConnectionActionsReturn => {
+  const { 
+    setConnectionStatus, 
+    setQrCode, 
+    setIsLoading, 
+    setConnectionError, 
+    setMetrics 
+  } = stateSetters;
+  
   // Individual action hooks
   const { connectWhatsApp } = useConnectWhatsApp(
     setConnectionStatus,

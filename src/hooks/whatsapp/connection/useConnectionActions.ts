@@ -2,5 +2,5 @@
 import { ConnectionStateSetters, useConnectionActions } from './actions';
 
 // This file now just re-exports the hook from the actions folder
-// to maintain backwards compatibility with existing imports
-export { useConnectionActions };
+// to maintain backward compatibility with existing imports
+export { useConnectionActions, ConnectionStateSetters };
