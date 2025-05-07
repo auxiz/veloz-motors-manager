@@ -8,6 +8,7 @@ import {
   Smartphone, 
   WifiOff
 } from 'lucide-react';
+import { toast } from 'sonner';
 import { ConnectionHeader } from './connection/ConnectionHeader';
 import { ConnectionStatus } from './connection/ConnectionStatus';
 import { QRCodeDisplay } from './connection/QRCodeDisplay';
@@ -32,12 +33,21 @@ const WhatsAppConnection: React.FC = () => {
   
   const { user } = useUsers();
   const [checkAttempts, setCheckAttempts] = useState(0);
+  const [initializingConnection, setInitializingConnection] = useState(false);
   
   const isAdmin = user?.profile?.role === 'administrator';
   
   const handleConnect = async () => {
-    console.log('Connect button clicked');
-    await connectWhatsApp();
+    try {
+      setInitializingConnection(true);
+      console.log('Connect button clicked');
+      await connectWhatsApp();
+    } catch (error) {
+      console.error('Error connecting to WhatsApp:', error);
+      toast.error('Erro ao conectar ao WhatsApp');
+    } finally {
+      setInitializingConnection(false);
+    }
   };
   
   const handleDisconnect = async () => {
@@ -45,7 +55,15 @@ const WhatsAppConnection: React.FC = () => {
   };
   
   const handleReconnect = async () => {
-    await reconnectWhatsApp();
+    try {
+      setInitializingConnection(true);
+      await reconnectWhatsApp();
+    } catch (error) {
+      console.error('Error reconnecting to WhatsApp:', error);
+      toast.error('Erro ao reconectar ao WhatsApp');
+    } finally {
+      setInitializingConnection(false);
+    }
   };
   
   const handleRefresh = async () => {
@@ -57,11 +75,26 @@ const WhatsAppConnection: React.FC = () => {
   };
 
   // Effect to automatically connect or get QR code when component mounts
+  // or when disconnected status is detected
   useEffect(() => {
-    if (user && connectionStatus === 'disconnected') {
-      console.log('Auto-initiating connection flow on component mount');
-      connectWhatsApp();
-    }
+    const initializeConnection = async () => {
+      if (!user) return;
+      
+      // Only auto-connect if we're disconnected and not already loading or initializing
+      if (connectionStatus === 'disconnected' && !isLoading && !initializingConnection) {
+        try {
+          console.log('Auto-initiating connection flow');
+          setInitializingConnection(true);
+          await connectWhatsApp();
+        } catch (error) {
+          console.error('Error in auto-connection:', error);
+        } finally {
+          setInitializingConnection(false);
+        }
+      }
+    };
+
+    initializeConnection();
   }, [user, connectionStatus]);
 
   // Check connection status on initial load and set up polling with backoff
@@ -126,6 +159,22 @@ const WhatsAppConnection: React.FC = () => {
     });
   }, [connectionStatus, qrCode, isLoading, connectionError, user]);
   
+  // Handle situations where we're disconnected without a QR code
+  useEffect(() => {
+    // If we're disconnected without a QR code and not loading/initializing, 
+    // we should try to get a QR code for the user
+    if (
+      (connectionStatus === 'disconnected' || connectionStatus === 'connecting') && 
+      !qrCode && 
+      !isLoading && 
+      !initializingConnection && 
+      user
+    ) {
+      console.log('Disconnected without QR code, attempting to refresh');
+      refreshQRCode().catch(error => console.error('Error refreshing QR code:', error));
+    }
+  }, [connectionStatus, qrCode, isLoading, initializingConnection, user]);
+  
   const getStatusIcon = () => {
     switch (connectionStatus) {
       case 'connected': return <Smartphone className="text-green-500" />;
@@ -145,13 +194,18 @@ const WhatsAppConnection: React.FC = () => {
     );
   }
   
+  // Determine whether to show the QR code
+  const shouldShowQRCode = 
+    (connectionStatus === 'disconnected' || connectionStatus === 'connecting') && 
+    (qrCode || initializingConnection);
+  
   return (
     <div className="space-y-6">
       <Card className="bg-veloz-gray text-white border-veloz-gray">
         <CardHeader>
           <ConnectionHeader 
             connectionStatus={connectionStatus}
-            isLoading={isLoading}
+            isLoading={isLoading || initializingConnection}
             getStatusIcon={getStatusIcon}
           />
         </CardHeader>
@@ -160,18 +214,25 @@ const WhatsAppConnection: React.FC = () => {
           <div className="flex flex-col items-center">
             <ConnectionStatus 
               connectionStatus={connectionStatus} 
-              isLoading={isLoading} 
+              isLoading={isLoading || initializingConnection} 
               metrics={metrics}
             />
             
-            {/* QR Code Display Section - Show QR code when disconnected or while connecting */}
-            {((connectionStatus === 'disconnected' || connectionStatus === 'connecting') && qrCode) && (
-              <QRCodeDisplay 
-                qrCode={qrCode} 
-                onRefreshQR={handleRefreshQR} 
-                isLoading={isLoading} 
-              />
-            )}
+            {/* QR Code Display Section - Always show QR code when disconnected or connecting */}
+            {shouldShowQRCode ? (
+              qrCode ? (
+                <QRCodeDisplay 
+                  qrCode={qrCode} 
+                  onRefreshQR={handleRefreshQR} 
+                  isLoading={isLoading || initializingConnection} 
+                />
+              ) : (
+                <div className="my-4 p-8 bg-white rounded-lg w-full max-w-xs mx-auto text-center">
+                  <Loader className="mx-auto text-black animate-spin mb-2" />
+                  <p className="text-black">Carregando QR Code...</p>
+                </div>
+              )
+            ) : null}
             
             {/* Error Display */}
             {connectionError && (
@@ -186,7 +247,7 @@ const WhatsAppConnection: React.FC = () => {
         <CardFooter>
           <ConnectionActions
             connectionStatus={connectionStatus}
-            isLoading={isLoading}
+            isLoading={isLoading || initializingConnection}
             isAdmin={isAdmin}
             onConnect={handleConnect}
             onDisconnect={handleDisconnect}

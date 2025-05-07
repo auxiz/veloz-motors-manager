@@ -19,19 +19,27 @@ export const useRefreshQRCode = (
       
       if (error) {
         console.error('Error refreshing QR code:', error);
-        toast.error('Erro ao atualizar QR Code');
+        toast.error('Erro ao atualizar QR Code: ' + error.message);
+        return;
+      }
+      
+      if (data.success === false) {
+        console.error('QR Code refresh failed:', data.message);
+        toast.error(data.message || 'Erro ao atualizar QR Code');
         return;
       }
       
       if (data.qrCode) {
+        console.log('New QR Code received, length:', data.qrCode.length);
         setQrCode(data.qrCode);
-        toast.success('QR Code atualizado');
+        toast.success('QR Code atualizado com sucesso');
       } else {
+        console.warn('No QR Code in response');
         toast.info('QR Code não disponível no momento');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error refreshing QR code:', error);
-      toast.error('Erro ao atualizar QR Code');
+      toast.error('Erro ao atualizar QR Code: ' + (error.message || error));
     } finally {
       setIsLoading(false);
     }
